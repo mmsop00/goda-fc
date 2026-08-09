@@ -10,9 +10,9 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-// Admin credentials from environment variables
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@goda-fc.vn";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "GODA2026!";
+// Admin credentials from environment variables (trimmed for safety)
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "admin@goda-fc.vn").trim();
+const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || "GODA2026!").trim();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   // No adapter needed — JWT strategy stores session in token
