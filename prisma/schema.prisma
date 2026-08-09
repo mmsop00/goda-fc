@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -100,8 +100,8 @@ model Match {
   opponent       String
   opponentScore  Int      @default(0)
   godaScore      Int      @default(0)
-  godaLineup     String   @default("[]")
-  opponentLineup String   @default("[]")
+  godaLineup     Json     @default("[]")
+  opponentLineup Json     @default("[]")
   mvp            String?
   imageUrl       String   @default("")
   videoUrl       String?
@@ -153,7 +153,7 @@ model NewsItem {
 model HallOfFameEntry {
   id          String   @id @default(cuid())
   name        String
-  categories  String   @default("")
+  categories  String[]
   title       String
   year        String
   description String
