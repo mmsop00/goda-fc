@@ -1,0 +1,184 @@
+// ═══════════════════════════════════════
+// GODA FC — Prisma Schema (PostgreSQL)
+// ═══════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════
+// Auth — NextAuth.js v5
+// ═══════════════════════════════════════
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          String    @default("editor") // admin | editor
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ═══════════════════════════════════════
+// Club Data
+// ═══════════════════════════════════════
+
+model Member {
+  id        String   @id @default(cuid())
+  name      String
+  nickname  String
+  position  String   // Thủ môn | Hậu vệ | Tiền vệ | Tiền đạo
+  number    Int
+  avatarUrl String   @default("")
+  matches   Int      @default(0)
+  goals     Int      @default(0)
+  assists   Int      @default(0)
+  mvp       Int      @default(0)
+  birthday  String?  // DD/MM
+  joinYear  Int?
+  status    String   @default("Đang thi đấu")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Match {
+  id             String   @id @default(cuid())
+  season         String
+  date           String   // DD/MM/YYYY
+  time           String   @default("16:00")
+  venue          String
+  type           String   @default("Giao hữu") // Giao hữu | Giải đấu | Cúp
+  tournament     String?
+  isHome         Boolean  @default(false)
+  opponent       String
+  opponentScore  Int      @default(0)
+  godaScore      Int      @default(0)
+  godaLineup     String   @default("[]")
+  opponentLineup String   @default("[]")
+  mvp            String?
+  imageUrl       String   @default("")
+  videoUrl       String?
+  googleMapsUrl  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  goals MatchGoal[]
+  cards MatchCard[]
+}
+
+model MatchGoal {
+  id      String @id @default(cuid())
+  matchId String
+  player  String
+  minute  Int
+  assist  String?
+  side    String // GODA | opponent
+
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+}
+
+model MatchCard {
+  id      String @id @default(cuid())
+  matchId String
+  player  String
+  minute  Int
+  type    String // yellow | red
+  side    String // GODA | opponent
+
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+}
+
+model NewsItem {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  summary      String
+  content      String
+  date         String   // DD/MM/YYYY
+  category     String   // Tin CLB | Trận đấu | Sinh nhật | Giải đấu | Kỷ niệm | Thông báo
+  author       String   @default("Ban truyền thông GODA FC")
+  thumbnailUrl String   @default("")
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model HallOfFameEntry {
+  id          String   @id @default(cuid())
+  name        String
+  categories  String   @default("")
+  title       String
+  year        String
+  description String
+  avatarUrl   String   @default("")
+  highlight   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Donor {
+  id        String   @id @default(cuid())
+  name      String
+  amount    Int
+  month     String?
+  anonymous Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model GalleryPhoto {
+  id           String   @id @default(cuid())
+  category     String   // Trận đấu | Sự kiện | Sinh hoạt | Kỷ niệm
+  title        String
+  date         String
+  thumbnailUrl String
+  fullUrl      String
+  createdAt    DateTime @default(now())
+}

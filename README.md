@@ -1,33 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GODA FC ⚽
 
-## Getting Started
+**Câu lạc bộ bóng đá GODA** — Thành lập 1994, Hà Nội.
 
-First, run the development server:
+Website chính thức + member portal + admin dashboard.
+
+---
+
+## Công nghệ
+
+- **Next.js** (App Router)
+- **TypeScript** (strict)
+- **Tailwind CSS** v4
+- **shadcn/ui** (New York style, Neutral base)
+- PostgreSQL (Supabase) + Prisma *(sẽ thiết lập ở Phase 2)*
+
+---
+
+## Chạy local
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở [http://localhost:3000](http://localhost:3000) trong trình duyệt.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Các lệnh
 
-## Learn More
+| Lệnh | Mô tả |
+|---|---|
+| `npm run dev` | Chạy development server tại `localhost:3000` |
+| `npm run build` | Build production |
+| `npm run start` | Chạy production server |
+| `npm run lint` | Kiểm tra ESLint |
+| `npm run typecheck` | Kiểm tra TypeScript (không emit file) |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Cấu trúc thư mục
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+goda-fc/
+├── src/
+│   ├── app/
+│   │   ├── (public)/       → Route gốc "/"
+│   │   ├── member/         → "/member" (khu vực thành viên)
+│   │   ├── admin/          → "/admin" (khu vực quản trị)
+│   │   ├── dev/ui-lab/     → "/dev/ui-lab" (UI component library)
+│   │   ├── layout.tsx      → Root layout
+│   │   └── globals.css     → Global styles + design tokens
+│   ├── components/
+│   │   └── ui/             → shadcn/ui components
+│   └── lib/
+│       └── utils.ts        → Utility functions (cn, etc.)
+├── public/                 → Static assets
+├── components.json         → shadcn/ui configuration
+├── next.config.ts
+├── tsconfig.json
+├── package.json
+└── README.md
+```
+
+---
+
+## Design Tokens
+
+| Token | Giá trị |
+|---|---|
+| Primary Yellow | `#F7C600` |
+| Deep Navy | `#0B1E3A` |
+| GODA Green | `#0F6B4D` |
+| Warm White | `#FFFDF6` |
+| Soft Gray | `#F2F4F7` |
+| Text Dark | `#152033` |
+| Font Display | Be Vietnam Pro → Manrope → Inter |
+
+---
+
+## License
+
+Private — GODA FC.
 
 ## Deploy on Vercel
 
