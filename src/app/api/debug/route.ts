@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const env = {
+  const env: Record<string, string> = {
     DATABASE_URL: process.env.DATABASE_URL ? "set (" + process.env.DATABASE_URL.substring(0, 30) + "...)" : "missing",
     AUTH_SECRET: process.env.AUTH_SECRET ? "set" : "missing",
     AUTH_URL: process.env.AUTH_URL ? "set" : "missing",
@@ -14,18 +14,18 @@ export async function GET() {
   };
 
   let dbOk = false;
-  let dbError = "";
+  let dbError: string | null = null;
   try {
     const count = await prisma.user.count();
     dbOk = true;
     env["DB_USER_COUNT"] = String(count);
-  } catch (e: any) {
-    dbError = e.message;
+  } catch (e: unknown) {
+    dbError = (e as Error).message;
   }
 
   return NextResponse.json({
     dbOk,
-    dbError: dbError || null,
+    dbError,
     env,
   });
 }
