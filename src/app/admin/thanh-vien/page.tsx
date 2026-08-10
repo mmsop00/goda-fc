@@ -4,23 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, X } from "lucide-react";
 
 interface Member {
   id: string;
@@ -229,141 +215,88 @@ export default function AdminMembersPage() {
         </Card>
       )}
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editing?.id ? "✏️ Sửa thành viên" : "➕ Thêm thành viên mới"}
-            </DialogTitle>
-          </DialogHeader>
+      {/* Create/Edit Modal */}
+      {dialogOpen && editing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setDialogOpen(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto m-4" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-lg font-display font-bold text-goda-navy">
+                {editing.id ? "✏️ Sửa thành viên" : "➕ Thêm thành viên mới"}
+              </h2>
+              <button onClick={() => setDialogOpen(false)} className="p-1 hover:bg-gray-100 rounded">
+                <X className="size-5" />
+              </button>
+            </div>
 
-          {editing && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="p-6 grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <Label>Tên *</Label>
-                <Input
-                  value={editing.name || ""}
-                  onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                  placeholder="Nguyễn Văn A"
-                />
+                <Input value={editing.name || ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} placeholder="Nguyễn Văn A" />
               </div>
               <div>
                 <Label>Biệt danh</Label>
-                <Input
-                  value={editing.nickname || ""}
-                  onChange={(e) => setEditing({ ...editing, nickname: e.target.value })}
-                  placeholder="Nickname"
-                />
+                <Input value={editing.nickname || ""} onChange={(e) => setEditing({ ...editing, nickname: e.target.value })} placeholder="Nickname" />
               </div>
               <div>
                 <Label>Số áo</Label>
-                <Input
-                  type="number"
-                  value={editing.number || 0}
-                  onChange={(e) => setEditing({ ...editing, number: +e.target.value })}
-                />
+                <Input type="number" value={editing.number || 0} onChange={(e) => setEditing({ ...editing, number: +e.target.value })} />
               </div>
               <div>
                 <Label>Vị trí</Label>
-                <Select
+                <select
+                  className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
                   value={editing.position || "Tiền vệ"}
-                  onValueChange={(v) => setEditing({ ...editing, position: v })}
+                  onChange={(e) => setEditing({ ...editing, position: e.target.value })}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {POSITIONS.map((p) => (
-                      <SelectItem key={p} value={p}>{p}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {POSITIONS.map((p) => <option key={p} value={p}>{p}</option>)}
+                </select>
               </div>
               <div>
                 <Label>Trạng thái</Label>
-                <Select
+                <select
+                  className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
                   value={editing.status || "Đang thi đấu"}
-                  onValueChange={(v) => setEditing({ ...editing, status: v })}
+                  onChange={(e) => setEditing({ ...editing, status: e.target.value })}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {STATUSES.map((s) => (
-                      <SelectItem key={s} value={s}>{s}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
               </div>
               <div>
                 <Label>Ngày sinh</Label>
-                <Input
-                  value={editing.birthday || ""}
-                  onChange={(e) => setEditing({ ...editing, birthday: e.target.value })}
-                  placeholder="DD/MM"
-                />
+                <Input value={editing.birthday || ""} onChange={(e) => setEditing({ ...editing, birthday: e.target.value })} placeholder="DD/MM" />
               </div>
               <div>
                 <Label>Năm tham gia</Label>
-                <Input
-                  type="number"
-                  value={editing.joinYear || ""}
-                  onChange={(e) => setEditing({ ...editing, joinYear: +e.target.value || null })}
-                />
+                <Input type="number" value={editing.joinYear || ""} onChange={(e) => setEditing({ ...editing, joinYear: +e.target.value || null })} />
               </div>
               <div>
                 <Label>Trận</Label>
-                <Input
-                  type="number"
-                  value={editing.matches || 0}
-                  onChange={(e) => setEditing({ ...editing, matches: +e.target.value })}
-                />
+                <Input type="number" value={editing.matches || 0} onChange={(e) => setEditing({ ...editing, matches: +e.target.value })} />
               </div>
               <div>
                 <Label>Bàn</Label>
-                <Input
-                  type="number"
-                  value={editing.goals || 0}
-                  onChange={(e) => setEditing({ ...editing, goals: +e.target.value })}
-                />
+                <Input type="number" value={editing.goals || 0} onChange={(e) => setEditing({ ...editing, goals: +e.target.value })} />
               </div>
               <div>
                 <Label>Kiến tạo</Label>
-                <Input
-                  type="number"
-                  value={editing.assists || 0}
-                  onChange={(e) => setEditing({ ...editing, assists: +e.target.value })}
-                />
+                <Input type="number" value={editing.assists || 0} onChange={(e) => setEditing({ ...editing, assists: +e.target.value })} />
               </div>
               <div>
                 <Label>MVP</Label>
-                <Input
-                  type="number"
-                  value={editing.mvp || 0}
-                  onChange={(e) => setEditing({ ...editing, mvp: +e.target.value })}
-                />
+                <Input type="number" value={editing.mvp || 0} onChange={(e) => setEditing({ ...editing, mvp: +e.target.value })} />
               </div>
             </div>
-          )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Hủy
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={saving || !editing?.name}
-              className="bg-goda-navy hover:bg-goda-navy/90"
-            >
-              {saving ? (
-                <Loader2 className="size-4 animate-spin mr-2" />
-              ) : null}
-              {editing?.id ? "Cập nhật" : "Thêm mới"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <div className="flex justify-end gap-3 p-6 border-t">
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>Hủy</Button>
+              <Button onClick={handleSave} disabled={saving || !editing.name} className="bg-goda-navy hover:bg-goda-navy/90">
+                {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
+                {editing.id ? "Cập nhật" : "Thêm mới"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
