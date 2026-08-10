@@ -248,6 +248,12 @@ export const MOCK_HISTORY: HistoryMilestone[] = [
     description:
       "Trở lại đỉnh cao sau 10 năm, khẳng định bản lĩnh GODA FC.",
   },
+  {
+    year: 2026,
+    title: "Ra mắt website chính thức",
+    description:
+      "Chuyển đổi số GODA FC. Website clbgoda.vn ra mắt, đánh dấu bước chuyển mình trong kỷ nguyên số.",
+  },
 ];
 
 export const MOCK_EVENTS: UpcomingEvent[] = [
@@ -625,7 +631,7 @@ export const MOCK_HISTORY_ENTRIES: HistoryEntry[] = [
 export const MOCK_HALL_OF_FAME: HallOfFameEntry[] = [
   {
     id: "hof-001",
-    name: "Quý Yếm, Ngọc Béo, Quang Gà",
+    name: "Chú Quý Yếm, Chú Ngọc Béo, Chú Quang Gà",
     categories: ["Sáng lập"],
     title: "Đồng sáng lập GODA FC",
     year: "1994–2000",
@@ -636,7 +642,7 @@ export const MOCK_HALL_OF_FAME: HallOfFameEntry[] = [
   },
   {
     id: "hof-002",
-    name: "Văn Cót, Huy",
+    name: "Chú Văn Cót, Chú Huy",
     categories: ["Ban quản lý"],
     title: "Chủ tịch CLB giai đoạn 2000–2003",
     year: "2000–2003",
@@ -750,20 +756,20 @@ export const MOCK_FULL_HISTORY: FullHistoryItem[] = [
     year: 1994,
     type: "founding",
     title: "Thành lập GODA FC",
-    subtitle: "Quý Yếm, Ngọc Béo, Quang Gà",
+    subtitle: "Chú Quý Yếm, Chú Ngọc Béo, Chú Quang Gà",
     description: "Ba người bạn thân thành lập CLB tại sân C500, Hà Nội. Đây là nơi khởi nguồn của mọi câu chuyện.",
   },
   {
     year: 2000,
     type: "achievement",
     title: "Vô địch sân 11 Lạng Sơn mở rộng",
-    subtitle: "Văn Cót, Huy — Chủ tịch CLB",
+    subtitle: "Chú Văn Cót, Chú Huy — Chủ tịch CLB",
     description: "Danh hiệu vô địch đầu tiên trong lịch sử, đánh dấu bước ngoặt phát triển vượt bậc.",
   },
   {
     year: 2000,
     type: "president",
-    title: "Văn Cót, Huy",
+    title: "Chú Văn Cót, Chú Huy",
     subtitle: "Chủ tịch CLB (2000–2003)",
     description: "Dẫn dắt GODA FC đến chức vô địch Lạng Sơn mở rộng — danh hiệu đầu tiên.",
   },
@@ -835,7 +841,7 @@ export const MOCK_FULL_HISTORY: FullHistoryItem[] = [
     type: "achievement",
     title: "Ra mắt website chính thức",
     subtitle: "Chuyển đổi số GODA FC",
-    description: "Website goda-fc.vn ra mắt, đánh dấu bước chuyển mình trong kỷ nguyên số.",
+    description: "Website clbgoda.vn ra mắt, đánh dấu bước chuyển mình trong kỷ nguyên số.",
   },
 ];
 
