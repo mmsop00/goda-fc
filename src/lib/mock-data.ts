@@ -1039,8 +1039,8 @@ export const MOCK_MEMBERS: MemberPublic[] = [
   { id: "m-005", name: "Lê Thanh Hà", nickname: "Chủ tịch", position: "Hậu vệ", number: 7, avatarUrl: "", matches: 129, goals: 3, assists: 10, mvp: 0, birthday: "01/08", joinYear: 2009, status: "Đội trưởng" },
   // ── Đội phó ──
   { id: "m-016", name: "Trần Đình Thanh", nickname: "Thanh", position: "Tiền vệ", number: 22, avatarUrl: "", matches: 175, goals: 26, assists: 29, mvp: 2, birthday: "", joinYear: 2018, status: "Đội phó" },
-  { id: "m-017", name: "Hoàng Trọng Nội", nickname: "Nội", position: "Hậu vệ", number: 0, avatarUrl: "", matches: 0, goals: 0, assists: 0, mvp: 0, birthday: "23/05", joinYear: 2026, status: "Đội phó" },
   { id: "m-018", name: "Huy Quang", nickname: "Quang", position: "Hậu vệ", number: 0, avatarUrl: "", matches: 0, goals: 0, assists: 0, mvp: 0, birthday: "", joinYear: 2026, status: "Đội phó" },
+  { id: "m-017", name: "Hoàng Trọng Nội", nickname: "Nội", position: "Hậu vệ", number: 0, avatarUrl: "", matches: 0, goals: 0, assists: 0, mvp: 0, birthday: "23/05", joinYear: 2026, status: "Đội phó" },
   // ── Cầu thủ (theo tuổi, già nhất trước) ──
   { id: "m-011", name: "Nguyễn Văn Bình", nickname: "Bình", position: "Tiền vệ", number: 0, avatarUrl: "", matches: 87, goals: 6, assists: 11, mvp: 0, birthday: "19/04", joinYear: 2026, status: "Đang thi đấu" },
   { id: "m-009", name: "Chu Triệu Thành", nickname: "Thầy giáo", position: "Tiền vệ", number: 0, avatarUrl: "", matches: 114, goals: 9, assists: 18, mvp: 0, birthday: "25/02", joinYear: 2026, status: "Đang thi đấu" },
