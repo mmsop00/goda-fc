@@ -92,7 +92,7 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
               )}
 
               <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                {items.map((item, i) => (
+                {sorted.map((item, i) => (
                   <div key={item.id} className="shrink-0 w-72 snap-start">
                     <div onClick={() => setLightboxIndex(i)} className="group/card relative aspect-video rounded-lg overflow-hidden bg-goda-navy/10 cursor-pointer">
                       <Image src={item.thumbnailUrl} alt={item.title} fill sizes="288px" className="object-cover transition-transform group-hover/card:scale-105" loading="lazy" />
@@ -124,9 +124,9 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
         photo={lightboxPhoto}
         onClose={() => setLightboxIndex(null)}
         onPrev={() => setLightboxIndex(p => p !== null ? Math.max(0, p - 1) : null)}
-        onNext={() => setLightboxIndex(p => p !== null ? Math.min(items.length - 1, p + 1) : null)}
+        onNext={() => setLightboxIndex(p => p !== null ? Math.min(sorted.length - 1, p + 1) : null)}
         hasPrev={lightboxIndex !== null && lightboxIndex > 0}
-        hasNext={lightboxIndex !== null && lightboxIndex < items.length - 1}
+        hasNext={lightboxIndex !== null && lightboxIndex < sorted.length - 1}
       />
     </>
   );
