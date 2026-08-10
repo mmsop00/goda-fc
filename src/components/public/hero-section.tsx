@@ -20,7 +20,7 @@ export function HeroSection() {
       />
 
       {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-goda-navy/75" />
+      <div className="absolute inset-0 bg-goda-navy/50" />
 
       <div className="relative max-w-7xl mx-auto px-6 py-20 md:py-28 lg:py-36">
         <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
