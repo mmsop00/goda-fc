@@ -89,11 +89,11 @@ export function MatchSpotlight({ matches, isLoading }: MatchSpotlightProps) {
                     {match.score ? (
                       <div className="flex items-center justify-center gap-6 py-4 bg-goda-soft-gray/50 rounded-lg">
                         <span className="text-3xl font-bold text-goda-navy">
-                          {match.score.goda}
+                          {match.isHome ? match.score.goda : match.score.opponent}
                         </span>
                         <span className="text-xl text-gray-400">-</span>
                         <span className="text-3xl font-bold text-gray-500">
-                          {match.score.opponent}
+                          {match.isHome ? match.score.opponent : match.score.goda}
                         </span>
                       </div>
                     ) : (

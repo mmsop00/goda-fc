@@ -101,11 +101,11 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             ) : (
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-extrabold text-goda-navy">
-                  {match.godaScore}
+                  {match.isHome ? match.godaScore : match.opponentScore}
                 </span>
                 <span className="text-lg text-gray-400">-</span>
                 <span className="text-2xl font-extrabold text-gray-500">
-                  {match.opponentScore}
+                  {match.isHome ? match.opponentScore : match.godaScore}
                 </span>
               </div>
             )}
