@@ -11,7 +11,7 @@ import { FooterSection } from "@/components/public/footer-section";
 
 import {
   MOCK_MATCHES,
-  MOCK_PLAYERS,
+  MOCK_MEMBERS,
   MOCK_HISTORY,
   MOCK_EVENTS,
   MOCK_DONORS,
@@ -31,8 +31,8 @@ export default function PublicHomePage() {
       {/* Section 3: About */}
       <AboutSection />
 
-      {/* Section 4: Player Spotlight */}
-      <PlayerSpotlight players={MOCK_PLAYERS} />
+      {/* Section 4: Player Slider */}
+      <PlayerSpotlight members={MOCK_MEMBERS} />
 
       {/* Section 5: History Teaser */}
       <HistoryTeaser milestones={MOCK_HISTORY} />
