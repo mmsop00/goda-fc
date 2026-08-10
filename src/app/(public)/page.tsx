@@ -16,7 +16,7 @@ import {
   MOCK_EVENTS,
   MOCK_DONORS,
   MOCK_NEWS,
-  MOCK_GALLERY,
+  MOCK_ALBUM,
 } from "@/lib/mock-data";
 
 export default function PublicHomePage() {
@@ -43,8 +43,8 @@ export default function PublicHomePage() {
       {/* Section 7: News */}
       <NewsSection news={MOCK_NEWS} />
 
-      {/* Section 8: Gallery */}
-      <GallerySection items={MOCK_GALLERY} />
+      {/* Section 8: Gallery Slider */}
+      <GallerySection items={MOCK_ALBUM} />
 
       {/* Section 9: CTA */}
       <CTASection />
