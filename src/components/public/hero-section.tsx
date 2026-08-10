@@ -1,15 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trophy } from "lucide-react";
+import Image from "next/image";
+
+const HERO_PHOTO = "/photos/z8053179673964_efe7a825564ab004cb6a5e9da363fdbf.jpg";
 
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-goda-navy">
-      {/* Decorative background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-10 size-64 rounded-full bg-goda-yellow blur-3xl" />
-        <div className="absolute bottom-10 right-10 size-96 rounded-full bg-goda-green blur-3xl" />
-      </div>
+      {/* Background photo */}
+      <Image
+        src={HERO_PHOTO}
+        alt="GODA FC team"
+        fill
+        className="object-cover object-center"
+        priority
+        sizes="100vw"
+        quality={90}
+      />
+
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-goda-navy/75" />
 
       <div className="relative max-w-7xl mx-auto px-6 py-20 md:py-28 lg:py-36">
         <div className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto">
@@ -19,7 +30,7 @@ export function HeroSection() {
             Est. 1994
           </Badge>
 
-          {/* Main heading — C-003 fix: text-white on navy, contrast ~12:1 ✓ */}
+          {/* Main heading */}
           <h1 className="font-display font-extrabold text-5xl md:text-6xl lg:text-7xl text-white leading-tight tracking-tight">
             Câu lạc bộ bóng đá
             <br />
