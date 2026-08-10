@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,6 +19,17 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
+  // Sort by date descending (newest first) — timeline order
+  const sorted = useMemo(() => {
+    return [...items].sort((a, b) => {
+      const parse = (d: string) => {
+        const parts = d.split("/");
+        return new Date(+parts[2], +parts[1] - 1, +parts[0]).getTime();
+      };
+      return parse(b.date) - parse(a.date);
+    });
+  }, [items]);
+
   const checkScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -31,7 +42,7 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
     const el = scrollRef.current;
     if (el) el.addEventListener("scroll", checkScroll, { passive: true });
     return () => { if (el) el.removeEventListener("scroll", checkScroll); };
-  }, [items, checkScroll]);
+  }, [sorted, checkScroll]);
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
@@ -39,7 +50,7 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
     el.scrollBy({ left: dir === "left" ? -300 : 300, behavior: "smooth" });
   };
 
-  const lightboxPhoto = lightboxIndex !== null ? items[lightboxIndex] : null;
+  const lightboxPhoto = lightboxIndex !== null ? sorted[lightboxIndex] : null;
 
   return (
     <>
@@ -61,7 +72,7 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
                 </div>
               ))}
             </div>
-          ) : items.length === 0 ? (
+          ) : sorted.length === 0 ? (
             <Card className="border-dashed border-2 border-gray-300 bg-white mx-auto max-w-lg">
               <CardContent className="flex flex-col items-center py-12 gap-4">
                 <p className="text-gray-500">Chưa có ảnh/video nào.</p>
