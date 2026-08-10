@@ -1126,4 +1126,8 @@ export const MOCK_ALBUM: AlbumPhoto[] = [
   { id: "alb-063", category: "Sinh hoạt", title: "Rèn thể lực", date: "16/08/2023", thumbnailUrl: "/photos/z8053179996882_54c1c0b6287bb6369e51ed9594d8e119.jpg", fullUrl: "/photos/z8053179996882_54c1c0b6287bb6369e51ed9594d8e119.jpg" },
   { id: "alb-064", category: "Kỷ niệm", title: "Kỷ niệm 28 năm", date: "16/05/2026", thumbnailUrl: "/photos/z8053184531263_aec1f50384a4387ab65e320508c9e257.jpg", fullUrl: "/photos/z8053184531263_aec1f50384a4387ab65e320508c9e257.jpg" },
   { id: "alb-065", category: "Trận đấu", title: "Pha cứu thua", date: "19/03/2026", thumbnailUrl: "/photos/z8053184555238_15b672b9f7420b236c733356a5b05aef.jpg", fullUrl: "/photos/z8053184555238_15b672b9f7420b236c733356a5b05aef.jpg" },
+  // ── Videos (YouTube embed) ──
+  { id: "vid-001", category: "Video", title: "GODA FC - Giao hữu 1", date: "08/08/2026", thumbnailUrl: "/photos/z8053184475382_01eca30330d964dec2cbe880b97c6af0.jpg", fullUrl: "/photos/z8053184475382_01eca30330d964dec2cbe880b97c6af0.jpg", videoUrl: "https://www.youtube.com/embed/VIDEO_ID_1" },
+  { id: "vid-002", category: "Video", title: "GODA FC - Giao hữu 2", date: "26/07/2026", thumbnailUrl: "/photos/z8053184543075_18a4ba86d31f679d9ab2c4a45ee38419.jpg", fullUrl: "/photos/z8053184543075_18a4ba86d31f679d9ab2c4a45ee38419.jpg", videoUrl: "https://www.youtube.com/embed/VIDEO_ID_2" },
+  { id: "vid-003", category: "Video", title: "GODA FC - Giao hữu 3", date: "18/07/2026", thumbnailUrl: "/photos/z8053184524254_a0bda9fbee6ae5488608a1a51c47b10e.jpg", fullUrl: "/photos/z8053184524254_a0bda9fbee6ae5488608a1a51c47b10e.jpg", videoUrl: "https://www.youtube.com/embed/VIDEO_ID_3" },
 ];
