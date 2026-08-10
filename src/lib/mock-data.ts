@@ -125,7 +125,7 @@ export const MOCK_MATCHES: MatchInfo[] = [
   {
     id: "match-003",
     type: "recent",
-    opponent: "FC Nguyên Dương",
+    opponent: "Nguyên Dương FC",
     date: "26/07/2026",
     time: "16:00",
     venue: "Sân Nguyên Dương, Hà Nội",

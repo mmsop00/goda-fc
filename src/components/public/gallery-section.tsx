@@ -40,23 +40,20 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
                 key={item.id}
                 className="group relative aspect-video rounded-lg overflow-hidden bg-goda-navy/10 cursor-pointer"
               >
-                {/* Placeholder background */}
-                <div
-                  className={`absolute inset-0 flex items-center justify-center ${
-                    item.type === "video" ? "bg-goda-navy/80" : "bg-goda-navy/20"
-                  }`}
-                >
-                  {item.type === "video" ? (
-                    <div className="flex flex-col items-center gap-2">
-                      <Play className="size-10 text-white fill-white" />
-                      <span className="text-xs text-white font-medium">
-                        Xem video
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-3xl opacity-30">📷</span>
-                  )}
-                </div>
+                {/* Thumbnail image */}
+                <img
+                  src={item.thumbnailUrl}
+                  alt={item.caption}
+                  className="absolute inset-0 size-full object-cover"
+                  loading="lazy"
+                />
+
+                {/* Video play icon overlay */}
+                {item.type === "video" && (
+                  <div className="absolute inset-0 bg-goda-navy/40 flex items-center justify-center">
+                    <Play className="size-10 text-white fill-white" />
+                  </div>
+                )}
 
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-goda-navy/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
