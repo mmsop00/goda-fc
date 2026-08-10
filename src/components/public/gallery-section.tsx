@@ -4,7 +4,8 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Lightbox } from "./lightbox";
 import type { AlbumPhoto } from "@/lib/mock-data";
 
 interface GallerySectionProps {
@@ -16,7 +17,7 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-  const [lightbox, setLightbox] = useState<AlbumPhoto | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const checkScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -38,15 +39,7 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
     el.scrollBy({ left: dir === "left" ? -300 : 300, behavior: "smooth" });
   };
 
-  // Close lightbox on Escape key
-  useEffect(() => {
-    if (!lightbox) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLightbox(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [lightbox]);
+  const lightboxPhoto = lightboxIndex !== null ? items[lightboxIndex] : null;
 
   return (
     <>
@@ -76,61 +69,27 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
             </Card>
           ) : (
             <div className="relative group">
-              {/* Left arrow */}
               {canScrollLeft && (
-                <button
-                  onClick={() => scroll("left")}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-lg rounded-full p-2 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
-                  aria-label="Cuộn trái"
-                >
+                <button onClick={() => scroll("left")} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-lg rounded-full p-2 hover:bg-white transition-all opacity-0 group-hover:opacity-100" aria-label="Cuộn trái">
                   <ChevronLeft className="size-5 text-goda-navy" />
                 </button>
               )}
-              {/* Right arrow */}
               {canScrollRight && (
-                <button
-                  onClick={() => scroll("right")}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-lg rounded-full p-2 hover:bg-white transition-all opacity-0 group-hover:opacity-100"
-                  aria-label="Cuộn phải"
-                >
+                <button onClick={() => scroll("right")} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-lg rounded-full p-2 hover:bg-white transition-all opacity-0 group-hover:opacity-100" aria-label="Cuộn phải">
                   <ChevronRight className="size-5 text-goda-navy" />
                 </button>
               )}
 
-              {/* Slider */}
-              <div
-                ref={scrollRef}
-                className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-              >
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="shrink-0 w-72 snap-start"
-                  >
-                    <div
-                      onClick={() => setLightbox(item)}
-                      className="group/card relative aspect-video rounded-lg overflow-hidden bg-goda-navy/10 cursor-pointer"
-                    >
-                      <Image
-                        src={item.thumbnailUrl}
-                        alt={item.title}
-                        fill
-                        sizes="288px"
-                        className="object-cover transition-transform group-hover/card:scale-105"
-                        loading="lazy"
-                      />
-
-                      {/* Hover overlay with info */}
+              <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                {items.map((item, i) => (
+                  <div key={item.id} className="shrink-0 w-72 snap-start">
+                    <div onClick={() => setLightboxIndex(i)} className="group/card relative aspect-video rounded-lg overflow-hidden bg-goda-navy/10 cursor-pointer">
+                      <Image src={item.thumbnailUrl} alt={item.title} fill sizes="288px" className="object-cover transition-transform group-hover/card:scale-105" loading="lazy" />
                       <div className="absolute inset-0 bg-goda-navy/0 group-hover/card:bg-goda-navy/60 transition-all flex flex-col justify-end p-4">
                         <div className="translate-y-4 group-hover/card:translate-y-0 transition-transform">
                           <span className="text-xs text-white/70">{item.date}</span>
-                          <p className="text-sm text-white font-medium line-clamp-2 mt-1">
-                            {item.title}
-                          </p>
-                          <span className="inline-block mt-2 text-xs bg-goda-yellow/90 text-goda-navy px-2 py-0.5 rounded-full">
-                            {item.category}
-                          </span>
+                          <p className="text-sm text-white font-medium line-clamp-2 mt-1">{item.title}</p>
+                          <span className="inline-block mt-2 text-xs bg-goda-yellow/90 text-goda-navy px-2 py-0.5 rounded-full">{item.category}</span>
                         </div>
                       </div>
                     </div>
@@ -140,50 +99,18 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
             </div>
           )}
         </div>
-
-        {/* Hide scrollbar style */}
-        <style>{`
-          .scrollbar-hide::-webkit-scrollbar { display: none; }
-        `}</style>
+        <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; }`}</style>
       </section>
 
-      {/* Lightbox Modal */}
-      {lightbox && (
-        <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-          onClick={() => setLightbox(null)}
-        >
-          <button
-            onClick={() => setLightbox(null)}
-            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            aria-label="Đóng"
-          >
-            <X className="size-6 text-white" />
-          </button>
-
-          <div
-            className="relative max-w-5xl max-h-[90vh] w-full aspect-video"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={lightbox.fullUrl}
-              alt={lightbox.title}
-              fill
-              sizes="(max-width: 1280px) 100vw, 1280px"
-              className="object-contain"
-              priority
-            />
-          </div>
-
-          {/* Caption */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur rounded-lg px-6 py-3 text-white text-center max-w-lg">
-            <p className="font-medium">{lightbox.title}</p>
-            <p className="text-sm text-white/60 mt-1">
-              {lightbox.date} · {lightbox.category}
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Shared Lightbox — click outside to close, large display, prev/next */}
+      <Lightbox
+        photo={lightboxPhoto}
+        onClose={() => setLightboxIndex(null)}
+        onPrev={() => setLightboxIndex(p => p !== null ? Math.max(0, p - 1) : null)}
+        onNext={() => setLightboxIndex(p => p !== null ? Math.min(items.length - 1, p + 1) : null)}
+        hasPrev={lightboxIndex !== null && lightboxIndex > 0}
+        hasNext={lightboxIndex !== null && lightboxIndex < items.length - 1}
+      />
     </>
   );
 }

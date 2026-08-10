@@ -49,10 +49,10 @@ export function Lightbox({
   if (!photo) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop — click to close */}
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/90"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -70,7 +70,7 @@ export function Lightbox({
       {hasPrev && (
         <button
           onClick={onPrev}
-          className="absolute left-4 z-10 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+          className="absolute left-4 z-10 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
           aria-label="Ảnh trước"
         >
           <ChevronLeft className="size-6" />
@@ -81,42 +81,38 @@ export function Lightbox({
       {hasNext && (
         <button
           onClick={onNext}
-          className="absolute right-4 z-10 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+          className="absolute right-4 z-10 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
           aria-label="Ảnh sau"
         >
           <ChevronRight className="size-6" />
         </button>
       )}
 
-      {/* Photo display */}
-      <div className="relative z-10 max-w-4xl max-h-[90vh] mx-4 flex flex-col items-center gap-4">
-        {/* Photo */}
-        <div className="relative aspect-[4/3] w-full max-w-2xl rounded-xl overflow-hidden bg-goda-navy/50">
-          {photo.fullUrl ? (
-            <Image
-              src={photo.fullUrl}
-              alt={photo.title}
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, 672px"
-              priority
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-goda-navy/50 to-goda-green/50 flex items-center justify-center">
-              {/* eslint-disable-next-line jsx-a11y/alt-text */}
-              <ImageIcon className="size-24 text-white/30" aria-hidden="true" />
-            </div>
-          )}
-        </div>
+      {/* Photo — large, fills screen */}
+      <div className="relative z-10 w-full max-w-6xl max-h-[85vh] aspect-[4/3]">
+        {photo.fullUrl ? (
+          <Image
+            src={photo.fullUrl}
+            alt={photo.title}
+            fill
+            className="object-contain"
+            sizes="(max-width: 1280px) 100vw, 1152px"
+            priority
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-goda-navy/50 to-goda-green/50 flex items-center justify-center rounded-xl">
+            <ImageIcon className="size-24 text-white/30" aria-hidden="true" />
+          </div>
+        )}
+      </div>
 
-        {/* Info */}
-        <div className="text-center">
-          <h3 className="font-display font-semibold text-lg text-white">
-            {photo.title}
-          </h3>
-          <p className="text-sm text-gray-300">{photo.date}</p>
-        </div>
+      {/* Caption at bottom */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 bg-black/60 backdrop-blur rounded-lg px-6 py-3 text-white text-center max-w-lg">
+        <p className="font-medium">{photo.title}</p>
+        <p className="text-sm text-white/60 mt-1">{photo.date}</p>
       </div>
     </div>
+  );
+}
   );
 }
