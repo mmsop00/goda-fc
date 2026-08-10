@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { Lightbox } from "./lightbox";
 import type { AlbumPhoto } from "@/lib/mock-data";
 
@@ -85,6 +85,12 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
                   <div key={item.id} className="shrink-0 w-72 snap-start">
                     <div onClick={() => setLightboxIndex(i)} className="group/card relative aspect-video rounded-lg overflow-hidden bg-goda-navy/10 cursor-pointer">
                       <Image src={item.thumbnailUrl} alt={item.title} fill sizes="288px" className="object-cover transition-transform group-hover/card:scale-105" loading="lazy" />
+                      {/* Video play icon */}
+                      {item.category === "Video" && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-goda-navy/30">
+                          <Play className="size-12 text-white fill-white opacity-80 group-hover/card:opacity-100 group-hover/card:scale-110 transition-all" />
+                        </div>
+                      )}
                       <div className="absolute inset-0 bg-goda-navy/0 group-hover/card:bg-goda-navy/60 transition-all flex flex-col justify-end p-4">
                         <div className="translate-y-4 group-hover/card:translate-y-0 transition-transform">
                           <span className="text-xs text-white/70">{item.date}</span>

@@ -18,6 +18,7 @@ const CATEGORIES: { label: string; value: AlbumCategory | "all" }[] = [
   { label: "Sự kiện", value: "Sự kiện" },
   { label: "Sinh hoạt", value: "Sinh hoạt" },
   { label: "Kỷ niệm", value: "Kỷ niệm" },
+  { label: "🎬 Video", value: "Video" },
 ];
 
 export function AlbumGrid({ photos, isLoading }: AlbumGridProps) {

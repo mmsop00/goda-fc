@@ -1019,7 +1019,7 @@ export interface MemberPublic {
   status?: string;
 }
 
-export type AlbumCategory = "Trận đấu" | "Sự kiện" | "Sinh hoạt" | "Kỷ niệm";
+export type AlbumCategory = "Trận đấu" | "Sự kiện" | "Sinh hoạt" | "Kỷ niệm" | "Video";
 
 export interface AlbumPhoto {
   id: string;
@@ -1028,6 +1028,7 @@ export interface AlbumPhoto {
   date: string;
   thumbnailUrl: string;
   fullUrl: string;
+  videoUrl?: string;
 }
 
 // ═══════════════════════════════════════

@@ -89,8 +89,16 @@ export function Lightbox({
       )}
 
       {/* Photo — large, fills screen */}
-      <div className="relative z-10 w-full max-w-6xl max-h-[85vh] aspect-[4/3]">
-        {photo.fullUrl ? (
+      <div className="relative z-10 w-full max-w-6xl max-h-[85vh] aspect-video">
+        {photo.videoUrl ? (
+          <iframe
+            src={photo.videoUrl}
+            className="absolute inset-0 w-full h-full rounded-xl"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title={photo.title}
+          />
+        ) : photo.fullUrl ? (
           <Image
             src={photo.fullUrl}
             alt={photo.title}
