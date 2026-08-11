@@ -101,12 +101,11 @@ export interface GalleryItem {
 export const MOCK_MATCHES: MatchInfo[] = [
   {
     id: "match-001",
-    type: "recent",
+    type: "upcoming",
     opponent: "Việt Nhật FC",
     date: "08/08/2026",
     time: "16:00",
     venue: "Sân Cổ Nhuế, Hà Nội",
-    score: { goda: 0, opponent: 3 },
     isHome: false,
     detailId: "mr-004",
     googleMapsUrl: "https://maps.app.goo.gl/KoyeCaWrBjNVoyg46",

@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { label: "Giới thiệu", href: "/gioi-thieu" },
   { label: "Trận đấu", href: "/tran-dau" },
   { label: "Hall of Fame", href: "/hall-of-fame" },
-  { label: "Tin tức & Media", href: "/tin-tuc" },
+  { label: "Tin tức & Hình ảnh", href: "/tin-tuc" },
   { label: "Thành viên", href: "/thanh-vien" },
   { label: "Đăng nhập", href: "/admin" },
 ];

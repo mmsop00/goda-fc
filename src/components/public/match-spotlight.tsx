@@ -80,20 +80,20 @@ export function MatchSpotlight({ matches, isLoading }: MatchSpotlightProps) {
                       </div>
                     </div>
                     <CardTitle className="text-xl mt-2">
-                      {match.isHome ? "GODA FC" : match.opponent}{" "}
+                      GODA FC{" "}
                       <span className="text-gray-400 font-normal">vs</span>{" "}
-                      {match.isHome ? match.opponent : "GODA FC"}
+                      {match.opponent}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {match.score ? (
                       <div className="space-y-3">
-                        {/* Score display with scorers */}
+                        {/* Score display with scorers — GODA always left */}
                         <div className="py-4 bg-goda-soft-gray/50 rounded-lg">
                           <div className="flex items-center justify-center gap-6">
                             <div className="text-right min-w-[60px]">
                               <span className="text-3xl font-bold text-goda-navy">
-                                {match.isHome ? match.score.goda : match.score.opponent}
+                                {match.score.goda}
                               </span>
                               {match.goalScorers && (
                                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">
@@ -104,7 +104,7 @@ export function MatchSpotlight({ matches, isLoading }: MatchSpotlightProps) {
                             <span className="text-xl text-gray-400">-</span>
                             <div className="text-left min-w-[60px]">
                               <span className="text-3xl font-bold text-gray-500">
-                                {match.isHome ? match.score.opponent : match.score.goda}
+                                {match.score.opponent}
                               </span>
                             </div>
                           </div>
