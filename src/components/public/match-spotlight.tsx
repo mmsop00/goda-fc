@@ -88,15 +88,26 @@ export function MatchSpotlight({ matches, isLoading }: MatchSpotlightProps) {
                   <CardContent className="space-y-3">
                     {match.score ? (
                       <div className="space-y-3">
-                        {/* Score display */}
-                        <div className="flex items-center justify-center gap-6 py-4 bg-goda-soft-gray/50 rounded-lg">
-                          <span className="text-3xl font-bold text-goda-navy">
-                            {match.isHome ? match.score.goda : match.score.opponent}
-                          </span>
-                          <span className="text-xl text-gray-400">-</span>
-                          <span className="text-3xl font-bold text-gray-500">
-                            {match.isHome ? match.score.opponent : match.score.goda}
-                          </span>
+                        {/* Score display with scorers */}
+                        <div className="py-4 bg-goda-soft-gray/50 rounded-lg">
+                          <div className="flex items-center justify-center gap-6">
+                            <div className="text-right min-w-[60px]">
+                              <span className="text-3xl font-bold text-goda-navy">
+                                {match.isHome ? match.score.goda : match.score.opponent}
+                              </span>
+                              {match.goalScorers && (
+                                <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                                  {match.goalScorers}
+                                </p>
+                              )}
+                            </div>
+                            <span className="text-xl text-gray-400">-</span>
+                            <div className="text-left min-w-[60px]">
+                              <span className="text-3xl font-bold text-gray-500">
+                                {match.isHome ? match.score.opponent : match.score.goda}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                         {/* Win/Draw/Loss badge */}
                         <div className="flex justify-center">
@@ -108,12 +119,6 @@ export function MatchSpotlight({ matches, isLoading }: MatchSpotlightProps) {
                             <Badge className="bg-goda-yellow text-goda-navy text-sm px-4 py-1 border-0">🤝 Hòa</Badge>
                           )}
                         </div>
-                        {/* Goal scorers */}
-                        {match.goalScorers && (
-                          <p className="text-xs text-gray-500 text-center leading-relaxed">
-                            {match.goalScorers}
-                          </p>
-                        )}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 text-sm text-goda-green font-medium">
