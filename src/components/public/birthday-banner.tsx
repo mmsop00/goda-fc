@@ -52,7 +52,7 @@ export function BirthdayBanner({ members, events, recentDonations = [] }: Birthd
     // Top 5 recent donations
     const top5 = recentDonations.slice(0, 5);
     if (top5.length > 0) {
-      items.push({ label: "── 5 NGƯỜI TÀI TRỢ GẦN ĐÂY NHẤT ──", date: "", section: "header" });
+      items.push({ label: "── 5 NHÀ TÀI TRỢ GẦN ĐÂY NHẤT ──", date: "", section: "header" });
       top5.forEach((d) => {
         items.push({ label: `💛 ${d.name}`, date: d.date, section: "donor" });
       });

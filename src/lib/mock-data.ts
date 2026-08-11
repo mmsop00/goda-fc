@@ -707,22 +707,12 @@ export const MOCK_HALL_OF_FAME: HallOfFameEntry[] = [
   },
   {
     id: "hof-011",
-    name: "Phan Trần Phương",
-    categories: ["Cầu thủ nổi bật"],
-    title: "Cựu đội trưởng — Số 5",
-    year: "2018–2024",
+    name: "Huy Quang",
+    categories: ["Nhà tài trợ", "Đội phó", "Kỷ lục"],
+    title: "Nhà tài trợ chính — Đội phó GODA FC",
+    year: "2026–nay",
     description:
-      "82 trận, 9 bàn, 15 kiến tạo. Thầy giáo Phương — người thủ lĩnh mẫu mực, truyền lửa cho các thế hệ cầu thủ trẻ GODA FC.",
-    avatarUrl: "",
-  },
-  {
-    id: "hof-012",
-    name: "Đào Thanh Tùng",
-    categories: ["Kỷ lục"],
-    title: "Thủ môn huyền thoại — Số 8",
-    year: "1994–nay",
-    description:
-      "Người gác đền trung thành nhất lịch sử GODA FC. Hơn 30 năm cống hiến, vô số pha cứu thua xuất thần. Biểu tượng của lòng trung thành.",
+      "Nhà tài trợ chính của GODA FC, đồng hành cùng đội bóng trong giai đoạn khó khăn nhất. Người tiếp lửa cho thế hệ cầu thủ trẻ, góp phần đưa GODA FC vươn xa.",
     avatarUrl: "",
     highlight: true,
   },

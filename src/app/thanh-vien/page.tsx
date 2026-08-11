@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { MemberCard } from "@/components/public/member-card";
-import { Users } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Users, Trophy, Goal, BadgeCheck } from "lucide-react";
 import { MOCK_MEMBERS, type MemberPosition } from "@/lib/mock-data";
 
 const POSITIONS: { label: string; value: MemberPosition | "all" }[] = [
@@ -20,6 +21,11 @@ export default function ThanhVienPage() {
     position === "all"
       ? MOCK_MEMBERS
       : MOCK_MEMBERS.filter((m) => m.position === position);
+
+  // Top stats
+  const topGoals = useMemo(() => [...MOCK_MEMBERS].sort((a, b) => b.goals - a.goals).slice(0, 5), []);
+  const topAssists = useMemo(() => [...MOCK_MEMBERS].sort((a, b) => b.assists - a.assists).slice(0, 5), []);
+  const topMVP = useMemo(() => [...MOCK_MEMBERS].sort((a, b) => b.mvp - a.mvp).slice(0, 5), []);
 
   return (
     <>
@@ -39,6 +45,66 @@ export default function ThanhVienPage() {
 
       <section className="py-12 md:py-16 bg-goda-warm-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          {/* Leaderboard */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {/* Top ghi bàn */}
+            <Card className="bg-white overflow-hidden">
+              <div className="bg-goda-green px-5 py-3 flex items-center gap-2">
+                <Goal className="size-5 text-white" />
+                <span className="font-display font-bold text-white text-sm">TOP GHI BÀN</span>
+              </div>
+              <CardContent className="p-0">
+                {topGoals.map((m, i) => (
+                  <div key={m.id} className={`flex items-center gap-3 px-4 py-2.5 ${i < topGoals.length - 1 ? "border-b border-gray-100" : ""}`}>
+                    <span className={`font-bold text-sm w-6 text-center ${i === 0 ? "text-goda-yellow" : "text-gray-400"}`}>
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 text-sm font-medium text-goda-navy truncate">{m.name}</span>
+                    <span className="text-sm font-bold text-goda-green">{m.goals}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Top kiến tạo */}
+            <Card className="bg-white overflow-hidden">
+              <div className="bg-goda-navy px-5 py-3 flex items-center gap-2">
+                <BadgeCheck className="size-5 text-goda-yellow" />
+                <span className="font-display font-bold text-white text-sm">TOP KIẾN TẠO</span>
+              </div>
+              <CardContent className="p-0">
+                {topAssists.map((m, i) => (
+                  <div key={m.id} className={`flex items-center gap-3 px-4 py-2.5 ${i < topAssists.length - 1 ? "border-b border-gray-100" : ""}`}>
+                    <span className={`font-bold text-sm w-6 text-center ${i === 0 ? "text-goda-yellow" : "text-gray-400"}`}>
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 text-sm font-medium text-goda-navy truncate">{m.name}</span>
+                    <span className="text-sm font-bold text-goda-navy">{m.assists}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Top MVP */}
+            <Card className="bg-white overflow-hidden">
+              <div className="bg-goda-yellow px-5 py-3 flex items-center gap-2">
+                <Trophy className="size-5 text-goda-navy" />
+                <span className="font-display font-bold text-goda-navy text-sm">TOP MVP</span>
+              </div>
+              <CardContent className="p-0">
+                {topMVP.map((m, i) => (
+                  <div key={m.id} className={`flex items-center gap-3 px-4 py-2.5 ${i < topMVP.length - 1 ? "border-b border-gray-100" : ""}`}>
+                    <span className={`font-bold text-sm w-6 text-center ${i === 0 ? "text-goda-yellow" : "text-gray-400"}`}>
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 text-sm font-medium text-goda-navy truncate">{m.name}</span>
+                    <span className="text-sm font-bold text-goda-yellow">{m.mvp}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Position Filter */}
           <div className="flex flex-wrap justify-center gap-2 mb-10">
             {POSITIONS.map((pos) => (
