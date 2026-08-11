@@ -231,7 +231,7 @@ export const MOCK_HISTORY: HistoryMilestone[] = [
     year: 1994,
     title: "Thành lập CLB",
     description:
-      "GODA FC được thành lập bởi Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn yêu bóng đá tại Hà Nội, với sân bóng đầu tiên tại sân C500.",
+      "GODA FC được thành lập bởi Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn yêu bóng đá tại Hà Nội.",
   },
   {
     year: 2000,
@@ -534,7 +534,7 @@ export const MOCK_ABOUT_TIMELINE: AboutTimelineItem[] = [
   {
     year: 1994,
     title: "Ngày thành lập",
-    description: "Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn thành lập GODA FC tại sân C500, Hà Nội.",
+    description: "Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn thành lập GODA FC tại Hà Nội.",
   },
   {
     year: 2000,
@@ -560,7 +560,7 @@ export const MOCK_HISTORY_ENTRIES: HistoryEntry[] = [
     decade: "1990s",
     title: "Thành lập GODA FC",
     description:
-      "Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn yêu bóng đá tại Hà Nội chính thức thành lập GODA FC. Sân bóng đầu tiên là sân C500 — nơi ghi dấu những bước chạy đầu tiên của đội bóng.",
+      "Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn yêu bóng đá tại Hà Nội chính thức thành lập GODA FC, ghi dấu những bước chạy đầu tiên của đội bóng.",
     imageUrl: "https://placehold.co/600x400/0B1E3A/F7C600?text=GODA+1994",
     relatedPeople: ["Quý Yếm", "Ngọc Béo", "Quang Gà"],
   },
@@ -618,7 +618,7 @@ export const MOCK_HALL_OF_FAME: HallOfFameEntry[] = [
     title: "Đồng sáng lập GODA FC",
     year: "1994–2000",
     description:
-      "Ba người bạn thân đã cùng nhau đặt nền móng cho GODA FC tại sân C500, Hà Nội. Tinh thần đoàn kết và đam mê bóng đá của họ là ngọn lửa đầu tiên thắp sáng CLB.",
+      "Ba người bạn thân đã cùng nhau đặt nền móng cho GODA FC tại Hà Nội. Tinh thần đoàn kết và đam mê bóng đá của họ là ngọn lửa đầu tiên thắp sáng CLB.",
     avatarUrl: "",
     highlight: true,
   },
@@ -729,7 +729,7 @@ export const MOCK_FULL_HISTORY: FullHistoryItem[] = [
     type: "founding",
     title: "Thành lập GODA FC",
     subtitle: "Chú Quý Yếm, Chú Ngọc Béo, Chú Quang Gà",
-    description: "Ba người bạn thân thành lập CLB tại sân C500, Hà Nội. Đây là nơi khởi nguồn của mọi câu chuyện.",
+    description: "Ba người bạn thân thành lập CLB tại Hà Nội. Đây là nơi khởi nguồn của mọi câu chuyện.",
   },
   {
     year: 2000,
@@ -1086,7 +1086,7 @@ export const MOCK_ALBUM: AlbumPhoto[] = [
   { id: "alb-009", category: "Trận đấu", title: "Huddle trước trận", date: "18/11/2026", thumbnailUrl: "/photos/z8053184574132_34845101c4b6e25ba1efa5e79499d792.jpg", fullUrl: "/photos/z8053184574132_34845101c4b6e25ba1efa5e79499d792.jpg" },
   { id: "alb-010", category: "Sự kiện", title: "Tất niên", date: "06/01/2026", thumbnailUrl: "/photos/z8053180062593_6be896fa844bd5cd80efcae993a4b047.jpg", fullUrl: "/photos/z8053180062593_6be896fa844bd5cd80efcae993a4b047.jpg" },
   { id: "alb-011", category: "Sinh hoạt", title: "Khởi động làm nóng", date: "25/07/2026", thumbnailUrl: "/photos/z8053184470393_cba3e0b14c67f4ca6b5a309c200f1c3b.jpg", fullUrl: "/photos/z8053184470393_cba3e0b14c67f4ca6b5a309c200f1c3b.jpg" },
-  { id: "alb-012", category: "Kỷ niệm", title: "Ký ức sân C500", date: "22/10/2026", thumbnailUrl: "/photos/z8053184562712_cd2a9252e2f3b2b415747adf1e2970f8.jpg", fullUrl: "/photos/z8053184562712_cd2a9252e2f3b2b415747adf1e2970f8.jpg" },
+  { id: "alb-012", category: "Kỷ niệm", title: "Ký ức những ngày đầu", date: "22/10/2026", thumbnailUrl: "/photos/z8053184562712_cd2a9252e2f3b2b415747adf1e2970f8.jpg", fullUrl: "/photos/z8053184562712_cd2a9252e2f3b2b415747adf1e2970f8.jpg" },
   { id: "alb-013", category: "Trận đấu", title: "Tình huống cố định", date: "17/07/2026", thumbnailUrl: "/photos/z8053184543075_18a4ba86d31f679d9ab2c4a45ee38419.jpg", fullUrl: "/photos/z8053184543075_18a4ba86d31f679d9ab2c4a45ee38419.jpg" },
   { id: "alb-014", category: "Sự kiện", title: "Lễ vinh danh", date: "03/01/2026", thumbnailUrl: "/photos/z8053184562428_7ddb53725f36ca1e01452fbd6526a8d5.jpg", fullUrl: "/photos/z8053184562428_7ddb53725f36ca1e01452fbd6526a8d5.jpg" },
   { id: "alb-015", category: "Sinh hoạt", title: "Rèn kỹ thuật cá nhân", date: "23/03/2026", thumbnailUrl: "/photos/z8053179712048_402eef6bb32ad1d49a0bdad50faa31da.jpg", fullUrl: "/photos/z8053179712048_402eef6bb32ad1d49a0bdad50faa31da.jpg" },
