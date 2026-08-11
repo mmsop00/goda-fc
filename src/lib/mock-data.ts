@@ -399,7 +399,7 @@ export const ABOUT_TEXT = {
   title: "GODA FC — Hơn cả một đội bóng",
   paragraphs: [
     "Thành lập năm 1994 tại Hà Nội, GODA FC là nơi hội tụ của những người yêu bóng đá, gắn kết bởi niềm đam mê và tinh thần thể thao.",
-    "Trải qua hơn 30 năm, CLB đã xây dựng một cộng đồng vững mạnh với hơn 50 thành viên, tham gia hàng trăm trận đấu và giải đấu từ phong trào đến chuyên nghiệp.",
+    "Trải qua hơn 30 năm, CLB đã xây dựng một cộng đồng vững mạnh với hơn 50 thành viên, tham gia hơn 1500 trận đấu và giải đấu từ phong trào đến chuyên nghiệp.",
     "Giá trị cốt lõi: Đoàn kết — Fair Play — Cống hiến — Gia đình.",
   ],
   stats: [
@@ -496,9 +496,8 @@ export interface FullHistoryItem {
 export const ABOUT_STORY = {
   title: "Câu chuyện GODA FC",
   paragraphs: [
-    "GODA FC ra đời vào một buổi chiều mùa hè năm 1994, khi một nhóm bạn trẻ yêu bóng đá tại Hà Nội quyết định thành lập một đội bóng riêng. Sân bóng đầu tiên là sân C500 — một sân đất nhỏ giữa lòng Thủ đô.",
-    "Cái tên GODA được ghép từ những chữ cái đầu tiên trong tên của các thành viên sáng lập. Từ một đội bóng 'tập thể dục cuối tuần', GODA FC dần phát triển thành một câu lạc bộ có tổ chức, tham gia các giải đấu phong trào và gặt hái nhiều thành tích đáng tự hào.",
-    "Trải qua hơn 30 năm, GODA FC không chỉ là nơi để chơi bóng — đó là một gia đình, nơi các thế hệ cầu thủ gắn kết, chia sẻ niềm vui và cùng nhau trưởng thành. Từ những trận đấu giao hữu đầu tiên đến các chức vô địch, từ sân đất C500 đến những sân cỏ nhân tạo hiện đại, hành trình của GODA FC là câu chuyện về đam mê, tình bạn và sự bền bỉ.",
+    "GODA FC ra đời vào một buổi chiều mùa hè năm 1994, khi một nhóm bạn trẻ yêu bóng đá tại Hà Nội quyết định thành lập một đội bóng riêng. Từ một đội bóng 'tập thể dục cuối tuần', GODA FC dần phát triển thành một câu lạc bộ có tổ chức, tham gia các giải đấu phong trào và gặt hái nhiều thành tích đáng tự hào.",
+    "Trải qua hơn 30 năm, GODA FC không chỉ là nơi để chơi bóng — đó là một gia đình, nơi các thế hệ cầu thủ gắn kết, chia sẻ niềm vui và cùng nhau trưởng thành. Từ những trận đấu giao hữu đầu tiên đến các chức vô địch, từ sân bóng đầu tiên đến những sân cỏ nhân tạo hiện đại, hành trình của GODA FC là câu chuyện về đam mê, tình bạn và sự bền bỉ.",
     "Hôm nay, GODA FC tiếp tục sứ mệnh kết nối cộng đồng yêu bóng đá, xây dựng một môi trường thể thao lành mạnh và truyền cảm hứng cho thế hệ trẻ.",
   ],
   imageUrl: "https://placehold.co/600x400/0B1E3A/F7C600?text=GODA+1994",

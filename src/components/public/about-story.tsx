@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ABOUT_STORY } from "@/lib/mock-data";
 
 export function AboutStory() {
@@ -17,17 +18,17 @@ export function AboutStory() {
             </div>
           </div>
 
-          {/* Image placeholder */}
+          {/* Photo */}
           <div className="relative">
-            <div className="aspect-[3/2] rounded-2xl bg-goda-navy/10 flex items-center justify-center overflow-hidden">
-              <div className="text-center p-8">
-                <span className="text-6xl font-extrabold text-goda-navy/20">
-                  1994
-                </span>
-                <p className="text-sm text-goda-navy/50 mt-2">
-                  Sân C500, Hà Nội
-                </p>
-              </div>
+            <div className="aspect-[3/2] rounded-2xl overflow-hidden">
+              <Image
+                src="/photos/z8053179673964_efe7a825564ab004cb6a5e9da363fdbf.jpg"
+                alt="GODA FC team"
+                fill
+                className="object-cover"
+                sizes="600px"
+                unoptimized
+              />
             </div>
             {/* Decorative accent */}
             <div className="absolute -bottom-3 -right-3 size-24 rounded-xl bg-goda-yellow/20 -z-10" />
