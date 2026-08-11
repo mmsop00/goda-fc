@@ -44,6 +44,22 @@ export default function PublicHomePage() {
       {/* Section 1: Hero */}
       <HeroSection />
 
+      {/* Mobile CTA buttons — visible only on mobile, right below hero */}
+      <div className="sm:hidden flex gap-3 px-4 py-4 bg-goda-warm-white justify-center">
+        <Link
+          href="/tran-dau"
+          className="px-6 py-3 bg-goda-yellow text-goda-navy font-bold rounded-full text-sm shadow-md active:scale-95 transition-transform"
+        >
+          Lịch thi đấu
+        </Link>
+        <Link
+          href="/thanh-vien"
+          className="px-6 py-3 bg-goda-navy text-white font-semibold rounded-full text-sm shadow-md active:scale-95 transition-transform"
+        >
+          Thành viên
+        </Link>
+      </div>
+
       {/* Birthday & Event Banner — shows when within 7 days */}
       <BirthdayBanner members={MOCK_MEMBERS} events={MOCK_EVENTS} recentDonations={MOCK_RECENT_DONATIONS} />
 

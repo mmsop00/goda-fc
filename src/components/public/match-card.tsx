@@ -25,6 +25,17 @@ function getResultBg(goda: number, opp: number) {
   return "bg-goda-yellow/5";
 }
 
+function formatGoalPlayer(name: string): string {
+  // Remove "Cầu thủ " prefix for opponent goals
+  if (name.startsWith("Cầu thủ ")) {
+    return name.replace("Cầu thủ ", "");
+  }
+  // For player names, take last 2 parts (drop first name)
+  const parts = name.split(" ");
+  if (parts.length <= 2) return name;
+  return parts.slice(-2).join(" ");
+}
+
 export function MatchCard({ match, isLoading }: MatchCardProps) {
   const router = useRouter();
 
@@ -138,11 +149,15 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                   <div className="flex-1 text-right space-y-0.5">
                     {match.goals
                       .filter((g) => (match.isHome ? g.side === "GODA" : g.side !== "GODA"))
-                      .map((g, i) => (
-                        <p key={`lg-${i}`} className="text-xs text-gray-500 leading-tight font-normal">
-                          {g.player} {g.minute}&apos;{g.assist ? ` (${g.assist})` : ""}
-                        </p>
-                      ))}
+                      .map((g, i) => {
+                        const playerDisplay = formatGoalPlayer(g.player);
+                        const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
+                        return (
+                          <p key={`lg-${i}`} className="text-xs text-gray-500 leading-tight font-normal">
+                            {g.minute}&apos; {playerDisplay}{assistDisplay}
+                          </p>
+                        );
+                      })}
                   </div>
                   {/* Score spacer */}
                   <div className="shrink-0 w-[72px]" />
@@ -150,11 +165,15 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                   <div className="flex-1 text-left space-y-0.5">
                     {match.goals
                       .filter((g) => (match.isHome ? g.side !== "GODA" : g.side === "GODA"))
-                      .map((g, i) => (
-                        <p key={`rg-${i}`} className="text-xs text-gray-600 leading-tight font-normal">
-                          {g.player} {g.minute}&apos;{g.assist ? ` (${g.assist})` : ""}
-                        </p>
-                      ))}
+                      .map((g, i) => {
+                        const playerDisplay = formatGoalPlayer(g.player);
+                        const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
+                        return (
+                          <p key={`rg-${i}`} className="text-xs text-gray-600 leading-tight font-normal">
+                            {g.minute}&apos; {playerDisplay}{assistDisplay}
+                          </p>
+                        );
+                      })}
                   </div>
                 </div>
               )}
