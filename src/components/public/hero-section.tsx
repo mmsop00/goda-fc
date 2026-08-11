@@ -49,5 +49,3 @@ export function HeroSection() {
     </section>
   );
 }
-  );
-}
