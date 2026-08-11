@@ -18,6 +18,7 @@ export interface MatchInfo {
   isHome: boolean;
   detailId?: string;
   googleMapsUrl?: string;
+  goalScorers?: string;
 }
 
 export interface PlayerSpotlight {
@@ -121,6 +122,7 @@ export const MOCK_MATCHES: MatchInfo[] = [
     isHome: false,
     detailId: "mr-003",
     googleMapsUrl: "https://maps.app.goo.gl/dwVAQCR4ZAVYtkFD9",
+    goalScorers: "⚽ Bá 30'",
   },
   {
     id: "match-003",
@@ -133,6 +135,7 @@ export const MOCK_MATCHES: MatchInfo[] = [
     isHome: true,
     detailId: "mr-002",
     googleMapsUrl: "https://maps.app.goo.gl/k9rrrGwQikdfVTDFA",
+    goalScorers: "⚽ Quang 85', Thái 90+3'",
   },
   {
     id: "match-004",

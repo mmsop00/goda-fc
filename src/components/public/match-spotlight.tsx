@@ -108,6 +108,12 @@ export function MatchSpotlight({ matches, isLoading }: MatchSpotlightProps) {
                             <Badge className="bg-goda-yellow text-goda-navy text-sm px-4 py-1 border-0">🤝 Hòa</Badge>
                           )}
                         </div>
+                        {/* Goal scorers */}
+                        {match.goalScorers && (
+                          <p className="text-xs text-gray-500 text-center leading-relaxed">
+                            {match.goalScorers}
+                          </p>
+                        )}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 text-sm text-goda-green font-medium">
