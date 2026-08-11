@@ -6,7 +6,7 @@ export function HeroSection() {
   return (
     <section>
       {/* Full-width team photo */}
-      <div className="relative w-full h-[320px] sm:h-[420px] md:h-[560px] lg:h-[640px]">
+      <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
         <Image
           src={HERO_PHOTO}
           alt="GODA FC team"
@@ -14,7 +14,8 @@ export function HeroSection() {
           className="object-cover object-center"
           priority
           sizes="100vw"
-          quality={90}
+          quality={100}
+          unoptimized
         />
       </div>
 
