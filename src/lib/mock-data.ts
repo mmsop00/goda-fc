@@ -267,7 +267,7 @@ export const MOCK_EVENTS: UpcomingEvent[] = [
     date: "27/09/2026",
     time: "18:00",
     description:
-      "Mừng sinh nhật lần thứ 32. Tiệc BBQ + bóng đá + kỷ niệm.",
+      "Mừng sinh nhật lần thứ 32. Gặp mặt giao lưu tháng 8.",
     level: "MAJOR",
   },
   {
@@ -276,7 +276,7 @@ export const MOCK_EVENTS: UpcomingEvent[] = [
     title: "Sân bia giao lưu tháng 8",
     date: "16/08/2026",
     time: "19:00",
-    description: "Gặp mặt cuối tháng, xem lại highlights mùa giải, bàn kế hoạch sắp tới.",
+    description: "Gặp mặt giao lưu tháng 8, xem lại highlights mùa giải, bàn kế hoạch sắp tới.",
     level: "NORMAL",
   },
 ];
@@ -464,9 +464,11 @@ export type HallOfFameCategory =
   | "Sáng lập"
   | "Ban quản lý"
   | "Đội trưởng"
+  | "Đội phó"
   | "Cầu thủ nổi bật"
   | "Kỷ lục"
-  | "Khoảnh khắc";
+  | "Khoảnh khắc"
+  | "Nhà tài trợ";
 
 export interface HallOfFameEntry {
   id: string;
