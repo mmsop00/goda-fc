@@ -33,12 +33,47 @@ export function HeroSection() {
 
   return (
     <section
-      className="relative bg-goda-navy overflow-hidden"
+      className="bg-goda-navy overflow-hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* ── Image Slider ── */}
-      <div className="relative w-full h-[320px] md:h-[600px] lg:h-[680px]">
+      {/* ── Text Block (above image, no overlap) ── */}
+      <div className="bg-goda-navy px-6 py-10 md:py-14 text-center">
+        <div className="flex flex-col gap-5 max-w-xl mx-auto">
+          <div>
+            <Badge className="bg-goda-yellow text-goda-navy text-sm px-4 py-1 font-semibold border-0">
+              <Trophy className="size-3.5" />
+              Est. 1994
+            </Badge>
+          </div>
+          <h1 className="font-display font-extrabold text-4xl sm:text-5xl md:text-6xl text-white leading-tight tracking-tight">
+            Câu lạc bộ bóng đá
+            <br />
+            <span className="text-goda-yellow">GODA FC</span>
+          </h1>
+          <p className="text-base md:text-lg text-gray-300">
+            Hơn 30 năm gắn kết đam mê — Nơi bóng đá là gia đình.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
+            <Button
+              size="lg"
+              className="bg-goda-yellow text-goda-navy hover:bg-goda-yellow/90 font-semibold text-base px-8"
+            >
+              Khám phá GODA FC
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-white/30 text-white hover:bg-white/10 hover:text-white text-base px-8"
+            >
+              Liên hệ với chúng tôi
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Image Slider (below text) ── */}
+      <div className="relative w-full h-[280px] sm:h-[360px] md:h-[500px] lg:h-[580px]">
         {HERO_PHOTOS.map((src, i) => (
           <Image
             key={src}
@@ -54,8 +89,8 @@ export function HeroSection() {
           />
         ))}
 
-        {/* Dark overlay for readability */}
-        <div className="absolute inset-0 bg-goda-navy/60" />
+        {/* Light overlay for arrow/dot visibility */}
+        <div className="absolute inset-0 bg-black/10" />
 
         {/* Arrow buttons */}
         <button
@@ -87,74 +122,6 @@ export function HeroSection() {
               aria-label={`Ảnh ${i + 1}`}
             />
           ))}
-        </div>
-
-        {/* ── Floating text card (desktop) ── */}
-        <div className="hidden md:flex absolute inset-0 items-center justify-center z-10 px-6">
-          <div className="bg-black/60 backdrop-blur-sm rounded-2xl px-10 py-8 max-w-xl text-center">
-            <Badge className="bg-goda-yellow text-goda-navy text-sm px-4 py-1 font-semibold border-0 mb-4">
-              <Trophy className="size-3.5" />
-              Est. 1994
-            </Badge>
-            <h1 className="font-display font-extrabold text-4xl lg:text-5xl text-white leading-tight tracking-tight mb-3">
-              Câu lạc bộ bóng đá
-              <br />
-              <span className="text-goda-yellow">GODA FC</span>
-            </h1>
-            <p className="text-base lg:text-lg text-gray-300 mb-6">
-              Hơn 30 năm gắn kết đam mê — Nơi bóng đá là gia đình.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button
-                size="lg"
-                className="bg-goda-yellow text-goda-navy hover:bg-goda-yellow/90 font-semibold text-base px-8"
-              >
-                Khám phá GODA FC
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-white/30 text-white hover:bg-white/10 hover:text-white text-base px-8"
-              >
-                Liên hệ với chúng tôi
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Text block (mobile) ── */}
-      <div className="md:hidden bg-goda-navy px-6 py-10 text-center">
-        <div className="flex flex-col gap-5 max-w-md mx-auto">
-          <div>
-            <Badge className="bg-goda-yellow text-goda-navy text-sm px-4 py-1 font-semibold border-0">
-              <Trophy className="size-3.5" />
-              Est. 1994
-            </Badge>
-          </div>
-          <h1 className="font-display font-extrabold text-4xl text-white leading-tight tracking-tight">
-            Câu lạc bộ bóng đá
-            <br />
-            <span className="text-goda-yellow">GODA FC</span>
-          </h1>
-          <p className="text-base text-gray-300">
-            Hơn 30 năm gắn kết đam mê — Nơi bóng đá là gia đình.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button
-              size="lg"
-              className="bg-goda-yellow text-goda-navy hover:bg-goda-yellow/90 font-semibold text-base px-8"
-            >
-              Khám phá GODA FC
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-white/30 text-white hover:bg-white/10 hover:text-white text-base px-8"
-            >
-              Liên hệ với chúng tôi
-            </Button>
-          </div>
         </div>
       </div>
 

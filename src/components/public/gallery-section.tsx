@@ -56,14 +56,6 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
     <>
       <section className="py-16 md:py-20 bg-goda-soft-gray">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="font-display font-bold text-3xl md:text-4xl text-goda-navy mb-3">
-              <span className="mr-2" aria-hidden="true">🖼️</span>
-              Ảnh & Video
-            </h2>
-            <p className="text-gray-500">Khoảnh khắc đáng nhớ của GODA FC — kéo để xem tất cả</p>
-          </div>
-
           {isLoading ? (
             <div className="flex gap-4 overflow-hidden">
               {[1, 2, 3, 4, 5].map((i) => (
