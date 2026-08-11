@@ -45,6 +45,7 @@ export interface UpcomingEvent {
   type: "match" | "club_event" | "social" | "birthday";
   title: string;
   date: string;
+  time?: string;
   description: string;
   level: "MAJOR" | "NORMAL" | "MINOR";
 }
@@ -260,18 +261,11 @@ export const MOCK_HISTORY: HistoryMilestone[] = [
 
 export const MOCK_EVENTS: UpcomingEvent[] = [
   {
-    id: "evt-001",
-    type: "match",
-    title: "Giao hữu GODA FC vs FC Hà Nội Trẻ",
-    date: "15/08/2026",
-    description: "Trận giao hữu định kỳ. Gặp mặt anh em, giao lưu bóng đá.",
-    level: "MAJOR",
-  },
-  {
     id: "evt-002",
     type: "birthday",
     title: "Sinh nhật CLB — GODA FC tròn 32 tuổi",
-    date: "20/09/2026",
+    date: "27/09/2026",
+    time: "18:00",
     description:
       "Mừng sinh nhật lần thứ 32. Tiệc BBQ + bóng đá + kỷ niệm.",
     level: "MAJOR",
@@ -280,100 +274,86 @@ export const MOCK_EVENTS: UpcomingEvent[] = [
     id: "evt-003",
     type: "social",
     title: "Sân bia giao lưu tháng 8",
-    date: "27/08/2026",
+    date: "16/08/2026",
+    time: "19:00",
     description: "Gặp mặt cuối tháng, xem lại highlights mùa giải, bàn kế hoạch sắp tới.",
-    level: "NORMAL",
-  },
-  {
-    id: "evt-004",
-    type: "club_event",
-    title: "Họp BQL CLB quý 3",
-    date: "05/09/2026",
-    description: "Họp ban quản lý: kế hoạch giải đấu, tài chính, thành viên mới.",
     level: "NORMAL",
   },
 ];
 
 export const MOCK_DONORS: TopDonor[] = [
-  { id: "d-001", name: "Vũ Ngọc Sơn", amount: 5000000, month: "08/2026", anonymous: false },
-  { id: "d-002", name: "Trần Minh Tuấn", amount: 3000000, month: "08/2026", anonymous: false },
-  { id: "d-003", name: "Ẩn danh", amount: 2500000, month: "08/2026", anonymous: true },
-  { id: "d-004", name: "Lê Quốc Bảo", amount: 2000000, month: "08/2026", anonymous: false },
-  { id: "d-005", name: "Phạm Đức Thắng", amount: 1500000, month: "08/2026", anonymous: false },
+  { id: "d-001", name: "Huy Quang", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-002", name: "Lê Thanh Hà", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-003", name: "Trần Đình Thanh", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-004", name: "Hoàng Trọng Nội", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-005", name: "Nguyễn Văn Bình", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-006", name: "Chu Triệu Thành", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-007", name: "Nguyễn Tiến Dũng", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-008", name: "Phạm Trung Thông", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-009", name: "Trần Tam Thịnh", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-010", name: "Phạm Duy Thắng", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-011", name: "Phan Trần Phương", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-012", name: "Nguyễn Việt Dũng", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-013", name: "Nguyễn Văn Mạnh", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-014", name: "Vũ Thái Thịnh", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-015", name: "Đinh Thái Bình", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-016", name: "Nguyễn Khắc Vĩnh", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-017", name: "Vũ Đăng Tuấn", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-018", name: "Đào Thanh Tùng", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-019", name: "Nguyễn An", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-020", name: "Trần Tiến Dũng", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-021", name: "Trương Quang Huy", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-022", name: "Phùng Văn Lục", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-023", name: "Nguyễn Mạnh Tuấn", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-024", name: "Vũ Ngọc Sơn", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-025", name: "Trần Nguyên Bá", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-026", name: "Phan Hồng Thái", amount: 0, month: "08/2026", anonymous: false },
+  { id: "d-027", name: "Nguyễn Minh Quang", amount: 0, month: "08/2026", anonymous: false },
 ];
+
+export interface RecentDonation {
+  id: string;
+  name: string;
+  amount: number;
+  date: string;
+  message?: string;
+}
+
+export const MOCK_RECENT_DONATIONS: RecentDonation[] = Array.from({ length: 50 }, (_, i) => {
+  const names = [
+    "Huy Quang", "Lê Thanh Hà", "Trần Đình Thanh", "Vũ Đăng Tuấn", "Nguyễn Văn Mạnh",
+    "Phan Hồng Thái", "Nguyễn Minh Quang", "Phạm Duy Thắng", "Vũ Ngọc Sơn", "Trần Nguyên Bá",
+    "Đinh Thái Bình", "Nguyễn An", "Phạm Trung Thông", "Chu Triệu Thành", "Phan Trần Phương",
+    "Nguyễn Khắc Vĩnh", "Đào Thanh Tùng", "Vũ Thái Thịnh", "Phùng Văn Lục", "Trương Quang Huy",
+    "Nguyễn Văn Bình", "Nguyễn Việt Dũng", "Nguyễn Mạnh Tuấn", "Trần Tam Thịnh", "Hoàng Trọng Nội",
+  ];
+  const msgs = [
+    "Ủng hộ đội bóng", "Góp quỹ tháng 8", "Tài trợ giải đấu", "Ủng hộ sinh nhật CLB",
+    "Góp quỹ hoạt động", "Tài trợ trang phục", "Ủng hộ sân bãi", "Góp quỹ từ thiện",
+    "", "", "", "", "",
+  ];
+  const d = new Date(2026, 7, 11 - i); // last 50 days
+  return {
+    id: `rd-${String(i + 1).padStart(3, "0")}`,
+    name: names[i % names.length],
+    amount: 0,
+    date: `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`,
+    message: i < 8 ? msgs[i] : undefined,
+  };
+});
 
 export const MOCK_NEWS: NewsItem[] = [
   {
     id: "news-001",
-    slug: "goda-fc-thang-fc-thanh-xuan-3-1",
-    title: "GODA FC thắng thuyết phục 3-1 trước FC Thanh Xuân",
-    summary: "Chiến thắng ấn tượng với cú đúp của Hùng 'Goda' và bàn thắng từ Tuấn 'Tường'.",
+    slug: "fc-goda-vo-dich-giai-phui-ha-noi-2007",
+    title: "FC Goda vô địch giải Phủi Hà Nội 2007 trong lần đầu tham dự",
+    summary: "CLB Goda đã vượt qua đối thủ Cường Quốc trong loạt luân lưu nghẹt thở để đoạt cup vô địch Giải bóng đá các CLB Hà Nội mở rộng 2007.",
     content:
-      "Trong khuôn khổ giao hữu định kỳ, GODA FC đã có chiến thắng thuyết phục 3-1 trước FC Thanh Xuân trên sân khách.\n\nNgay từ phút thứ 15, Hùng 'Goda' đã mở tỉ số bằng một cú sút xa đẹp mắt từ ngoài vòng cấm. Đội bạn gỡ hòa ở phút 35 sau một tình huống lộn xộn trước khung thành.\n\nSang hiệp 2, GODA FC pressing mạnh mẽ và có bàn thắng thứ 2 ở phút 60 do công của Tuấn 'Tường' với pha đệm bóng cận thành. Hùng 'Goda' hoàn tất cú đúp ở phút 80, ấn định chiến thắng 3-1.\n\nHLV nhận xét: 'Toàn đội đã chơi một trận tuyệt vời. Tinh thần đồng đội và sự tập trung là chìa khóa.'\n\nGODA FC sẽ tiếp tục tập luyện để chuẩn bị cho trận giao hữu tiếp theo gặp FC Hà Nội Trẻ vào ngày 15/08.",
-    date: "03/08/2026",
-    category: "Trận đấu",
-    author: "Ban truyền thông GODA FC",
-    thumbnailUrl: "https://placehold.co/600x400/0B1E3A/F7C600?text=Match+Recap",
-  },
-  {
-    id: "news-002",
-    slug: "chuc-mung-sinh-nhat-thanh-vien-thang-8",
-    title: "Chúc mừng sinh nhật thành viên tháng 8",
-    summary: "GODA FC gửi lời chúc mừng sinh nhật tới các thành viên có sinh nhật trong tháng 8.",
-    content:
-      "Thay mặt Ban quản lý và toàn thể thành viên, GODA FC xin gửi lời chúc mừng sinh nhật nồng nhiệt nhất tới các thành viên có sinh nhật trong tháng 8!\n\nChúc các anh em luôn dồi dào sức khỏe, giữ vững đam mê với trái bóng tròn, và tiếp tục đồng hành cùng GODA FC trên mọi chặng đường.\n\nDanh sách thành viên sinh nhật tháng 8:\n- Trần Minh Tuấn (05/08)\n- Lê Quốc Bảo (12/08)\n- Hoàng Anh Dũng (25/08)\n\nHẹn gặp anh em tại buổi giao lưu cuối tháng để cùng nâng ly chúc mừng!",
-    date: "01/08/2026",
-    category: "Sinh nhật",
-    author: "Ban quản lý GODA FC",
-    thumbnailUrl: "https://placehold.co/600x400/F7C600/0B1E3A?text=Birthday",
-  },
-  {
-    id: "news-003",
-    slug: "lich-tap-luyen-giao-huu-thang-8-2026",
-    title: "Lịch tập luyện và giao hữu tháng 8/2026",
-    summary: "Cập nhật lịch tập luyện định kỳ và các trận giao hữu trong tháng 8.",
-    content:
-      "Ban quản lý GODA FC xin thông báo lịch tập luyện và thi đấu tháng 8/2026:\n\n📅 Lịch tập luyện:\n- Thứ 4 hàng tuần: 18:00 - 20:00 tại sân Hoàng Gia\n- Chủ nhật: 16:00 - 18:00 tại sân Hoàng Gia\n\n⚽ Lịch giao hữu:\n- 15/08: GODA FC vs FC Hà Nội Trẻ (16:00, sân Hoàng Gia)\n- 22/08: GODA FC vs FC Cầu Giấy (17:00, sân Cầu Giấy)\n\n🍺 Giao lưu cuối tháng:\n- 27/08: Sân bia giao lưu tháng 8 (19:00, quán Bia Hơi Hà Nội)\n\nAnh em lưu ý đi đúng giờ và mang theo đồng phục thi đấu. Mọi thay đổi sẽ được cập nhật trên group.",
-    date: "28/07/2026",
-    category: "Thông báo",
-    author: "Ban quản lý GODA FC",
-    thumbnailUrl: "https://placehold.co/600x400/0F6B4D/FFFFFF?text=Schedule",
-  },
-  {
-    id: "news-004",
-    slug: "goda-fc-dang-cai-giai-phong-trao-ha-noi-2026",
-    title: "GODA FC đăng cai tổ chức giải phong trào Hà Nội 2026",
-    summary: "Lần đầu tiên GODA FC vinh dự được chọn làm đơn vị đăng cai giải đấu phong trào lớn nhất Hà Nội.",
-    content:
-      "Tin vui cho cộng đồng GODA FC! CLB chúng ta đã chính thức được Liên đoàn bóng đá phong trào Hà Nội chọn làm đơn vị đăng cai Giải bóng đá phong trào Hà Nội mở rộng 2026.\n\nĐây là giải đấu quy tụ 16 đội bóng phong trào mạnh nhất khu vực, diễn ra từ tháng 10 đến tháng 12/2026. Các trận đấu sẽ được tổ chức tại cụm sân Hoàng Gia và sân C500.\n\nBan tổ chức giải đấu sẽ được thành lập trong tuần tới. Anh em nào muốn tham gia công tác tổ chức (trọng tài, hậu cần, truyền thông) vui lòng đăng ký với BQL trước ngày 15/08.\n\nĐây là cơ hội lớn để GODA FC khẳng định vị thế trong cộng đồng bóng đá phong trào Thủ đô!",
-    date: "20/07/2026",
+      "CLB Goda đã vượt qua đối thủ \"rắn\" Cường Quốc trong loạt luân lưu nghẹt thở để đoạt cup vô địch. Mất tiền đạo chủ lực vì thẻ đỏ, \"ngựa ô\" của giải phong trào truyền thống này đã cầm cự đến phút chót và bước lên bục nhận giải sau 6 loạt đá 11m.\n\nĐiều bất ngờ là có hàng nghìn CĐV trung thành của hai đội cờ quạt, mũ mão đến cổ vũ cho đội bóng \"con cưng\". Họ tạo ra một không khí rộn ràng trên sân Hàng Đẫy.\n\nThiếu 3 trụ cột, Goda vẫn nhập cuộc lấn lướt và ghi bàn thắng chỉ sau 10 phút bóng lăn. Bước ngoặt của trận đấu chỉ đến khi trọng tài chính rút 2 thẻ đỏ, truất quyền thi đấu mỗi bên một cầu thủ.\n\nMất chân sút chủ lực, Goda không gây được sức ép như trong nửa đầu hiệp 1 và bị CLB Cường Quốc san bằng tỷ số. Cường Quốc tiếp tục lấn lướt nhưng 10 cầu thủ Goda đã chơi phòng thủ chủ động và đưa số phận trận đấu lên chấm phạt đền.\n\nSau 6 loạt cân não, Goda đã lật ngược thế cờ và đoạt chức vô địch - một chiếc cup khó nhọc nhưng xứng đáng.\n\nÔng Chủ tịch Nguyễn Quang Huy hớn hở: \"Tôi muốn và đang có kế hoạch đưa Goda vào bản đồ bóng đá chuyên nghiệp. FC Goda là một công ty cổ phần, mà trong đó cổ phiếu chính là tình yêu và nhiệt huyết của các CĐV\".\n\nNguồn: Báo Dân Trí (11/06/2007)",
+    date: "11/06/2007",
     category: "Giải đấu",
-    author: "Ban quản lý GODA FC",
-    thumbnailUrl: "https://placehold.co/600x400/F7C600/0B1E3A?text=Tournament",
-  },
-  {
-    id: "news-005",
-    slug: "ky-niem-32-nam-thanh-lap-goda-fc",
-    title: "Kỷ niệm 32 năm thành lập GODA FC — Nhìn lại hành trình",
-    summary: "Nhân dịp sinh nhật lần thứ 32, cùng nhìn lại chặng đường đáng tự hào của GODA FC.",
-    content:
-      "Tháng 9 này, GODA FC sẽ kỷ niệm 32 năm thành lập — một cột mốc đáng tự hào trong hành trình của đội bóng.\n\nTừ những ngày đầu trên sân đất C500 với 11 thành viên, GODA FC đã trưởng thành vượt bậc. Đến nay, CLB có hơn 50 thành viên, tham gia hàng trăm trận đấu, giành nhiều danh hiệu cao quý.\n\nNhững con số ấn tượng:\n- 32 năm hoạt động liên tục\n- 1000+ trận đấu chính thức\n- 3 chức vô địch các giải đấu\n- Hơn 50 thành viên qua các thế hệ\n\nBan quản lý đang lên kế hoạch tổ chức lễ kỷ niệm đặc biệt vào ngày 20/09. Chi tiết sẽ được thông báo sớm!",
-    date: "15/07/2026",
-    category: "Kỷ niệm",
-    author: "Ban truyền thông GODA FC",
-    thumbnailUrl: "https://placehold.co/600x400/0B1E3A/F7C600?text=Anniversary",
-  },
-  {
-    id: "news-006",
-    slug: "ra-mat-bo-nhan-dien-thuong-hieu-moi",
-    title: "Ra mắt bộ nhận diện thương hiệu mới của GODA FC",
-    summary: "GODA FC chính thức ra mắt logo mới, đồng phục thi đấu và bộ nhận diện thương hiệu 2026.",
-    content:
-      "Sau nhiều tháng ấp ủ, GODA FC tự hào giới thiệu bộ nhận diện thương hiệu mới — đánh dấu bước chuyển mình mạnh mẽ trong kỷ nguyên mới.\n\nLogo mới giữ nguyên tinh thần của GODA FC nhưng được thiết kế hiện đại hơn với 3 màu chủ đạo: Vàng, Navy và Xanh lục — tượng trưng cho Nhiệt huyết, Bản lĩnh và Phát triển.\n\nĐồng phục thi đấu mùa giải 2026 cũng được nâng cấp với chất liệu cao cấp, thiết kế thể thao năng động. Anh em có thể đặt mua đồng phục mới từ ngày 01/08.\n\nĐặc biệt, website chính thức goda-fc.vn phiên bản mới cũng đã được ra mắt — nơi cập nhật đầy đủ thông tin về CLB, lịch thi đấu, kết quả và hoạt động.",
-    date: "10/07/2026",
-    category: "Tin CLB",
-    author: "Ban truyền thông GODA FC",
-    thumbnailUrl: "https://placehold.co/600x400/0F6B4D/F7C600?text=Branding",
+    author: "Báo Dân Trí",
+    thumbnailUrl: "/photos/z8053184475382_01eca30330d964dec2cbe880b97c6af0.jpg",
   },
 ];
 
@@ -425,7 +405,7 @@ export const ABOUT_TEXT = {
   stats: [
     { label: "Năm thành lập", value: "1994" },
     { label: "Thành viên", value: "50+" },
-    { label: "Trận đấu", value: "1000+" },
+    { label: "Trận đấu", value: "1500+" },
     { label: "Mùa giải", value: "32" },
   ],
 };
@@ -443,14 +423,13 @@ export const FOOTER_DATA = {
     "Câu lạc bộ bóng đá GODA — Thành lập 1994 tại Hà Nội. Nơi kết nối đam mê bóng đá và tinh thần thể thao.",
   links: [
     { label: "Trang chủ", href: "/" },
-    { label: "Giới thiệu", href: "#" },
+    { label: "Giới thiệu", href: "/gioi-thieu" },
     { label: "Lịch sử", href: "/gioi-thieu" },
-    { label: "Tin tức", href: "#" },
+    { label: "Tin tức & Hình ảnh", href: "/tin-tuc" },
   ],
   contact: {
     address: "Hà Nội, Việt Nam",
-    email: "contact@goda-fc.vn",
-    phone: "0912 345 678",
+    phone: "0974 617 962",
   },
 };
 
@@ -920,6 +899,24 @@ const OPP_LINEUP: MatchPlayer[] = [];
 
 export const MOCK_MATCH_RESULTS: MatchResult[] = [
   {
+    id: "mr-005",
+    season: "2026",
+    date: "16/08/2026",
+    time: "16:45",
+    venue: "Sân Hòa Phát, Hà Nội",
+    type: "Giao hữu",
+    isHome: false,
+    opponent: "Tràng An FC",
+    opponentScore: 0,
+    godaScore: 0,
+    godaLineup: BASE_LINEUP,
+    opponentLineup: OPP_LINEUP,
+    goals: [],
+    cards: [],
+    imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+0-0",
+    googleMapsUrl: "https://maps.app.goo.gl/S4a87o6VP4jk9vgW7",
+  },
+  {
     id: "mr-004",
     season: "2026",
     date: "08/08/2026",
@@ -932,50 +929,14 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     godaScore: 0,
     godaLineup: BASE_LINEUP,
     opponentLineup: OPP_LINEUP,
-    goals: [],
+    goals: [
+      { player: "Cầu thủ Việt Nhật FC", minute: 30, side: "opponent" },
+      { player: "Cầu thủ Việt Nhật FC", minute: 65, side: "opponent" },
+      { player: "Cầu thủ Việt Nhật FC", minute: 80, side: "opponent" },
+    ],
     cards: [],
     imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+0-3",
     googleMapsUrl: "https://maps.app.goo.gl/KoyeCaWrBjNVoyg46",
-  },
-  {
-    id: "mr-001",
-    season: "2026",
-    date: "18/07/2026",
-    time: "16:00",
-    venue: "Sân Cổ Nhuế, Hà Nội",
-    type: "Giao hữu",
-    isHome: false,
-    opponent: "Việt Nhật FC",
-    opponentScore: 3,
-    godaScore: 1,
-    godaLineup: BASE_LINEUP,
-    opponentLineup: OPP_LINEUP,
-    goals: [],
-    cards: [],
-    imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+1-3",
-    googleMapsUrl: "https://maps.app.goo.gl/KoyeCaWrBjNVoyg46",
-  },
-  {
-    id: "mr-002",
-    season: "2026",
-    date: "26/07/2026",
-    time: "16:00",
-    venue: "Sân Nguyên Dương, Hà Nội",
-    type: "Giao hữu",
-    isHome: true,
-    opponent: "Nguyên Dương FC",
-    opponentScore: 1,
-    godaScore: 2,
-    godaLineup: BASE_LINEUP,
-    opponentLineup: OPP_LINEUP,
-    goals: [
-      { player: "Nguyễn Minh Quang", minute: 85, side: "GODA" },
-      { player: "Phạm Hồng Thái", minute: 93, side: "GODA" },
-    ],
-    cards: [],
-    mvp: "Phạm Hồng Thái",
-    imageUrl: "https://placehold.co/800x400/0F6B4D/F7C600?text=GODA+2-1",
-    googleMapsUrl: "https://maps.app.goo.gl/k9rrrGwQikdfVTDFA",
   },
   {
     id: "mr-003",
@@ -992,11 +953,58 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     opponentLineup: OPP_LINEUP,
     goals: [
       { player: "Trần Nguyên Bá", minute: 30, assist: "Trần Đình Thanh", side: "GODA" },
+      { player: "Cầu thủ Bắc Việt FC", minute: 85, side: "opponent" },
     ],
     cards: [],
     mvp: "Trần Nguyên Bá",
     imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+1-1",
     googleMapsUrl: "https://maps.app.goo.gl/dwVAQCR4ZAVYtkFD9",
+  },
+  {
+    id: "mr-002",
+    season: "2026",
+    date: "26/07/2026",
+    time: "16:00",
+    venue: "Sân Nguyên Dương, Hà Nội",
+    type: "Giao hữu",
+    isHome: true,
+    opponent: "Nguyên Dương FC",
+    opponentScore: 1,
+    godaScore: 2,
+    godaLineup: BASE_LINEUP,
+    opponentLineup: OPP_LINEUP,
+    goals: [
+      { player: "Cầu thủ Nguyên Dương FC", minute: 80, side: "opponent" },
+      { player: "Nguyễn Minh Quang", minute: 85, side: "GODA" },
+      { player: "Phan Hồng Thái", minute: 93, side: "GODA" },
+    ],
+    cards: [],
+    mvp: "Phan Hồng Thái",
+    imageUrl: "https://placehold.co/800x400/0F6B4D/F7C600?text=GODA+2-1",
+    googleMapsUrl: "https://maps.app.goo.gl/k9rrrGwQikdfVTDFA",
+  },
+  {
+    id: "mr-001",
+    season: "2026",
+    date: "18/07/2026",
+    time: "16:00",
+    venue: "Sân Cổ Nhuế, Hà Nội",
+    type: "Giao hữu",
+    isHome: false,
+    opponent: "Việt Nhật FC",
+    opponentScore: 3,
+    godaScore: 1,
+    godaLineup: BASE_LINEUP,
+    opponentLineup: OPP_LINEUP,
+    goals: [
+      { player: "Cầu thủ GODA FC", minute: 20, side: "GODA" },
+      { player: "Cầu thủ Việt Nhật FC", minute: 60, side: "opponent" },
+      { player: "Cầu thủ Việt Nhật FC", minute: 80, side: "opponent" },
+      { player: "Cầu thủ Việt Nhật FC", minute: 90, side: "opponent" },
+    ],
+    cards: [],
+    imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+1-3",
+    googleMapsUrl: "https://maps.app.goo.gl/KoyeCaWrBjNVoyg46",
   },
 ];
 // ═══════════════════════════════════════
@@ -1039,30 +1047,43 @@ export interface AlbumPhoto {
 
 export const MOCK_MEMBERS: MemberPublic[] = [
   // ── Đội trưởng ──
-  { id: "m-005", name: "Lê Thanh Hà", nickname: "Chủ tịch", position: "Hậu vệ", number: 7, avatarUrl: "", matches: 129, goals: 3, assists: 10, mvp: 0, birthday: "01/08", joinYear: 2009, status: "Đội trưởng" },
-  // ── Đội phó ──
-  { id: "m-016", name: "Trần Đình Thanh", nickname: "Thanh", position: "Tiền vệ", number: 22, avatarUrl: "", matches: 175, goals: 26, assists: 29, mvp: 2, birthday: "", joinYear: 2018, status: "Đội phó" },
-  { id: "m-018", name: "Huy Quang", nickname: "Quang", position: "Hậu vệ", number: 0, avatarUrl: "", matches: 0, goals: 0, assists: 0, mvp: 0, birthday: "", joinYear: 2026, status: "Đội phó" },
-  { id: "m-017", name: "Hoàng Trọng Nội", nickname: "Nội", position: "Hậu vệ", number: 0, avatarUrl: "", matches: 0, goals: 0, assists: 0, mvp: 0, birthday: "23/05", joinYear: 2026, status: "Đội phó" },
-  // ── Cầu thủ (theo tuổi, già nhất trước) ──
-  { id: "m-011", name: "Nguyễn Văn Bình", nickname: "Bình", position: "Tiền vệ", number: 0, avatarUrl: "", matches: 87, goals: 6, assists: 11, mvp: 0, birthday: "19/04", joinYear: 2026, status: "Đang thi đấu" },
-  { id: "m-009", name: "Chu Triệu Thành", nickname: "Thầy giáo", position: "Tiền vệ", number: 0, avatarUrl: "", matches: 114, goals: 9, assists: 18, mvp: 0, birthday: "25/02", joinYear: 2026, status: "Đang thi đấu" },
-  { id: "m-014", name: "Phạm Trung Thông", nickname: "Thông", position: "Hậu vệ", number: 0, avatarUrl: "", matches: 196, goals: 3, assists: 11, mvp: 1, birthday: "07/08", joinYear: 2026, status: "Đang thi đấu" },
-  { id: "m-019", name: "Phạm Duy Thắng", nickname: "Thành Toldo", position: "Tiền đạo", number: 0, avatarUrl: "", matches: 0, goals: 0, assists: 0, mvp: 0, birthday: "25/11", joinYear: 2026, status: "Đang thi đấu" },
-  { id: "m-002", name: "Phan Trần Phương", nickname: "Thầy giáo Phương", position: "Hậu vệ", number: 5, avatarUrl: "", matches: 82, goals: 9, assists: 15, mvp: 0, birthday: "14/03", joinYear: 2018, status: "Đang thi đấu" },
-  { id: "m-008", name: "Nguyễn Văn Mạnh", nickname: "Mạnh", position: "Hậu vệ", number: 0, avatarUrl: "", matches: 196, goals: 29, assists: 34, mvp: 1, birthday: "28/08", joinYear: 2015, status: "Đang thi đấu" },
-  { id: "m-013", name: "Đinh Thái Bình", nickname: "Bình", position: "Tiền vệ", number: 0, avatarUrl: "", matches: 85, goals: 15, assists: 35, mvp: 2, birthday: "18/10", joinYear: 2026, status: "Đang thi đấu" },
-  { id: "m-003", name: "Vũ Đăng Tuấn", nickname: "Trâu Đồ Sơn", position: "Tiền vệ", number: 80, avatarUrl: "", matches: 123, goals: 25, assists: 34, mvp: 1, birthday: "08/02", joinYear: 1994, status: "Đang thi đấu" },
-  { id: "m-007", name: "Nguyễn Khắc Vĩnh", nickname: "Vĩnh", position: "Hậu vệ", number: 0, avatarUrl: "", matches: 102, goals: 10, assists: 17, mvp: 0, birthday: "18/07", joinYear: 2023, status: "Đang thi đấu" },
-  { id: "m-010", name: "Nguyễn An", nickname: "An", position: "Thủ môn", number: 0, avatarUrl: "", matches: 104, goals: 16, assists: 30, mvp: 1, birthday: "05/10", joinYear: 2020, status: "Đang thi đấu" },
-  { id: "m-006", name: "Đào Thanh Tùng", nickname: "Tùng Lò Gạch", position: "Thủ môn", number: 8, avatarUrl: "", matches: 121, goals: 2, assists: 4, mvp: 0, birthday: "18/03", joinYear: 2025, status: "Đang thi đấu" },
-  { id: "m-001", name: "Vũ Ngọc Sơn", nickname: "Xuân Son", position: "Tiền vệ", number: 15, avatarUrl: "https://drive.google.com/uc?export=view&id=1vAWvXyQxnNuTMbQHuJCuYHz4b2xXq0ak", matches: 0, goals: 0, assists: 0, mvp: 0, birthday: "20/01", joinYear: 2025, status: "Đang thi đấu" },
-  { id: "m-004", name: "Trần Nguyên Bá", nickname: "Bá Nghệ", position: "Tiền đạo", number: 37, avatarUrl: "", matches: 0, goals: 0, assists: 0, mvp: 0, birthday: "04/09", joinYear: 2026, status: "Đang thi đấu" },
-  { id: "m-015", name: "Phạm Hồng Thái", nickname: "Thái", position: "Tiền vệ", number: 0, avatarUrl: "", matches: 182, goals: 59, assists: 15, mvp: 2, birthday: "03/02", joinYear: 2016, status: "Đang thi đấu" },
-  { id: "m-012", name: "Nguyễn Minh Quang", nickname: "Quang", position: "Tiền vệ", number: 0, avatarUrl: "", matches: 151, goals: 52, assists: 19, mvp: 3, birthday: "26/09", joinYear: 2017, status: "Đang thi đấu" },
+  { id: "m-001", name: "Lê Thanh Hà", nickname: "Chủ tịch", position: "Hậu vệ", number: 7, avatarUrl: "", matches: 187, goals: 8, assists: 22, mvp: 32, birthday: "08/01", joinYear: 2009, status: "Đội trưởng" },
+  // ── Đội phó (sắp xếp theo tuổi) ──
+  { id: "m-002", name: "Trần Đình Thanh", nickname: "Thanh", position: "Tiền vệ", number: 16, avatarUrl: "", matches: 210, goals: 38, assists: 45, mvp: 45, birthday: "15/10", joinYear: 2018, status: "Đội phó" },
+  { id: "m-003", name: "Huy Quang", nickname: "Quang", position: "Hậu vệ", number: 3, avatarUrl: "", matches: 95, goals: 6, assists: 18, mvp: 15, birthday: "01/01", joinYear: 0, status: "Đội phó" },
+  { id: "m-004", name: "Hoàng Trọng Nội", nickname: "Nội", position: "Hậu vệ", number: 11, avatarUrl: "", matches: 88, goals: 4, assists: 15, mvp: 12, birthday: "23/05", joinYear: 0, status: "Đội phó" },
+  // ── Cầu thủ (sắp xếp theo tuổi, già nhất trước) ──
+  { id: "m-005", name: "Nguyễn Văn Bình", nickname: "Bình", position: "Tiền vệ", number: 55, avatarUrl: "", matches: 130, goals: 12, assists: 21, mvp: 14, birthday: "19/04", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-006", name: "Chu Triệu Thành", nickname: "Thầy giáo", position: "Tiền vệ", number: 56, avatarUrl: "", matches: 156, goals: 15, assists: 28, mvp: 16, birthday: "25/02", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-007", name: "Nguyễn Tiến Dũng", nickname: "Tiến Dũng", position: "Hậu vệ", number: 0, avatarUrl: "", matches: 45, goals: 1, assists: 6, mvp: 10, birthday: "25/06", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-008", name: "Phạm Trung Thông", nickname: "Thông", position: "Hậu vệ", number: 33, avatarUrl: "", matches: 230, goals: 6, assists: 20, mvp: 35, birthday: "08/07", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-009", name: "Trần Tam Thịnh", nickname: "Thịnh", position: "Tiền vệ", number: 22, avatarUrl: "", matches: 68, goals: 14, assists: 22, mvp: 13, birthday: "16/08", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-010", name: "Phạm Duy Thắng", nickname: "Thành Toldo", position: "Tiền đạo", number: 13, avatarUrl: "", matches: 82, goals: 55, assists: 18, mvp: 48, birthday: "25/11", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-011", name: "Phan Trần Phương", nickname: "Thầy giáo Phương", position: "Hậu vệ", number: 5, avatarUrl: "", matches: 142, goals: 15, assists: 27, mvp: 30, birthday: "14/03", joinYear: 2018, status: "Đang thi đấu" },
+  { id: "m-012", name: "Nguyễn Việt Dũng", nickname: "Dũng", position: "Hậu vệ", number: 76, avatarUrl: "", matches: 65, goals: 3, assists: 10, mvp: 11, birthday: "27/06", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-013", name: "Nguyễn Văn Mạnh", nickname: "Mạnh", position: "Hậu vệ", number: 77, avatarUrl: "", matches: 245, goals: 38, assists: 48, mvp: 42, birthday: "28/08", joinYear: 2015, status: "Đang thi đấu" },
+  { id: "m-014", name: "Vũ Thái Thịnh", nickname: "Thịnh tỉnh táo", position: "Tiền vệ", number: 17, avatarUrl: "", matches: 85, goals: 18, assists: 25, mvp: 17, birthday: "17/02", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-015", name: "Đinh Thái Bình", nickname: "Bình", position: "Tiền vệ", number: 10, avatarUrl: "", matches: 128, goals: 25, assists: 52, mvp: 38, birthday: "18/10", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-016", name: "Nguyễn Khắc Vĩnh", nickname: "Vĩnh", position: "Hậu vệ", number: 6, avatarUrl: "", matches: 145, goals: 16, assists: 28, mvp: 17, birthday: "18/07", joinYear: 2023, status: "Đang thi đấu" },
+  { id: "m-017", name: "Vũ Đăng Tuấn", nickname: "Trâu Đồ Sơn", position: "Tiền vệ", number: 80, avatarUrl: "", matches: 198, goals: 42, assists: 55, mvp: 46, birthday: "02/08", joinYear: 1994, status: "Đang thi đấu" },
+  { id: "m-018", name: "Đào Thanh Tùng", nickname: "Tùng Lò Gạch", position: "Thủ môn", number: 8, avatarUrl: "", matches: 168, goals: 3, assists: 8, mvp: 18, birthday: "18/03", joinYear: 2025, status: "Đang thi đấu" },
+  { id: "m-019", name: "Nguyễn An", nickname: "An", position: "Thủ môn", number: 1, avatarUrl: "", matches: 155, goals: 22, assists: 42, mvp: 36, birthday: "10/05", joinYear: 2020, status: "Đang thi đấu" },
+  { id: "m-020", name: "Trần Tiến Dũng", nickname: "Tiến Dũng", position: "Hậu vệ", number: 100, avatarUrl: "", matches: 52, goals: 2, assists: 8, mvp: 10, birthday: "04/10", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-021", name: "Trương Quang Huy", nickname: "Huy", position: "Hậu vệ", number: 4, avatarUrl: "", matches: 78, goals: 7, assists: 14, mvp: 13, birthday: "21/06", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-022", name: "Phùng Văn Lục", nickname: "Lục Cờ Đỏ", position: "Hậu vệ", number: 16, avatarUrl: "", matches: 88, goals: 10, assists: 20, mvp: 15, birthday: "05/08", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-023", name: "Nguyễn Mạnh Tuấn", nickname: "Tuấn", position: "Hậu vệ", number: 23, avatarUrl: "", matches: 92, goals: 8, assists: 19, mvp: 12, birthday: "21/05", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-024", name: "Vũ Ngọc Sơn", nickname: "Xuân Son", position: "Tiền vệ", number: 20, avatarUrl: "https://drive.google.com/uc?export=view&id=1vAWvXyQxnNuTMbQHuJCuYHz4b2xXq0ak", matches: 98, goals: 26, assists: 34, mvp: 33, birthday: "20/01", joinYear: 2025, status: "Đang thi đấu" },
+  { id: "m-025", name: "Trần Nguyên Bá", nickname: "Bá Nghệ", position: "Tiền đạo", number: 19, avatarUrl: "", matches: 72, goals: 45, assists: 16, mvp: 44, birthday: "09/04", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-026", name: "Phan Hồng Thái", nickname: "Thái", position: "Tiền vệ", number: 38, avatarUrl: "", matches: 220, goals: 78, assists: 28, mvp: 50, birthday: "02/03", joinYear: 2016, status: "Đang thi đấu" },
+  { id: "m-027", name: "Nguyễn Minh Quang", nickname: "Quang", position: "Tiền vệ", number: 2, avatarUrl: "", matches: 195, goals: 68, assists: 32, mvp: 47, birthday: "26/09", joinYear: 2017, status: "Đang thi đấu" },
 ];
 
 export const MOCK_ALBUM: AlbumPhoto[] = [
+  // ── Video: Kỷ niệm 30 năm thành lập GODA FC (28/09/2024) ──
+  { id: "alb-v01", category: "Video", title: "Toàn cảnh Giải bóng đá Kỷ niệm 30 năm thành lập CLB GODA: GODA FC - 5T FC", date: "28/09/2024", thumbnailUrl: "https://img.youtube.com/vi/zum8IuoT4BA/hqdefault.jpg", fullUrl: "https://img.youtube.com/vi/zum8IuoT4BA/hqdefault.jpg", videoUrl: "https://www.youtube.com/watch?v=zum8IuoT4BA" },
+  { id: "alb-v02", category: "Video", title: "FC GODA -vs- FC 5B | Giải bóng đá kỷ niệm 30 năm thành lập CLB GODA", date: "28/09/2024", thumbnailUrl: "https://img.youtube.com/vi/AgPt9pHzAM8/hqdefault.jpg", fullUrl: "https://img.youtube.com/vi/AgPt9pHzAM8/hqdefault.jpg", videoUrl: "https://www.youtube.com/watch?v=AgPt9pHzAM8" },
+  { id: "alb-v03", category: "Video", title: "FC GODA -vs- FC 5T | Giải bóng đá kỷ niệm 30 năm thành lập CLB GODA", date: "28/09/2024", thumbnailUrl: "https://img.youtube.com/vi/6JYJNApzsXc/hqdefault.jpg", fullUrl: "https://img.youtube.com/vi/6JYJNApzsXc/hqdefault.jpg", videoUrl: "https://www.youtube.com/watch?v=6JYJNApzsXc" },
+  { id: "alb-v04", category: "Video", title: "Full: FC MOTOR HÀ NỘI -vs- FC 5B | Giải bóng đá kỷ niệm 30 năm thành lập CLB GODA", date: "28/09/2024", thumbnailUrl: "https://img.youtube.com/vi/B8hOlIa7bYs/hqdefault.jpg", fullUrl: "https://img.youtube.com/vi/B8hOlIa7bYs/hqdefault.jpg", videoUrl: "https://www.youtube.com/watch?v=B8hOlIa7bYs" },
   { id: "alb-001", category: "Trận đấu", title: "Pha bóng đẹp", date: "14/02/2023", thumbnailUrl: "/photos/z8053179951528_5c1e87b1e2caf22cde3cd584133220e9.jpg", fullUrl: "/photos/z8053179951528_5c1e87b1e2caf22cde3cd584133220e9.jpg" },
   { id: "alb-002", category: "Sự kiện", title: "Tiệc BBQ", date: "26/04/2023", thumbnailUrl: "/photos/1784284566161_1879959454207999809_1879959454207999809_f51d837da341814b9e4863f6b9b3ee48.jpg", fullUrl: "/photos/1784284566161_1879959454207999809_1879959454207999809_f51d837da341814b9e4863f6b9b3ee48.jpg" },
   { id: "alb-003", category: "Sinh hoạt", title: "Rèn thể lực", date: "18/02/2026", thumbnailUrl: "/photos/1784284566088_1879959454207999809_1879959454207999809_e6d7930a6c6e6ade692ef730ec772f4e.jpg", fullUrl: "/photos/1784284566088_1879959454207999809_1879959454207999809_e6d7930a6c6e6ade692ef730ec772f4e.jpg" },

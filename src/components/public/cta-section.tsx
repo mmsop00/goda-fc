@@ -15,20 +15,15 @@ export function CTASection() {
         <p className="text-lg text-gray-300 mb-8 max-w-xl mx-auto">
           {CTA_DATA.description}
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            size="lg"
-            className="bg-goda-yellow text-goda-navy hover:bg-goda-yellow/90 font-semibold text-base px-8"
-          >
-            {CTA_DATA.primaryButton}
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="border-white/30 text-white hover:bg-white/10 hover:text-white text-base px-8"
-          >
-            {CTA_DATA.secondaryButton}
-          </Button>
+        <div className="flex justify-center">
+          <a href="tel:0974617962">
+            <Button
+              size="lg"
+              className="bg-goda-yellow text-goda-navy hover:bg-goda-yellow/90 font-semibold text-base px-8"
+            >
+              {CTA_DATA.secondaryButton}
+            </Button>
+          </a>
         </div>
       </div>
     </section>

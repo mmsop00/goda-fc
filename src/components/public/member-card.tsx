@@ -61,7 +61,7 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
         {/* Birthday + Join Year */}
         <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-gray-500 min-h-[1.25rem]">
           {member.birthday && <span>🎂 {member.birthday}</span>}
-          {member.joinYear && <span>Tham gia: {member.joinYear}</span>}
+          <span>Tham gia: {member.joinYear && member.joinYear > 0 ? member.joinYear : "xx"}</span>
         </div>
 
         {/* Stats — PUBLIC FIELDS ONLY */}
@@ -87,9 +87,15 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
           </div>
         </div>
 
-        {/* Status */}
-        {member.status && (
-          <Badge variant="outline" className="text-xs bg-goda-green/10 text-goda-green border-0">
+        {/* Chức vụ — only show for Đội trưởng / Đội phó */}
+        {member.status && member.status !== "Đang thi đấu" && (
+          <Badge
+            className={`text-xs border-0 ${
+              member.status === "Đội trưởng"
+                ? "bg-goda-yellow text-goda-navy"
+                : "bg-goda-navy text-white"
+            }`}
+          >
             {member.status}
           </Badge>
         )}

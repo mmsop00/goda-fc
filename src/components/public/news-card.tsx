@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 import Link from "next/link";
 import { NEWS_CATEGORY_COLORS } from "@/lib/mock-data";
 import type { NewsItem } from "@/lib/mock-data";
@@ -31,10 +32,14 @@ export function NewsCard({ item, isLoading }: NewsCardProps) {
     <Link href={`/tin-tuc/${item.slug}`}>
       <Card className="p-0 overflow-hidden group cursor-pointer h-full hover:shadow-md transition-shadow">
         {/* Thumbnail */}
-        <div className="h-48 bg-goda-navy/10 flex items-center justify-center overflow-hidden">
-          <span className="text-4xl font-extrabold text-goda-navy/20">
-            {item.category.slice(0, 2)}
-          </span>
+        <div className="h-48 bg-goda-navy/10 flex items-center justify-center overflow-hidden relative">
+          {item.thumbnailUrl && !item.thumbnailUrl.includes("placehold.co") ? (
+            <Image src={item.thumbnailUrl} alt={item.title} fill sizes="400px" className="object-cover" />
+          ) : (
+            <span className="text-4xl font-extrabold text-goda-navy/20">
+              {item.category.slice(0, 2)}
+            </span>
+          )}
         </div>
 
         <CardContent className="p-5 space-y-3">

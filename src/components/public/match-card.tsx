@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, Clock, MapPin, Award, ExternalLink } from "lucide-react";
+import { CountdownTimer } from "./countdown-timer";
 import type { MatchResult } from "@/lib/mock-data";
 
 interface MatchCardProps {
@@ -57,17 +58,27 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
 
   const isUpcoming = match.godaScore === 0 && match.opponentScore === 0 && match.goals.length === 0;
 
+  // Dynamic team name colors based on result
+  const leftIsGoda = match.isHome;
+  const godaColor = isUpcoming || result === "D" ? "text-goda-navy" : result === "W" ? "text-goda-navy" : "text-gray-400";
+  const oppColor = isUpcoming || result === "D" ? "text-goda-navy" : result === "W" ? "text-gray-400" : "text-goda-navy";
+  const godaWeight = isUpcoming || result === "D" || result === "W" ? "font-semibold" : "font-normal";
+  const oppWeight = isUpcoming || result === "D" || result === "L" ? "font-semibold" : "font-normal";
+  const godaScoreColor = isUpcoming || result === "D" || result === "W" ? "text-goda-navy" : "text-gray-400";
+  const oppScoreColor = isUpcoming || result === "D" || result === "L" ? "text-goda-navy" : "text-gray-400";
+
   return (
     <div
       onClick={() => router.push(`/tran-dau/${match.id}`)}
       role="link"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === "Enter") router.push(`/tran-dau/${match.id}`); }}
+      className="h-full"
     >
       <Card
-        className={`p-0 overflow-hidden border-l-4 ${resultColor} ${resultBg} hover:shadow-md transition-shadow cursor-pointer`}
+        className={`p-0 overflow-hidden border-l-4 ${resultColor} ${resultBg} hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col`}
       >
-        <CardContent className="p-5 space-y-4">
+        <CardContent className="p-5 space-y-4 flex-1 flex flex-col">
           {/* Type Badge + Date + Time */}
           <div className="flex items-center justify-between">
             <Badge variant="outline" className="text-xs">
@@ -87,34 +98,66 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             </div>
           </div>
 
-          {/* Teams Row — always show */}
-          <div className="flex items-center justify-center gap-4 py-2">
-            <div className="text-right flex-1">
-              <p className="font-display font-bold text-sm text-goda-navy">
-                {match.isHome ? "GODA FC" : match.opponent}
-              </p>
-            </div>
+          {/* Teams Row — always show team names */}
+          <div className="flex items-center justify-center gap-3 py-3">
+            {/* Left team name */}
+            <span className={`flex-1 text-right font-display text-sm truncate ${leftIsGoda ? godaColor : oppColor} ${leftIsGoda ? godaWeight : oppWeight}`}>
+              {match.isHome ? "GODA FC" : match.opponent}
+            </span>
+            {/* Score or upcoming badge */}
             {isUpcoming ? (
-              <Badge className="bg-goda-navy text-white text-xs px-3 py-1">
+              <Badge className="bg-goda-navy text-white text-xs px-3 py-1 shrink-0">
                 ⏳ Chưa diễn ra
               </Badge>
             ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-extrabold text-goda-navy">
+              <>
+                <span className={`text-2xl font-extrabold shrink-0 ${leftIsGoda ? godaScoreColor : oppScoreColor}`}>
                   {match.isHome ? match.godaScore : match.opponentScore}
                 </span>
-                <span className="text-lg text-gray-400">-</span>
-                <span className="text-2xl font-extrabold text-gray-500">
+                <span className="text-lg text-gray-400 shrink-0">-</span>
+                <span className={`text-2xl font-extrabold shrink-0 ${leftIsGoda ? oppScoreColor : godaScoreColor}`}>
                   {match.isHome ? match.opponentScore : match.godaScore}
                 </span>
-              </div>
+              </>
             )}
-            <div className="text-left flex-1">
-              <p className="font-display font-bold text-sm text-gray-500">
-                {match.isHome ? match.opponent : "GODA FC"}
-              </p>
-            </div>
+            {/* Right team name */}
+            <span className={`flex-1 text-left font-display text-sm truncate ${leftIsGoda ? oppColor : godaColor} ${leftIsGoda ? oppWeight : godaWeight}`}>
+              {match.isHome ? match.opponent : "GODA FC"}
+            </span>
           </div>
+
+          {/* Countdown for upcoming matches */}
+          {isUpcoming && match.time && (
+            <CountdownTimer date={match.date} time={match.time} />
+          )}
+
+          {/* Goal Scorers — under each team (completed matches only) */}
+          {!isUpcoming && match.goals.length > 0 && (
+                <div className="flex justify-center gap-3">
+                  {/* Left goals */}
+                  <div className="flex-1 text-right space-y-0.5">
+                    {match.goals
+                      .filter((g) => (match.isHome ? g.side === "GODA" : g.side !== "GODA"))
+                      .map((g, i) => (
+                        <p key={`lg-${i}`} className="text-xs text-gray-500 leading-tight font-normal">
+                          {g.player} {g.minute}&apos;{g.assist ? ` (${g.assist})` : ""}
+                        </p>
+                      ))}
+                  </div>
+                  {/* Score spacer */}
+                  <div className="shrink-0 w-[72px]" />
+                  {/* Right goals */}
+                  <div className="flex-1 text-left space-y-0.5">
+                    {match.goals
+                      .filter((g) => (match.isHome ? g.side !== "GODA" : g.side === "GODA"))
+                      .map((g, i) => (
+                        <p key={`rg-${i}`} className="text-xs text-gray-600 leading-tight font-normal">
+                          {g.player} {g.minute}&apos;{g.assist ? ` (${g.assist})` : ""}
+                        </p>
+                      ))}
+                  </div>
+                </div>
+              )}
 
           {/* Result Badge — only for completed matches */}
           {!isUpcoming && (
@@ -133,8 +176,8 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             </div>
           )}
 
-          {/* Venue + MVP */}
-          <div className="space-y-1">
+          {/* Venue + MVP — pushed to bottom for consistent card heights */}
+          <div className="space-y-1 mt-auto pt-2 border-t border-gray-100">
             <div className="flex items-center gap-1">
               <MapPin className="size-3 text-gray-400 shrink-0" />
               {match.googleMapsUrl ? (

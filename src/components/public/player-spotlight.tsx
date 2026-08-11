@@ -130,18 +130,23 @@ export function PlayerSpotlight({ members, isLoading }: PlayerSpotlightProps) {
                         )}
                       </div>
 
-                      {/* Status */}
-                      <Badge
-                        className={`text-xs border-0 ${
-                          member.status?.includes("Đội trưởng")
-                            ? "bg-goda-yellow text-goda-navy"
-                            : member.status?.includes("Đội phó")
-                              ? "bg-goda-navy text-white"
-                              : "bg-goda-green/10 text-goda-green"
-                        }`}
-                      >
-                        {member.status}
-                      </Badge>
+                      {/* Chức vụ — only show for Đội trưởng / Đội phó */}
+                      {member.status && member.status !== "Đang thi đấu" && (
+                        <Badge
+                          className={`text-xs border-0 ${
+                            member.status === "Đội trưởng"
+                              ? "bg-goda-yellow text-goda-navy"
+                              : "bg-goda-navy text-white"
+                          }`}
+                        >
+                          {member.status}
+                        </Badge>
+                      )}
+
+                      {/* Join Year */}
+                      <span className="text-xs text-gray-400">
+                        Tham gia: {member.joinYear && member.joinYear > 0 ? member.joinYear : "xx"}
+                      </span>
 
                       {/* Stats */}
                       <div className="grid grid-cols-3 gap-1 w-full text-center pt-2 border-t border-gray-100">

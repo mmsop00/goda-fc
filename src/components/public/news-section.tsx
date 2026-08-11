@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, Newspaper } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { NewsItem } from "@/lib/mock-data";
 
@@ -52,12 +53,17 @@ export function NewsSection({ news, isLoading }: NewsSectionProps) {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {news.map((item) => (
-              <Card key={item.id} className="p-0 overflow-hidden group cursor-pointer">
+              <Link key={item.id} href={`/tin-tuc/${item.slug}`}>
+                <Card className="p-0 overflow-hidden group cursor-pointer h-full hover:shadow-md transition-shadow">
                 {/* Thumbnail */}
-                <div className="h-48 bg-goda-soft-gray flex items-center justify-center overflow-hidden">
-                  <span className="text-4xl text-goda-navy/20 font-extrabold">
-                    {item.category.slice(0, 2)}
-                  </span>
+                <div className="h-48 bg-goda-soft-gray flex items-center justify-center overflow-hidden relative">
+                  {item.thumbnailUrl && !item.thumbnailUrl.includes("placehold.co") ? (
+                    <Image src={item.thumbnailUrl} alt={item.title} fill sizes="400px" className="object-cover" />
+                  ) : (
+                    <span className="text-4xl text-goda-navy/20 font-extrabold">
+                      {item.category.slice(0, 2)}
+                    </span>
+                  )}
                 </div>
                 <CardContent className="p-5 space-y-3">
                   <div className="flex items-center gap-2">
@@ -74,6 +80,7 @@ export function NewsSection({ news, isLoading }: NewsSectionProps) {
                   </p>
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
         )}
