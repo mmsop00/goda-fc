@@ -68,7 +68,7 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
             <div className="flex gap-4 overflow-hidden">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="shrink-0 w-72">
-                  <Skeleton className="h-48 rounded-lg" />
+                  <Skeleton className="h-64 rounded-lg" />
                 </div>
               ))}
             </div>
@@ -94,8 +94,8 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
               <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
                 {sorted.map((item, i) => (
                   <div key={item.id} className="shrink-0 w-72 snap-start">
-                    <div onClick={() => setLightboxIndex(i)} className="group/card relative h-48 rounded-lg overflow-hidden bg-goda-navy/10 cursor-pointer">
-                      <Image src={item.thumbnailUrl} alt={item.title} fill sizes="288px" className="object-cover transition-transform group-hover/card:scale-105" loading="lazy" />
+                    <div onClick={() => setLightboxIndex(i)} className="group/card relative h-64 rounded-lg overflow-hidden bg-goda-navy/10 cursor-pointer">
+                      <Image src={item.thumbnailUrl} alt={item.title} fill sizes="288px" className="object-contain transition-transform group-hover/card:scale-105" loading="lazy" />
                       {/* Video play icon */}
                       {item.category === "Video" && (
                         <div className="absolute inset-0 flex items-center justify-center bg-goda-navy/30">
