@@ -25,26 +25,26 @@ export default function PublicHomePage() {
       {/* Section 1: Hero */}
       <HeroSection />
 
-      {/* Section 2: Match Spotlight */}
+      {/* Section 2: Gallery Slider */}
+      <GallerySection items={MOCK_ALBUM} />
+
+      {/* Section 3: Match Spotlight */}
       <MatchSpotlight matches={MOCK_MATCHES} />
 
-      {/* Section 3: About */}
+      {/* Section 4: About */}
       <AboutSection />
 
-      {/* Section 4: Player Slider */}
+      {/* Section 5: Player Slider */}
       <PlayerSpotlight members={MOCK_MEMBERS} />
 
-      {/* Section 5: History Teaser */}
+      {/* Section 6: History Teaser */}
       <HistoryTeaser milestones={MOCK_HISTORY} />
 
-      {/* Section 6: Events + Top Donate */}
+      {/* Section 7: Events + Top Donate */}
       <EventsDonateSection events={MOCK_EVENTS} donors={MOCK_DONORS} />
 
-      {/* Section 7: News */}
+      {/* Section 8: News */}
       <NewsSection news={MOCK_NEWS} />
-
-      {/* Section 8: Gallery Slider */}
-      <GallerySection items={MOCK_ALBUM} />
 
       {/* Section 9: CTA */}
       <CTASection />
