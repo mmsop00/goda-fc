@@ -11,7 +11,7 @@ export function HeroSection() {
           src={HERO_PHOTO}
           alt="GODA FC team"
           fill
-          className="object-cover object-center"
+          className="object-contain object-center"
           priority
           sizes="100vw"
           quality={100}
