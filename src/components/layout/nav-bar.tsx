@@ -47,7 +47,7 @@ export function NavBar() {
             {/* Logo / Brand */}
             <Link
               href="/"
-              className="flex items-center gap-2 font-display font-extrabold text-xl text-white hover:text-goda-yellow transition-colors shrink-0"
+              className="flex items-center gap-2 font-display text-white hover:text-goda-yellow transition-colors shrink-0"
             >
               <Image
                 src="/logo/1784257218361_1879959454207999809_1879959454207999809_cf852bc3f51705542f6fa977a483853e.jpg"
@@ -59,7 +59,15 @@ export function NavBar() {
                 style={{ imageRendering: "crisp-edges" }}
                 priority
               />
-              <span className="hidden sm:inline">GODA FC</span>
+              {/* Desktop: GODA FC only */}
+              <span className="hidden sm:inline font-extrabold text-xl">GODA FC</span>
+              {/* Mobile: GODA FC + tagline next to logo */}
+              <span className="sm:hidden flex flex-col leading-tight">
+                <span className="font-extrabold text-base">GODA FC</span>
+                <span className="text-[10px] text-white/70 tracking-[0.15em] uppercase font-semibold">
+                  Thành lập 1994 — Hà Nội
+                </span>
+              </span>
             </Link>
 
             {/* Desktop Links (≥768px) */}
