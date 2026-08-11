@@ -106,11 +106,11 @@ export function BirthdayBanner({ members, events, recentDonations = [] }: Birthd
   return (
     <div className="bg-gradient-to-r from-goda-yellow/25 via-goda-yellow/15 to-goda-yellow/25 border-b-2 border-goda-yellow overflow-hidden">
       <div className="py-2.5 flex">
-        <div className="animate-marquee whitespace-nowrap text-sm md:text-base flex shrink-0">
+        <div className="animate-marquee whitespace-nowrap text-sm md:text-base font-bold flex shrink-0">
           {tickerContent}
           <span className="px-10" />
         </div>
-        <div className="animate-marquee whitespace-nowrap text-sm md:text-base flex shrink-0">
+        <div className="animate-marquee whitespace-nowrap text-sm md:text-base font-bold flex shrink-0">
           {tickerContent}
           <span className="px-10" />
         </div>

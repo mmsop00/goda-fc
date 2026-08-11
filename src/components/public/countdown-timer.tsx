@@ -47,13 +47,13 @@ export function CountdownTimer({ date, time }: CountdownTimerProps) {
     <div className="flex items-center justify-center gap-0.5 pt-1.5 text-xs">
       <Clock className="size-3 text-goda-yellow shrink-0 animate-pulse" />
       {remaining.days > 0 && (
-        <span className="tabular-nums font-mono font-semibold">{remaining.days}<span className="text-[9px] text-gray-400 ml-0.5">d</span></span>
+        <span className="tabular-nums font-mono font-bold">{remaining.days}<span className="text-[9px] text-gray-500 ml-0.5 font-bold">d</span></span>
       )}
-      <span className="tabular-nums font-mono font-semibold">{String(remaining.hours).padStart(2, "0")}<span className="text-[9px] text-gray-400 ml-0.5">h</span></span>
+      <span className="tabular-nums font-mono font-bold">{String(remaining.hours).padStart(2, "0")}<span className="text-[9px] text-gray-500 ml-0.5 font-bold">h</span></span>
       <span className="text-goda-yellow font-bold">:</span>
-      <span className="tabular-nums font-mono font-semibold">{String(remaining.mins).padStart(2, "0")}<span className="text-[9px] text-gray-400 ml-0.5">m</span></span>
+      <span className="tabular-nums font-mono font-bold">{String(remaining.mins).padStart(2, "0")}<span className="text-[9px] text-gray-500 ml-0.5 font-bold">m</span></span>
       <span className="text-goda-yellow font-bold">:</span>
-      <span className="tabular-nums font-mono font-semibold">{String(remaining.secs).padStart(2, "0")}<span className="text-[9px] text-gray-400 ml-0.5">s</span></span>
+      <span className="tabular-nums font-mono font-bold">{String(remaining.secs).padStart(2, "0")}<span className="text-[9px] text-gray-500 ml-0.5 font-bold">s</span></span>
     </div>
   );
 }
