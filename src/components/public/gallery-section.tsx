@@ -95,7 +95,7 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
                 {sorted.map((item, i) => (
                   <div key={item.id} className="shrink-0 w-72 snap-start">
                     <div onClick={() => setLightboxIndex(i)} className="group/card relative h-48 rounded-lg overflow-hidden bg-goda-navy/10 cursor-pointer">
-                      <Image src={item.thumbnailUrl} alt={item.title} fill sizes="288px" className="object-contain transition-transform group-hover/card:scale-105" loading="lazy" />
+                      <Image src={item.thumbnailUrl} alt={item.title} fill sizes="288px" className="object-cover transition-transform group-hover/card:scale-105" loading="lazy" />
                       {/* Video play icon */}
                       {item.category === "Video" && (
                         <div className="absolute inset-0 flex items-center justify-center bg-goda-navy/30">
