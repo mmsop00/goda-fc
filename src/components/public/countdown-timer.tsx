@@ -1,33 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Clock } from "lucide-react";
 
 interface CountdownTimerProps {
-  date: string; // "DD/MM/YYYY"
-  time: string; // "16:00" or "16h00"
-}
-
-function TimeDigit({ value, label }: { value: string; label: string }) {
-  const prevValue = useRef(value);
-
-  useEffect(() => {
-    prevValue.current = value;
-  }, [value]);
-
-  const changed = prevValue.current !== value;
-
-  return (
-    <span className="flex items-baseline gap-0.5">
-      <span
-        key={value}
-        className={`inline-block tabular-nums font-mono font-semibold text-sm bg-goda-navy/10 rounded-md px-1.5 py-0.5 min-w-[2ch] text-center ${changed ? "animate-in zoom-in-95 duration-200" : ""}`}
-      >
-        {value}
-      </span>
-      <span className="text-[10px] text-gray-400">{label}</span>
-    </span>
-  );
+  date: string;
+  time: string;
 }
 
 export function CountdownTimer({ date, time }: CountdownTimerProps) {
@@ -66,16 +44,16 @@ export function CountdownTimer({ date, time }: CountdownTimerProps) {
   if (!remaining || (remaining.days === 0 && remaining.hours === 0 && remaining.mins === 0 && remaining.secs === 0)) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 pt-2">
-      <Clock className="size-3.5 text-goda-yellow shrink-0 animate-pulse" />
+    <div className="flex items-center justify-center gap-0.5 pt-1.5 text-xs">
+      <Clock className="size-3 text-goda-yellow shrink-0 animate-pulse" />
       {remaining.days > 0 && (
-        <TimeDigit value={String(remaining.days)} label="ngày" />
+        <span className="tabular-nums font-mono font-semibold">{remaining.days}<span className="text-[9px] text-gray-400 ml-0.5">d</span></span>
       )}
-      <TimeDigit value={String(remaining.hours).padStart(2, "0")} label="h" />
-      <span className="text-sm font-bold text-goda-yellow animate-pulse">:</span>
-      <TimeDigit value={String(remaining.mins).padStart(2, "0")} label="m" />
-      <span className="text-sm font-bold text-goda-yellow animate-pulse">:</span>
-      <TimeDigit value={String(remaining.secs).padStart(2, "0")} label="s" />
+      <span className="tabular-nums font-mono font-semibold">{String(remaining.hours).padStart(2, "0")}<span className="text-[9px] text-gray-400 ml-0.5">h</span></span>
+      <span className="text-goda-yellow font-bold">:</span>
+      <span className="tabular-nums font-mono font-semibold">{String(remaining.mins).padStart(2, "0")}<span className="text-[9px] text-gray-400 ml-0.5">m</span></span>
+      <span className="text-goda-yellow font-bold">:</span>
+      <span className="tabular-nums font-mono font-semibold">{String(remaining.secs).padStart(2, "0")}<span className="text-[9px] text-gray-400 ml-0.5">s</span></span>
     </div>
   );
 }

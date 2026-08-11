@@ -133,7 +133,7 @@ export function EventsDonateSection({
                         {event.description}
                       </p>
                     </div>
-                    <div className="sm:w-44 bg-goda-soft-gray/50 flex sm:flex-col items-center justify-center gap-1 p-3 sm:p-4 text-center">
+                    <div className="sm:w-36 bg-goda-soft-gray/50 flex sm:flex-col items-center justify-center gap-1 p-3 sm:p-4 text-center">
                       <Calendar className="size-4 text-goda-navy sm:mb-1" />
                       <span className="text-sm font-semibold text-goda-navy whitespace-nowrap">
                         {event.date}
