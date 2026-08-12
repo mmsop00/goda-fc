@@ -29,8 +29,10 @@ const LEVEL_STYLES: Record<string, string> = {
 
 function bdayKey(bday: string): number {
   const parts = bday.split("/");
-  if (parts.length === 2) return parseInt(parts[1]) * 100 + parseInt(parts[0]);
-  return 9999;
+  if (parts.length < 2) return 9999;
+  const day = parseInt(parts[0]) || 1; // "xx" → 1
+  const month = parseInt(parts[1]) || 1;
+  return month * 100 + day;
 }
 
 function sortMembersByUpcomingBirthday(members: MemberPublic[]): MemberPublic[] {
@@ -40,11 +42,11 @@ function sortMembersByUpcomingBirthday(members: MemberPublic[]): MemberPublic[] 
     .filter((m) => m.birthday && m.birthday.includes("/"))
     .map((m) => ({ ...m, _bdayKey: bdayKey(m.birthday!) }))
     .sort((a: any, b: any) => {
-      // Upcoming from today
+      // Upcoming from today first, past birthdays go to bottom
       const aAdj = a._bdayKey >= todayKey ? a._bdayKey : a._bdayKey + 1300;
       const bAdj = b._bdayKey >= todayKey ? b._bdayKey : b._bdayKey + 1300;
       if (aAdj !== bAdj) return aAdj - bAdj;
-      // Same date: older first (by joinYear - earlier = older)
+      // Same date: older first (by joinYear)
       return (a.joinYear || 9999) - (b.joinYear || 9999);
     });
 }
@@ -171,7 +173,7 @@ export function EventsDonateSection({
                         <div key={m.id}>
                           <div className={`flex items-center gap-3 px-4 py-2.5 ${bg}`}>
                             <span className="text-sm font-medium text-goda-navy w-20 shrink-0">
-                              {m.birthday}
+                              {(() => { const p = m.birthday!.split("/"); return `${p[0]}/${p[1]}`; })()}
                             </span>
                             <div className="flex-1 min-w-0">
                               <span className="text-sm text-goda-navy truncate block">
