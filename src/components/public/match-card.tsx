@@ -142,6 +142,22 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             <CountdownTimer date={match.date} time={match.time} />
           )}
 
+          {/* Jersey color for upcoming matches */}
+          {isUpcoming && match.godaJerseyColor && (
+            <div className="flex items-center justify-center gap-1.5">
+              <span className="text-xs text-gray-500">👕 GODA FC mặc áo:</span>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                match.godaJerseyColor === "Vàng" ? "bg-yellow-200 text-yellow-800" :
+                match.godaJerseyColor === "Xanh" ? "bg-blue-200 text-blue-800" :
+                match.godaJerseyColor === "Đỏ" ? "bg-red-200 text-red-800" :
+                match.godaJerseyColor === "Trắng" ? "bg-gray-200 text-gray-800" :
+                "bg-gray-100 text-gray-700"
+              }`}>
+                {match.godaJerseyColor}
+              </span>
+            </div>
+          )}
+
           {/* Goal Scorers — under each team (completed matches only) */}
           {!isUpcoming && match.goals.length > 0 && (
                 <div className="flex justify-center gap-3">

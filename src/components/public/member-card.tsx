@@ -61,7 +61,7 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
         {/* Birthday + Join Year */}
         <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-gray-500 min-h-[1.25rem]">
           {member.birthday && <span>🎂 {member.birthday}</span>}
-          <span>Tham gia: {member.joinYear && member.joinYear > 0 ? member.joinYear : "xx"}</span>
+          <span>Tham gia: {member.joinDate ? member.joinDate : (member.joinYear && member.joinYear > 0 ? member.joinYear : "xx")}</span>
         </div>
 
         {/* Stats — PUBLIC FIELDS ONLY */}

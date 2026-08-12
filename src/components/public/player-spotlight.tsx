@@ -145,7 +145,7 @@ export function PlayerSpotlight({ members, isLoading }: PlayerSpotlightProps) {
 
                       {/* Join Year */}
                       <span className="text-xs text-gray-400">
-                        Tham gia: {member.joinYear && member.joinYear > 0 ? member.joinYear : "xx"}
+                        Tham gia: {member.joinDate ? member.joinDate : (member.joinYear && member.joinYear > 0 ? member.joinYear : "xx")}
                       </span>
 
                       {/* Stats */}

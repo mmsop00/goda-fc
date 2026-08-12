@@ -862,6 +862,7 @@ export interface MatchResult {
   imageUrl: string;
   videoUrl?: string;
   googleMapsUrl?: string;
+  godaJerseyColor?: string;
 }
 
 // ═══════════════════════════════════════
@@ -901,6 +902,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     opponent: "Tràng An FC",
     opponentScore: 0,
     godaScore: 0,
+    godaJerseyColor: "Vàng",
     godaLineup: BASE_LINEUP,
     opponentLineup: OPP_LINEUP,
     goals: [],
@@ -919,6 +921,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     opponent: "Việt Nhật FC",
     opponentScore: 3,
     godaScore: 0,
+    godaJerseyColor: "Vàng",
     godaLineup: BASE_LINEUP,
     opponentLineup: OPP_LINEUP,
     goals: [
@@ -941,6 +944,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     opponent: "Bắc Việt FC",
     opponentScore: 1,
     godaScore: 1,
+    godaJerseyColor: "Vàng",
     godaLineup: BASE_LINEUP,
     opponentLineup: OPP_LINEUP,
     goals: [
@@ -963,6 +967,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     opponent: "Nguyên Dương FC",
     opponentScore: 1,
     godaScore: 2,
+    godaJerseyColor: "Xanh",
     godaLineup: BASE_LINEUP,
     opponentLineup: OPP_LINEUP,
     goals: [
@@ -986,6 +991,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     opponent: "Việt Nhật FC",
     opponentScore: 3,
     godaScore: 1,
+    godaJerseyColor: "Vàng",
     godaLineup: BASE_LINEUP,
     opponentLineup: OPP_LINEUP,
     goals: [
@@ -1018,6 +1024,7 @@ export interface MemberPublic {
   mvp: number;
   birthday?: string;
   joinYear?: number;
+  joinDate?: string;
   status?: string;
 }
 
@@ -1039,10 +1046,10 @@ export interface AlbumPhoto {
 
 export const MOCK_MEMBERS: MemberPublic[] = [
   // ── Đội trưởng ──
-  { id: "m-001", name: "Lê Thanh Hà", nickname: "Chủ tịch", position: "Hậu vệ", number: 7, avatarUrl: "", matches: 187, goals: 8, assists: 22, mvp: 32, birthday: "08/01", joinYear: 2009, status: "Đội trưởng" },
+  { id: "m-001", name: "Lê Thanh Hà", nickname: "Chủ tịch", position: "Hậu vệ", number: 7, avatarUrl: "", matches: 187, goals: 8, assists: 22, mvp: 32, birthday: "08/01", joinYear: 2009, joinDate: "13/05/2009", status: "Đội trưởng" },
   // ── Đội phó (sắp xếp theo tuổi) ──
-  { id: "m-002", name: "Trần Đình Thanh", nickname: "Thanh", position: "Tiền vệ", number: 16, avatarUrl: "", matches: 210, goals: 38, assists: 45, mvp: 45, birthday: "15/10", joinYear: 2018, status: "Đội phó" },
-  { id: "m-003", name: "Huy Quang", nickname: "Quang", position: "Hậu vệ", number: 3, avatarUrl: "", matches: 95, goals: 6, assists: 18, mvp: 15, birthday: "01/01", joinYear: 0, status: "Đội phó" },
+  { id: "m-002", name: "Trần Đình Thanh", nickname: "Thanh", position: "Tiền vệ", number: 16, avatarUrl: "", matches: 210, goals: 38, assists: 45, mvp: 45, birthday: "15/10", joinYear: 1994, joinDate: "1994", status: "Đội phó" },
+  { id: "m-003", name: "Huy Quang", nickname: "Quang", position: "Hậu vệ", number: 3, avatarUrl: "", matches: 95, goals: 6, assists: 18, mvp: 15, birthday: "01/01", joinYear: 1994, joinDate: "1994", status: "Đội phó" },
   { id: "m-004", name: "Hoàng Trọng Nội", nickname: "Nội", position: "Hậu vệ", number: 11, avatarUrl: "", matches: 88, goals: 4, assists: 15, mvp: 12, birthday: "23/05", joinYear: 0, status: "Đội phó" },
   // ── Cầu thủ (sắp xếp theo tuổi, già nhất trước) ──
   { id: "m-005", name: "Nguyễn Văn Bình", nickname: "Bình", position: "Tiền vệ", number: 55, avatarUrl: "", matches: 130, goals: 12, assists: 21, mvp: 14, birthday: "19/04", joinYear: 0, status: "Đang thi đấu" },
@@ -1051,23 +1058,23 @@ export const MOCK_MEMBERS: MemberPublic[] = [
   { id: "m-008", name: "Phạm Trung Thông", nickname: "Thông", position: "Hậu vệ", number: 33, avatarUrl: "", matches: 230, goals: 6, assists: 20, mvp: 35, birthday: "08/07", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-009", name: "Trần Tam Thịnh", nickname: "Thịnh", position: "Tiền vệ", number: 22, avatarUrl: "", matches: 68, goals: 14, assists: 22, mvp: 13, birthday: "16/08", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-010", name: "Phạm Duy Thắng", nickname: "Thành Toldo", position: "Tiền đạo", number: 13, avatarUrl: "", matches: 82, goals: 55, assists: 18, mvp: 48, birthday: "25/11", joinYear: 0, status: "Đang thi đấu" },
-  { id: "m-011", name: "Phan Trần Phương", nickname: "Thầy giáo Phương", position: "Hậu vệ", number: 5, avatarUrl: "", matches: 142, goals: 15, assists: 27, mvp: 30, birthday: "14/03", joinYear: 2018, status: "Đang thi đấu" },
+  { id: "m-011", name: "Phan Trần Phương", nickname: "Thầy giáo Phương", position: "Hậu vệ", number: 5, avatarUrl: "", matches: 142, goals: 15, assists: 27, mvp: 30, birthday: "14/03", joinYear: 2018, joinDate: "07/01/2018", status: "Đang thi đấu" },
   { id: "m-012", name: "Nguyễn Việt Dũng", nickname: "Dũng", position: "Hậu vệ", number: 76, avatarUrl: "", matches: 65, goals: 3, assists: 10, mvp: 11, birthday: "27/06", joinYear: 0, status: "Đang thi đấu" },
-  { id: "m-013", name: "Nguyễn Văn Mạnh", nickname: "Mạnh", position: "Hậu vệ", number: 77, avatarUrl: "", matches: 245, goals: 38, assists: 48, mvp: 42, birthday: "28/08", joinYear: 2015, status: "Đang thi đấu" },
+  { id: "m-013", name: "Nguyễn Văn Mạnh", nickname: "Mạnh", position: "Hậu vệ", number: 77, avatarUrl: "", matches: 245, goals: 38, assists: 48, mvp: 42, birthday: "28/08", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-014", name: "Vũ Thái Thịnh", nickname: "Thịnh tỉnh táo", position: "Tiền vệ", number: 17, avatarUrl: "", matches: 85, goals: 18, assists: 25, mvp: 17, birthday: "17/02", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-015", name: "Đinh Thái Bình", nickname: "Bình", position: "Tiền vệ", number: 10, avatarUrl: "", matches: 128, goals: 25, assists: 52, mvp: 38, birthday: "18/10", joinYear: 0, status: "Đang thi đấu" },
-  { id: "m-016", name: "Nguyễn Khắc Vĩnh", nickname: "Vĩnh", position: "Hậu vệ", number: 6, avatarUrl: "", matches: 145, goals: 16, assists: 28, mvp: 17, birthday: "18/07", joinYear: 2023, status: "Đang thi đấu" },
-  { id: "m-017", name: "Vũ Đăng Tuấn", nickname: "Trâu Đồ Sơn", position: "Tiền vệ", number: 80, avatarUrl: "", matches: 198, goals: 42, assists: 55, mvp: 46, birthday: "02/08", joinYear: 1994, status: "Đang thi đấu" },
-  { id: "m-018", name: "Đào Thanh Tùng", nickname: "Tùng Lò Gạch", position: "Thủ môn", number: 8, avatarUrl: "", matches: 168, goals: 3, assists: 8, mvp: 18, birthday: "18/03", joinYear: 2025, status: "Đang thi đấu" },
-  { id: "m-019", name: "Nguyễn An", nickname: "An", position: "Thủ môn", number: 1, avatarUrl: "", matches: 155, goals: 22, assists: 42, mvp: 36, birthday: "10/05", joinYear: 2020, status: "Đang thi đấu" },
+  { id: "m-016", name: "Nguyễn Khắc Vĩnh", nickname: "Vĩnh", position: "Hậu vệ", number: 6, avatarUrl: "", matches: 145, goals: 16, assists: 28, mvp: 17, birthday: "18/07", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-017", name: "Vũ Đăng Tuấn", nickname: "Trâu Đồ Sơn", position: "Tiền vệ", number: 80, avatarUrl: "", matches: 198, goals: 42, assists: 55, mvp: 46, birthday: "02/08", joinYear: 1994, joinDate: "30/09/1994", status: "Đang thi đấu" },
+  { id: "m-018", name: "Đào Thanh Tùng", nickname: "Tùng Lò Gạch", position: "Thủ môn", number: 8, avatarUrl: "", matches: 168, goals: 3, assists: 8, mvp: 18, birthday: "18/03", joinYear: 2025, joinDate: "15/12/2025", status: "Đang thi đấu" },
+  { id: "m-019", name: "Nguyễn An", nickname: "An", position: "Thủ môn", number: 1, avatarUrl: "", matches: 155, goals: 22, assists: 42, mvp: 36, birthday: "10/05", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-020", name: "Trần Tiến Dũng", nickname: "Tiến Dũng", position: "Hậu vệ", number: 100, avatarUrl: "", matches: 52, goals: 2, assists: 8, mvp: 10, birthday: "04/10", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-021", name: "Trương Quang Huy", nickname: "Huy", position: "Hậu vệ", number: 4, avatarUrl: "", matches: 78, goals: 7, assists: 14, mvp: 13, birthday: "21/06", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-022", name: "Phùng Văn Lục", nickname: "Lục Cờ Đỏ", position: "Tiền vệ", number: 16, avatarUrl: "", matches: 88, goals: 10, assists: 20, mvp: 15, birthday: "05/08", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-023", name: "Nguyễn Mạnh Tuấn", nickname: "Tuấn", position: "Hậu vệ", number: 23, avatarUrl: "", matches: 92, goals: 8, assists: 19, mvp: 12, birthday: "21/05", joinYear: 0, status: "Đang thi đấu" },
-  { id: "m-024", name: "Vũ Ngọc Sơn", nickname: "Xuân Son", position: "Tiền vệ", number: 20, avatarUrl: "https://drive.google.com/uc?export=view&id=1vAWvXyQxnNuTMbQHuJCuYHz4b2xXq0ak", matches: 98, goals: 26, assists: 34, mvp: 33, birthday: "20/01", joinYear: 2025, status: "Đang thi đấu" },
+  { id: "m-024", name: "Vũ Ngọc Sơn", nickname: "Xuân Son", position: "Tiền vệ", number: 20, avatarUrl: "https://drive.google.com/uc?export=view&id=1vAWvXyQxnNuTMbQHuJCuYHz4b2xXq0ak", matches: 98, goals: 26, assists: 34, mvp: 33, birthday: "20/01", joinYear: 2025, joinDate: "10/01/2025", status: "Đang thi đấu" },
   { id: "m-025", name: "Trần Nguyên Bá", nickname: "Bá Nghệ", position: "Tiền đạo", number: 19, avatarUrl: "", matches: 72, goals: 45, assists: 16, mvp: 44, birthday: "09/04", joinYear: 0, status: "Đang thi đấu" },
-  { id: "m-026", name: "Phan Hồng Thái", nickname: "Thái", position: "Tiền vệ", number: 38, avatarUrl: "", matches: 220, goals: 78, assists: 28, mvp: 50, birthday: "02/03", joinYear: 2016, status: "Đang thi đấu" },
-  { id: "m-027", name: "Nguyễn Minh Quang", nickname: "Quang", position: "Tiền vệ", number: 2, avatarUrl: "", matches: 195, goals: 68, assists: 32, mvp: 47, birthday: "26/09", joinYear: 2017, status: "Đang thi đấu" },
+  { id: "m-026", name: "Phan Hồng Thái", nickname: "Thái", position: "Tiền vệ", number: 38, avatarUrl: "", matches: 220, goals: 78, assists: 28, mvp: 50, birthday: "02/03", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-027", name: "Nguyễn Minh Quang", nickname: "Quang", position: "Tiền vệ", number: 2, avatarUrl: "", matches: 195, goals: 68, assists: 32, mvp: 47, birthday: "26/09", joinYear: 0, status: "Đang thi đấu" },
 ];
 
 export const MOCK_ALBUM: AlbumPhoto[] = [
