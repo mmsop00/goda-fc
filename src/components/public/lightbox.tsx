@@ -92,11 +92,16 @@ export function Lightbox({
       <div className="relative z-10 w-full max-w-6xl max-h-[85vh] aspect-video">
         {photo.videoUrl ? (
           <iframe
-            src={photo.videoUrl}
+            src={photo.videoUrl
+              .replace("youtube.com/watch?v=", "youtube-nocookie.com/embed/")
+              .replace("youtube.com/embed/", "youtube-nocookie.com/embed/")
+              .replace("youtu.be/", "youtube-nocookie.com/embed/")
+              + "?rel=0"}
             className="absolute inset-0 w-full h-full rounded-xl"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             title={photo.title}
+            referrerPolicy="strict-origin-when-cross-origin"
           />
         ) : photo.fullUrl ? (
           <Image

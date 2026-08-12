@@ -267,7 +267,7 @@ export const MOCK_EVENTS: UpcomingEvent[] = [
     date: "27/09/2026",
     time: "18:00",
     description:
-      "Mừng sinh nhật lần thứ 32. Gặp mặt giao lưu tháng 8.",
+      "Mừng sinh nhật lần thứ 32.",
     level: "MAJOR",
   },
   {
@@ -276,7 +276,7 @@ export const MOCK_EVENTS: UpcomingEvent[] = [
     title: "Sân bia giao lưu tháng 8",
     date: "16/08/2026",
     time: "19:00",
-    description: "Gặp mặt giao lưu tháng 8, xem lại highlights mùa giải, bàn kế hoạch sắp tới.",
+    description: "Gặp mặt giao lưu tháng 8, bàn kế hoạch sắp tới.",
     level: "NORMAL",
   },
 ];
@@ -676,16 +676,6 @@ export const MOCK_HALL_OF_FAME: HallOfFameEntry[] = [
     highlight: true,
   },
   {
-    id: "hof-007",
-    name: "Chú Thanh Béo",
-    categories: ["Ban quản lý"],
-    title: "Chủ tịch CLB giai đoạn 2013–2014",
-    year: "2013–2014",
-    description:
-      "Giai đoạn ngắn nhưng đầy ý nghĩa, chú đã giúp CLB ổn định sau mất mát lớn.",
-    avatarUrl: "",
-  },
-  {
     id: "hof-008",
     name: "Lê Thanh Hà",
     categories: ["Ban quản lý", "Đội trưởng", "Cầu thủ nổi bật"],
@@ -699,11 +689,11 @@ export const MOCK_HALL_OF_FAME: HallOfFameEntry[] = [
   {
     id: "hof-010",
     name: "Trần Đình Thanh",
-    categories: ["Sáng lập", "Đội phó", "Cầu thủ nổi bật"],
-    title: "Đội phó GODA FC — Số 16",
+    categories: ["Sáng lập", "Ban quản lý", "Đội phó", "Cầu thủ nổi bật"],
+    title: "Chủ tịch CLB (2013–2014) — Đội phó GODA FC",
     year: "1994–nay",
     description:
-      "Thành viên sáng lập từ 1994. 210 trận, 38 bàn, 45 kiến tạo. Trụ cột nơi tuyến giữa, người dẫn dắt lối chơi và là cánh tay phải đắc lực của đội trưởng.",
+      "Thành viên sáng lập từ 1994. Chủ tịch CLB giai đoạn 2013–2014, giúp CLB ổn định sau mất mát lớn. 210 trận, 38 bàn, 45 kiến tạo. Trụ cột nơi tuyến giữa, cánh tay phải đắc lực của đội trưởng.",
     avatarUrl: "",
     highlight: true,
   },
