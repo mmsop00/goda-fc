@@ -9,6 +9,16 @@ interface MemberCardProps {
   isLoading?: boolean;
 }
 
+function getPositionBg(position: string): string {
+  switch (position) {
+    case "Tiền đạo": return "bg-orange-50/60";
+    case "Tiền vệ": return "bg-emerald-50/60";
+    case "Hậu vệ": return "bg-sky-50/60";
+    case "Thủ môn": return "bg-amber-50/60";
+    default: return "";
+  }
+}
+
 export function MemberCard({ member, isLoading }: MemberCardProps) {
   if (isLoading) {
     return (
@@ -30,7 +40,7 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
   if (!member) return null;
 
   return (
-    <Card className="p-4 items-center text-center gap-0 h-full">
+    <Card className={`p-4 items-center text-center gap-0 h-full ${getPositionBg(member.position)}`}>
       <CardContent className="flex flex-col items-center gap-2.5 p-0 h-full">
         {/* Avatar initials */}
         <div className="size-16 rounded-full bg-goda-navy flex items-center justify-center text-white font-bold text-lg shrink-0">

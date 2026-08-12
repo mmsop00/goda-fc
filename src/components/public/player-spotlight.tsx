@@ -7,6 +7,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Award, ChevronLeft, ChevronRight, Users } from "lucide-react";
 import type { MemberPublic } from "@/lib/mock-data";
 
+function getPositionBg(position: string): string {
+  switch (position) {
+    case "Tiền đạo": return "bg-orange-50/60";
+    case "Tiền vệ": return "bg-emerald-50/60";
+    case "Hậu vệ": return "bg-sky-50/60";
+    case "Thủ môn": return "bg-amber-50/60";
+    default: return "";
+  }
+}
+
 interface PlayerSpotlightProps {
   members: MemberPublic[];
   isLoading?: boolean;
@@ -101,7 +111,7 @@ export function PlayerSpotlight({ members, isLoading }: PlayerSpotlightProps) {
                   key={member.id}
                   className="shrink-0 w-56 snap-start"
                 >
-                  <Card className="h-full hover:shadow-md transition-shadow">
+                  <Card className={`h-full hover:shadow-md transition-shadow ${getPositionBg(member.position)}`}>
                     <CardContent className="flex flex-col items-center gap-3 p-5 text-center">
                       {/* Avatar */}
                       <div className="size-16 rounded-full bg-goda-navy flex items-center justify-center text-white font-bold text-lg overflow-hidden shrink-0">
