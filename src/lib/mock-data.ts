@@ -101,12 +101,37 @@ export interface GalleryItem {
 
 export const MOCK_MATCHES: MatchInfo[] = [
   {
-    id: "match-001",
+    id: "match-006",
     type: "upcoming",
+    opponent: "Chè FC",
+    date: "23/08/2026",
+    time: "16:00",
+    venue: "Sân tập Mỹ Đình, Hà Nội",
+    isHome: false,
+    detailId: "mr-006",
+    googleMapsUrl: "https://maps.app.goo.gl/zhp7WXiKqcF3shwT6",
+  },
+  {
+    id: "match-005",
+    type: "recent",
+    opponent: "Tràng An FC",
+    date: "16/08/2026",
+    time: "16:45",
+    venue: "Sân Hòa Phát, Hà Nội",
+    score: { goda: 1, opponent: 4 },
+    isHome: false,
+    detailId: "mr-005",
+    googleMapsUrl: "https://maps.app.goo.gl/S4a87o6VP4jk9vgW7",
+    goalScorers: "⚽ Sơn 80'",
+  },
+  {
+    id: "match-001",
+    type: "recent",
     opponent: "Việt Nhật FC",
     date: "08/08/2026",
     time: "16:00",
     venue: "Sân Cổ Nhuế, Hà Nội",
+    score: { goda: 0, opponent: 3 },
     isHome: false,
     detailId: "mr-004",
     googleMapsUrl: "https://maps.app.goo.gl/KoyeCaWrBjNVoyg46",
@@ -229,9 +254,9 @@ export const MOCK_PLAYERS: PlayerSpotlight[] = [
 export const MOCK_HISTORY: HistoryMilestone[] = [
   {
     year: 1994,
-    title: "Thành lập CLB",
+    title: "Ý tưởng thành lập CLB",
     description:
-      "GODA FC được thành lập bởi Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn yêu bóng đá tại Hà Nội.",
+      "Ngày 30/08/1994, dưới cây đa Thủ Lệ, Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn yêu bóng đá đã lên ý tưởng thành lập GODA FC.",
   },
   {
     year: 2000,
@@ -269,15 +294,6 @@ export const MOCK_EVENTS: UpcomingEvent[] = [
     description:
       "Mừng sinh nhật lần thứ 32.",
     level: "MAJOR",
-  },
-  {
-    id: "evt-003",
-    type: "social",
-    title: "Sân bia giao lưu tháng 8",
-    date: "16/08/2026",
-    time: "19:00",
-    description: "Gặp mặt giao lưu tháng 8, bàn kế hoạch sắp tới.",
-    level: "NORMAL",
   },
 ];
 
@@ -533,8 +549,8 @@ export const MOCK_CORE_VALUES: CoreValue[] = [
 export const MOCK_ABOUT_TIMELINE: AboutTimelineItem[] = [
   {
     year: 1994,
-    title: "Ngày thành lập",
-    description: "Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn thành lập GODA FC tại Hà Nội.",
+    title: "Ý tưởng thành lập",
+    description: "Ngày 30/08/1994, dưới cây đa Thủ Lệ, Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn lên ý tưởng thành lập GODA FC tại Hà Nội.",
   },
   {
     year: 2000,
@@ -558,9 +574,9 @@ export const MOCK_HISTORY_ENTRIES: HistoryEntry[] = [
     id: "hist-001",
     year: 1994,
     decade: "1990s",
-    title: "Thành lập GODA FC",
+    title: "Ý tưởng thành lập GODA FC",
     description:
-      "Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn yêu bóng đá tại Hà Nội chính thức thành lập GODA FC, ghi dấu những bước chạy đầu tiên của đội bóng.",
+      "Ngày 30/08/1994, dưới cây đa Thủ Lệ, Quý Yếm, Ngọc Béo, Quang Gà cùng nhóm bạn yêu bóng đá tại Hà Nội lên ý tưởng thành lập GODA FC, ghi dấu khởi nguồn của đội bóng.",
     imageUrl: "https://placehold.co/600x400/0B1E3A/F7C600?text=GODA+1994",
     relatedPeople: ["Quý Yếm", "Ngọc Béo", "Quang Gà"],
   },
@@ -718,9 +734,9 @@ export const MOCK_FULL_HISTORY: FullHistoryItem[] = [
   {
     year: 1994,
     type: "founding",
-    title: "Thành lập GODA FC",
-    subtitle: "Chú Quý Yếm, Chú Ngọc Béo, Chú Quang Gà",
-    description: "Ba người bạn thân thành lập CLB tại Hà Nội. Đây là nơi khởi nguồn của mọi câu chuyện.",
+    title: "Ý tưởng thành lập GODA FC",
+    subtitle: "30/08/1994 — Cây đa Thủ Lệ, Hà Nội",
+    description: "Ngày 30/08/1994, dưới cây đa Thủ Lệ, Chú Quý Yếm, Chú Ngọc Béo, Chú Quang Gà đã lên ý tưởng thành lập GODA FC. Đây là nơi khởi nguồn của mọi câu chuyện.",
   },
   {
     year: 2000,
@@ -890,6 +906,31 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     type: "Giao hữu",
     isHome: false,
     opponent: "Tràng An FC",
+    opponentScore: 4,
+    godaScore: 1,
+    godaJerseyColor: "Vàng",
+    godaLineup: BASE_LINEUP,
+    opponentLineup: OPP_LINEUP,
+    goals: [
+      { player: "Cầu thủ Tràng An FC", minute: 5, side: "opponent" },
+      { player: "Cầu thủ Tràng An FC", minute: 20, side: "opponent" },
+      { player: "Cầu thủ Tràng An FC", minute: 60, side: "opponent" },
+      { player: "Cầu thủ Tràng An FC", minute: 75, side: "opponent" },
+      { player: "Vũ Ngọc Sơn", minute: 80, assist: "Nguyễn Việt Dũng", side: "GODA" },
+    ],
+    cards: [],
+    imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+1-4",
+    googleMapsUrl: "https://maps.app.goo.gl/S4a87o6VP4jk9vgW7",
+  },
+  {
+    id: "mr-006",
+    season: "2026",
+    date: "23/08/2026",
+    time: "16:00",
+    venue: "Sân tập Mỹ Đình, Hà Nội",
+    type: "Giao hữu",
+    isHome: false,
+    opponent: "Chè FC",
     opponentScore: 0,
     godaScore: 0,
     godaJerseyColor: "Vàng",
@@ -897,8 +938,8 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     opponentLineup: OPP_LINEUP,
     goals: [],
     cards: [],
-    imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+0-0",
-    googleMapsUrl: "https://maps.app.goo.gl/S4a87o6VP4jk9vgW7",
+    imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+VS+Ch%C3%A8+FC",
+    googleMapsUrl: "https://maps.app.goo.gl/zhp7WXiKqcF3shwT6",
   },
   {
     id: "mr-004",

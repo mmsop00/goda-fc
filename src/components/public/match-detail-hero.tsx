@@ -7,8 +7,14 @@ interface MatchDetailHeroProps {
 }
 
 export function MatchDetailHero({ match }: MatchDetailHeroProps) {
-  const result =
-    match.godaScore > match.opponentScore
+  const isUpcoming =
+    match.godaScore === 0 &&
+    match.opponentScore === 0 &&
+    match.goals.length === 0;
+
+  const result = isUpcoming
+    ? "Chưa diễn ra"
+    : match.godaScore > match.opponentScore
       ? "Thắng"
       : match.godaScore < match.opponentScore
         ? "Thua"
@@ -28,13 +34,12 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
             </Badge>
           )}
           <Badge
-            className={`text-sm ${
-              result === "Thắng"
+            className={`text-sm ${result === "Thắng"
                 ? "bg-goda-green text-white border-0"
                 : result === "Thua"
                   ? "bg-red-500 text-white border-0"
                   : "bg-goda-yellow text-goda-navy border-0"
-            }`}
+              }`}
           >
             {result}
           </Badge>
@@ -51,15 +56,21 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
 
           {/* Score */}
           <div className="text-center">
-            <div className="flex items-center gap-4">
-              <span className="text-5xl md:text-7xl font-extrabold text-white">
-                {match.godaScore}
+            {isUpcoming ? (
+              <span className="text-4xl md:text-5xl font-extrabold text-goda-yellow">
+                VS
               </span>
-              <span className="text-3xl md:text-5xl text-gray-500">-</span>
-              <span className="text-5xl md:text-7xl font-extrabold text-gray-400">
-                {match.opponentScore}
-              </span>
-            </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <span className="text-5xl md:text-7xl font-extrabold text-white">
+                  {match.isHome ? match.godaScore : match.opponentScore}
+                </span>
+                <span className="text-3xl md:text-5xl text-gray-500">-</span>
+                <span className="text-5xl md:text-7xl font-extrabold text-gray-400">
+                  {match.isHome ? match.opponentScore : match.godaScore}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Away/Home Team */}
