@@ -1,4 +1,4 @@
 {
   "installCommand": "npm install --legacy-peer-deps",
-  "buildCommand": "npx prisma generate && next build"
+  "buildCommand": "npx prisma generate && (if [ -n \"$DIRECT_URL\" ]; then npx prisma db push; fi) && next build"
 }
