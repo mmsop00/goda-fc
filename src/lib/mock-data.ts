@@ -104,7 +104,7 @@ export const MOCK_MATCHES: MatchInfo[] = [
     id: "match-006",
     type: "upcoming",
     opponent: "Chè FC",
-    date: "23/08/2026",
+    date: "30/08/2026",
     time: "16:00",
     venue: "Sân tập Mỹ Đình, Hà Nội",
     isHome: false,
@@ -869,6 +869,8 @@ export interface MatchResult {
   videoUrl?: string;
   googleMapsUrl?: string;
   godaJerseyColor?: string;
+  postponed?: boolean;
+  postponedReason?: string;
 }
 
 // ═══════════════════════════════════════
@@ -923,9 +925,30 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     googleMapsUrl: "https://maps.app.goo.gl/S4a87o6VP4jk9vgW7",
   },
   {
-    id: "mr-006",
+    id: "mr-006p",
     season: "2026",
     date: "23/08/2026",
+    time: "16:00",
+    venue: "Sân tập Mỹ Đình, Hà Nội",
+    type: "Giao hữu",
+    isHome: false,
+    opponent: "Chè FC",
+    opponentScore: 0,
+    godaScore: 0,
+    godaJerseyColor: "Vàng",
+    godaLineup: BASE_LINEUP,
+    opponentLineup: OPP_LINEUP,
+    goals: [],
+    cards: [],
+    postponed: true,
+    postponedReason: "Hoãn vì thời tiết — dời sang 30/08/2026",
+    imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+VS+Ch%C3%A8+FC",
+    googleMapsUrl: "https://maps.app.goo.gl/zhp7WXiKqcF3shwT6",
+  },
+  {
+    id: "mr-006",
+    season: "2026",
+    date: "30/08/2026",
     time: "16:00",
     venue: "Sân tập Mỹ Đình, Hà Nội",
     type: "Giao hữu",

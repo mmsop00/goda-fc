@@ -11,14 +11,17 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
     match.godaScore === 0 &&
     match.opponentScore === 0 &&
     match.goals.length === 0;
+  const isPostponed = match.postponed === true;
 
-  const result = isUpcoming
-    ? "Chưa diễn ra"
-    : match.godaScore > match.opponentScore
-      ? "Thắng"
-      : match.godaScore < match.opponentScore
-        ? "Thua"
-        : "Hòa";
+  const result = isPostponed
+    ? "Hoãn"
+    : isUpcoming
+      ? "Chưa diễn ra"
+      : match.godaScore > match.opponentScore
+        ? "Thắng"
+        : match.godaScore < match.opponentScore
+          ? "Thua"
+          : "Hòa";
 
   return (
     <section className="bg-goda-navy">
@@ -35,9 +38,11 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
           )}
           <Badge
             className={`text-sm ${result === "Thắng"
-                ? "bg-goda-green text-white border-0"
-                : result === "Thua"
-                  ? "bg-red-500 text-white border-0"
+              ? "bg-goda-green text-white border-0"
+              : result === "Thua"
+                ? "bg-red-500 text-white border-0"
+                : result === "Hoãn"
+                  ? "bg-amber-500 text-white border-0"
                   : "bg-goda-yellow text-goda-navy border-0"
               }`}
           >
@@ -56,7 +61,7 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
 
           {/* Score */}
           <div className="text-center">
-            {isUpcoming ? (
+            {isUpcoming || isPostponed ? (
               <span className="text-4xl md:text-5xl font-extrabold text-goda-yellow">
                 VS
               </span>
@@ -98,6 +103,13 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
             {match.venue}
           </span>
         </div>
+
+        {/* Lý do hoãn */}
+        {isPostponed && match.postponedReason && (
+          <p className="mt-3 text-center text-sm font-medium text-amber-300">
+            ⚠️ {match.postponedReason}
+          </p>
+        )}
       </div>
 
       <div className="h-1.5 bg-goda-yellow" />

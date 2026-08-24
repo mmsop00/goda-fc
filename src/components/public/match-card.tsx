@@ -68,6 +68,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
         : "D";
 
   const isUpcoming = match.godaScore === 0 && match.opponentScore === 0 && match.goals.length === 0;
+  const isPostponed = match.postponed === true;
 
   // Dynamic team name colors based on result
   const leftIsGoda = match.isHome;
@@ -116,7 +117,11 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
               {match.isHome ? "GODA FC" : match.opponent}
             </span>
             {/* Score or upcoming badge */}
-            {isUpcoming ? (
+            {isPostponed ? (
+              <Badge className="bg-amber-500 text-white text-xs px-3 py-1 shrink-0">
+                ⚠️ Hoãn
+              </Badge>
+            ) : isUpcoming ? (
               <Badge className="bg-goda-navy text-white text-xs px-3 py-1 shrink-0">
                 ⏳ Chưa diễn ra
               </Badge>
@@ -137,22 +142,28 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             </span>
           </div>
 
+          {/* Lý do hoãn */}
+          {isPostponed && match.postponedReason && (
+            <p className="rounded bg-amber-50 px-2 py-1 text-center text-xs font-medium text-amber-700">
+              ⚠️ {match.postponedReason}
+            </p>
+          )}
+
           {/* Countdown for upcoming matches */}
-          {isUpcoming && match.time && (
+          {isUpcoming && !isPostponed && match.time && (
             <CountdownTimer date={match.date} time={match.time} />
           )}
 
           {/* Jersey color for upcoming matches */}
-          {isUpcoming && match.godaJerseyColor && (
+          {isUpcoming && !isPostponed && match.godaJerseyColor && (
             <div className="flex items-center justify-center gap-1.5">
               <span className="text-xs text-gray-500">👕 GODA FC mặc áo:</span>
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                match.godaJerseyColor === "Vàng" ? "bg-yellow-200 text-yellow-800" :
-                match.godaJerseyColor === "Xanh" ? "bg-blue-200 text-blue-800" :
-                match.godaJerseyColor === "Đỏ" ? "bg-red-200 text-red-800" :
-                match.godaJerseyColor === "Trắng" ? "bg-gray-200 text-gray-800" :
-                "bg-gray-100 text-gray-700"
-              }`}>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${match.godaJerseyColor === "Vàng" ? "bg-yellow-200 text-yellow-800" :
+                  match.godaJerseyColor === "Xanh" ? "bg-blue-200 text-blue-800" :
+                    match.godaJerseyColor === "Đỏ" ? "bg-red-200 text-red-800" :
+                      match.godaJerseyColor === "Trắng" ? "bg-gray-200 text-gray-800" :
+                        "bg-gray-100 text-gray-700"
+                }`}>
                 {match.godaJerseyColor}
               </span>
             </div>
@@ -160,51 +171,50 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
 
           {/* Goal Scorers — under each team (completed matches only) */}
           {!isUpcoming && match.goals.length > 0 && (
-                <div className="flex justify-center gap-3">
-                  {/* Left goals */}
-                  <div className="flex-1 text-right space-y-0.5">
-                    {match.goals
-                      .filter((g) => (match.isHome ? g.side === "GODA" : g.side !== "GODA"))
-                      .map((g, i) => {
-                        const playerDisplay = formatGoalPlayer(g.player);
-                        const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
-                        return (
-                          <p key={`lg-${i}`} className="text-xs text-gray-500 leading-tight font-normal">
-                            {g.minute}&apos; {playerDisplay}{assistDisplay}
-                          </p>
-                        );
-                      })}
-                  </div>
-                  {/* Score spacer */}
-                  <div className="shrink-0 w-[72px]" />
-                  {/* Right goals */}
-                  <div className="flex-1 text-left space-y-0.5">
-                    {match.goals
-                      .filter((g) => (match.isHome ? g.side !== "GODA" : g.side === "GODA"))
-                      .map((g, i) => {
-                        const playerDisplay = formatGoalPlayer(g.player);
-                        const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
-                        return (
-                          <p key={`rg-${i}`} className="text-xs text-gray-600 leading-tight font-normal">
-                            {g.minute}&apos; {playerDisplay}{assistDisplay}
-                          </p>
-                        );
-                      })}
-                  </div>
-                </div>
-              )}
+            <div className="flex justify-center gap-3">
+              {/* Left goals */}
+              <div className="flex-1 text-right space-y-0.5">
+                {match.goals
+                  .filter((g) => (match.isHome ? g.side === "GODA" : g.side !== "GODA"))
+                  .map((g, i) => {
+                    const playerDisplay = formatGoalPlayer(g.player);
+                    const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
+                    return (
+                      <p key={`lg-${i}`} className="text-xs text-gray-500 leading-tight font-normal">
+                        {g.minute}&apos; {playerDisplay}{assistDisplay}
+                      </p>
+                    );
+                  })}
+              </div>
+              {/* Score spacer */}
+              <div className="shrink-0 w-[72px]" />
+              {/* Right goals */}
+              <div className="flex-1 text-left space-y-0.5">
+                {match.goals
+                  .filter((g) => (match.isHome ? g.side !== "GODA" : g.side === "GODA"))
+                  .map((g, i) => {
+                    const playerDisplay = formatGoalPlayer(g.player);
+                    const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
+                    return (
+                      <p key={`rg-${i}`} className="text-xs text-gray-600 leading-tight font-normal">
+                        {g.minute}&apos; {playerDisplay}{assistDisplay}
+                      </p>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
 
           {/* Result Badge — only for completed matches */}
           {!isUpcoming && (
             <div className="flex justify-center">
               <Badge
-                className={`text-xs ${
-                  result === "W"
+                className={`text-xs ${result === "W"
                     ? "bg-goda-green text-white border-0"
                     : result === "L"
                       ? "bg-red-500 text-white border-0"
                       : "bg-goda-yellow text-goda-navy border-0"
-                }`}
+                  }`}
               >
                 {result === "W" ? "Thắng" : result === "L" ? "Thua" : "Hòa"}
               </Badge>
