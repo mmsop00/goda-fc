@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User } from "lucide-react";
+import Image from "next/image";
 import { NEWS_CATEGORY_COLORS } from "@/lib/mock-data";
 import type { NewsItem } from "@/lib/mock-data";
 
@@ -10,14 +11,25 @@ interface NewsDetailHeroProps {
 export function NewsDetailHero({ item }: NewsDetailHeroProps) {
   return (
     <section className="bg-goda-navy">
-      {/* Image placeholder */}
+      {/* Cover image */}
       <div className="h-64 md:h-96 bg-goda-navy/80 flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-0 right-0 size-96 rounded-full bg-goda-yellow blur-3xl" />
         </div>
-        <span className="text-6xl font-extrabold text-white/10">
-          {item.category.slice(0, 2)}
-        </span>
+        {item.thumbnailUrl && !item.thumbnailUrl.includes("placehold.co") ? (
+          <Image
+            src={item.thumbnailUrl}
+            alt={item.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-contain"
+            priority
+          />
+        ) : (
+          <span className="text-6xl font-extrabold text-white/10">
+            {item.category.slice(0, 2)}
+          </span>
+        )}
       </div>
 
       {/* Title + Meta */}
