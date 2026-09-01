@@ -12,6 +12,8 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
     match.opponentScore === 0 &&
     match.goals.length === 0;
   const isPostponed = match.postponed === true;
+  const homeName = match.homeTeam ?? (match.isHome ? "GODA FC" : match.opponent);
+  const awayName = match.awayTeam ?? (match.isHome ? match.opponent : "GODA FC");
 
   const result = isPostponed
     ? "Hoãn"
@@ -55,7 +57,7 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
           {/* Home/Away Team */}
           <div className="text-center flex-1">
             <p className="font-display font-bold text-xl md:text-3xl text-white">
-              {match.isHome ? "GODA FC" : match.opponent}
+              {homeName}
             </p>
           </div>
 
@@ -81,7 +83,7 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
           {/* Away/Home Team */}
           <div className="text-center flex-1">
             <p className="font-display font-bold text-xl md:text-3xl text-gray-400">
-              {match.isHome ? match.opponent : "GODA FC"}
+              {awayName}
             </p>
           </div>
         </div>
@@ -109,12 +111,12 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
             {match.godaJerseyColor && (
               <span>
-                👕 GODA FC mặc: <strong className="text-white">{match.godaJerseyColor}</strong>
+                👕 {homeName} mặc: <strong className="text-white">{match.godaJerseyColor}</strong>
               </span>
             )}
             {match.opponentJerseyColor && (
               <span>
-                👥 {match.opponent} mặc: <strong className="text-white">{match.opponentJerseyColor}</strong>
+                👥 {awayName} mặc: <strong className="text-white">{match.opponentJerseyColor}</strong>
               </span>
             )}
           </div>

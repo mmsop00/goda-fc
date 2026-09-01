@@ -77,6 +77,8 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
 
   const isUpcoming = match.godaScore === 0 && match.opponentScore === 0 && match.goals.length === 0;
   const isPostponed = match.postponed === true;
+  const homeName = match.homeTeam ?? (match.isHome ? "GODA FC" : match.opponent);
+  const awayName = match.awayTeam ?? (match.isHome ? match.opponent : "GODA FC");
 
   // Dynamic team name colors based on result
   const leftIsGoda = match.isHome;
@@ -122,7 +124,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
           <div className="flex items-center justify-center gap-3 py-3">
             {/* Left team name */}
             <span className={`flex-1 text-right font-display text-sm truncate ${leftIsGoda ? godaColor : oppColor} ${leftIsGoda ? godaWeight : oppWeight}`}>
-              {match.isHome ? "GODA FC" : match.opponent}
+              {homeName}
             </span>
             {/* Score or upcoming badge */}
             {isPostponed ? (
@@ -146,7 +148,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             )}
             {/* Right team name */}
             <span className={`flex-1 text-left font-display text-sm truncate ${leftIsGoda ? oppColor : godaColor} ${leftIsGoda ? oppWeight : godaWeight}`}>
-              {match.isHome ? match.opponent : "GODA FC"}
+              {awayName}
             </span>
           </div>
 
@@ -167,7 +169,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             <div className="flex flex-col items-center gap-1.5">
               {match.godaJerseyColor && (
                 <div className="flex items-center justify-center gap-1.5">
-                  <span className="text-xs text-gray-500">👕 GODA FC mặc:</span>
+                  <span className="text-xs text-gray-500">👕 {homeName} mặc:</span>
                   <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(match.godaJerseyColor)}`}>
                     {match.godaJerseyColor}
                   </span>
@@ -175,7 +177,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
               )}
               {match.opponentJerseyColor && (
                 <div className="flex items-center justify-center gap-1.5">
-                  <span className="text-xs text-gray-500">👥 {match.opponent} mặc:</span>
+                  <span className="text-xs text-gray-500">👥 {awayName} mặc:</span>
                   <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(match.opponentJerseyColor)}`}>
                     {match.opponentJerseyColor}
                   </span>
