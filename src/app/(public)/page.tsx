@@ -24,6 +24,7 @@ import {
   MOCK_RECENT_DONATIONS,
   MOCK_NEWS,
   MOCK_ALBUM,
+  sortNewsByDateDesc,
 } from "@/lib/mock-data";
 
 export default function PublicHomePage() {
@@ -113,7 +114,7 @@ export default function PublicHomePage() {
       <EventsDonateSection events={MOCK_EVENTS} donors={MOCK_DONORS} recentDonations={MOCK_RECENT_DONATIONS} members={MOCK_MEMBERS} />
 
       {/* Section 7: News */}
-      <NewsSection news={MOCK_NEWS} />
+      <NewsSection news={sortNewsByDateDesc(MOCK_NEWS)} />
 
       {/* Section 8: Gallery */}
       <GallerySection items={MOCK_ALBUM} />

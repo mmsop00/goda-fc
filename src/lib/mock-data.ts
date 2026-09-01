@@ -399,9 +399,18 @@ export const MOCK_NEWS: NewsItem[] = [
     date: "01/09/2026",
     category: "Kỷ niệm",
     author: "Ban truyền thông GODA FC",
-    thumbnailUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GIAI+TU+HUNG+2026",
+    thumbnailUrl: "/logos/tu-hung-combined.png",
   },
 ];
+
+/** Sắp xếp bài viết theo ngày giảm dần (DD/MM/YYYY). */
+export function sortNewsByDateDesc(items: NewsItem[]): NewsItem[] {
+  return [...items].sort((a, b) => {
+    const da = a.date.split("/").reverse().join("");
+    const db = b.date.split("/").reverse().join("");
+    return db.localeCompare(da);
+  });
+}
 
 export const MOCK_GALLERY: GalleryItem[] = [
   {

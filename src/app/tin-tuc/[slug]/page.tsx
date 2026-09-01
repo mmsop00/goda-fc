@@ -4,7 +4,7 @@ import { NewsDetailHero } from "@/components/public/news-detail-hero";
 import { RelatedNews } from "@/components/public/related-news";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
-import { MOCK_NEWS } from "@/lib/mock-data";
+import { MOCK_NEWS, sortNewsByDateDesc } from "@/lib/mock-data";
 
 export function generateStaticParams() {
   return MOCK_NEWS.map((item) => ({
@@ -62,7 +62,7 @@ export default async function NewsDetailPage({
       <Separator />
 
       {/* Related Articles */}
-      <RelatedNews currentSlug={slug} news={MOCK_NEWS} />
+      <RelatedNews currentSlug={slug} news={sortNewsByDateDesc(MOCK_NEWS)} />
     </>
   );
 }

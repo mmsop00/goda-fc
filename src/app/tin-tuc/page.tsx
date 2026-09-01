@@ -4,7 +4,7 @@ import { useState } from "react";
 import { NewsListHero } from "@/components/public/news-list-hero";
 import { NewsCard } from "@/components/public/news-card";
 import { AlbumGrid } from "@/components/public/album-grid";
-import { MOCK_NEWS, MOCK_ALBUM, type NewsCategory } from "@/lib/mock-data";
+import { MOCK_NEWS, MOCK_ALBUM, type NewsCategory, sortNewsByDateDesc } from "@/lib/mock-data";
 
 const CATEGORIES: { label: string; value: NewsCategory | "all" }[] = [
   { label: "Tất cả", value: "all" },
@@ -24,8 +24,8 @@ export default function TinTucPage() {
 
   const filtered =
     activeCategory === "all"
-      ? MOCK_NEWS
-      : MOCK_NEWS.filter((n) => n.category === activeCategory);
+      ? sortNewsByDateDesc(MOCK_NEWS)
+      : sortNewsByDateDesc(MOCK_NEWS.filter((n) => n.category === activeCategory));
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
   const paginated = filtered.slice(
@@ -57,11 +57,10 @@ export default function TinTucPage() {
               <button
                 key={cat.value}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeCategory === cat.value
-                    ? "bg-goda-navy text-white"
-                    : "bg-white text-goda-navy border border-gray-200 hover:bg-goda-soft-gray"
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === cat.value
+                  ? "bg-goda-navy text-white"
+                  : "bg-white text-goda-navy border border-gray-200 hover:bg-goda-soft-gray"
+                  }`}
               >
                 {cat.label}
               </button>
