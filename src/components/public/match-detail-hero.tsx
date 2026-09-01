@@ -104,6 +104,22 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
           </span>
         </div>
 
+        {/* Trang phục thi đấu cho trận chưa diễn ra */}
+        {isUpcoming && !isPostponed && (match.godaJerseyColor || match.opponentJerseyColor) && (
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
+            {match.godaJerseyColor && (
+              <span>
+                👕 GODA FC mặc: <strong className="text-white">{match.godaJerseyColor}</strong>
+              </span>
+            )}
+            {match.opponentJerseyColor && (
+              <span>
+                👥 {match.opponent} mặc: <strong className="text-white">{match.opponentJerseyColor}</strong>
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Lý do hoãn */}
         {isPostponed && match.postponedReason && (
           <p className="mt-3 text-center text-sm font-medium text-amber-300">

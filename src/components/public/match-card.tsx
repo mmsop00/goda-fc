@@ -36,6 +36,14 @@ function formatGoalPlayer(name: string): string {
   return parts.slice(-2).join(" ");
 }
 
+function jerseyBadgeClass(color: string): string {
+  if (color.startsWith("Vàng")) return "bg-yellow-200 text-yellow-800";
+  if (color.startsWith("Xanh")) return "bg-blue-200 text-blue-800";
+  if (color.startsWith("Đỏ")) return "bg-red-200 text-red-800";
+  if (color.startsWith("Trắng")) return "bg-gray-200 text-gray-800";
+  return "bg-gray-100 text-gray-700";
+}
+
 export function MatchCard({ match, isLoading }: MatchCardProps) {
   const router = useRouter();
 
@@ -154,18 +162,25 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             <CountdownTimer date={match.date} time={match.time} />
           )}
 
-          {/* Jersey color for upcoming matches */}
-          {isUpcoming && !isPostponed && match.godaJerseyColor && (
-            <div className="flex items-center justify-center gap-1.5">
-              <span className="text-xs text-gray-500">👕 GODA FC mặc áo:</span>
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${match.godaJerseyColor === "Vàng" ? "bg-yellow-200 text-yellow-800" :
-                  match.godaJerseyColor === "Xanh" ? "bg-blue-200 text-blue-800" :
-                    match.godaJerseyColor === "Đỏ" ? "bg-red-200 text-red-800" :
-                      match.godaJerseyColor === "Trắng" ? "bg-gray-200 text-gray-800" :
-                        "bg-gray-100 text-gray-700"
-                }`}>
-                {match.godaJerseyColor}
-              </span>
+          {/* Trang phục cho trận sắp diễn ra */}
+          {isUpcoming && !isPostponed && (match.godaJerseyColor || match.opponentJerseyColor) && (
+            <div className="flex flex-col items-center gap-1.5">
+              {match.godaJerseyColor && (
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-xs text-gray-500">👕 GODA FC mặc:</span>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(match.godaJerseyColor)}`}>
+                    {match.godaJerseyColor}
+                  </span>
+                </div>
+              )}
+              {match.opponentJerseyColor && (
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="text-xs text-gray-500">👥 {match.opponent} mặc:</span>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(match.opponentJerseyColor)}`}>
+                    {match.opponentJerseyColor}
+                  </span>
+                </div>
+              )}
             </div>
           )}
 
@@ -210,10 +225,10 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             <div className="flex justify-center">
               <Badge
                 className={`text-xs ${result === "W"
-                    ? "bg-goda-green text-white border-0"
-                    : result === "L"
-                      ? "bg-red-500 text-white border-0"
-                      : "bg-goda-yellow text-goda-navy border-0"
+                  ? "bg-goda-green text-white border-0"
+                  : result === "L"
+                    ? "bg-red-500 text-white border-0"
+                    : "bg-goda-yellow text-goda-navy border-0"
                   }`}
               >
                 {result === "W" ? "Thắng" : result === "L" ? "Thua" : "Hòa"}
