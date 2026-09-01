@@ -288,16 +288,6 @@ export const MOCK_HISTORY: HistoryMilestone[] = [
 
 export const MOCK_EVENTS: UpcomingEvent[] = [
   {
-    id: "evt-002",
-    type: "social",
-    title: "Liên hoan sau giải — Bia hơi Thu Hằng",
-    date: "05/09/2026",
-    time: "18:30",
-    description:
-      "Liên hoan sau trận tại nhà hàng bia hơi Thu Hằng, 123 Nguyễn Phong Sắc.",
-    level: "NORMAL",
-  },
-  {
     id: "evt-004",
     type: "club_event",
     title: "Giải chạy 100m mở màn — Nhóm dưới U40",
