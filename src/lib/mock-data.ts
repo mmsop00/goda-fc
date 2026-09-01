@@ -289,13 +289,13 @@ export const MOCK_HISTORY: HistoryMilestone[] = [
 export const MOCK_EVENTS: UpcomingEvent[] = [
   {
     id: "evt-002",
-    type: "birthday",
-    title: "Sinh nhật CLB — GODA FC tròn 32 tuổi",
+    type: "social",
+    title: "Liên hoan sau giải — Bia hơi Thu Hằng",
     date: "05/09/2026",
-    time: "13:30",
+    time: "18:30",
     description:
-      "Các đội tập trung, check-in tại SVĐQG Mỹ Đình — khai mạc chương trình kỷ niệm 32 năm thành lập CLB.",
-    level: "MAJOR",
+      "Liên hoan sau trận tại nhà hàng bia hơi Thu Hằng, 123 Nguyễn Phong Sắc.",
+    level: "NORMAL",
   },
   {
     id: "evt-004",
@@ -321,7 +321,7 @@ export const MOCK_EVENTS: UpcomingEvent[] = [
     title: "Giải tứ hùng kỷ niệm 32 năm thành lập CLB GODA",
     date: "05/09/2026",
     time: "14:00",
-    description: "4 đội: GODA FC, Việt Nhật FC, Motor FC, FFC — 6 trận vòng tròn, sân 11 tại SVĐQG Mỹ Đình.",
+    description: "4 đội: GODA FC, Việt Nhật FC, Motor FC, FFC — 6 trận vòng tròn, sân 11 tại SVĐQG Mỹ Đình. Sau giải liên hoan tại nhà hàng bia hơi Thu Hằng, 123 Nguyễn Phong Sắc.",
     level: "MAJOR",
   },
 ];
