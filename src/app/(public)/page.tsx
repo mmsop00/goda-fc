@@ -31,7 +31,8 @@ export default function PublicHomePage() {
     () => [...MOCK_MATCH_RESULTS].sort((a, b) => {
       const da = a.date.split("/").reverse().join("");
       const db = b.date.split("/").reverse().join("");
-      return db.localeCompare(da);
+      if (da !== db) return db.localeCompare(da);
+      return (a.time ?? "99:99").localeCompare(b.time ?? "99:99");
     }),
     []
   );

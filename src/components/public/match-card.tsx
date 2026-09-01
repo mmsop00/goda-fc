@@ -120,12 +120,24 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             </div>
           </div>
 
-          {/* Teams Row — always show team names */}
-          <div className="flex items-center justify-center gap-3 py-3">
-            {/* Left team name */}
-            <span className={`flex-1 text-right font-display text-sm truncate ${leftIsGoda ? godaColor : oppColor} ${leftIsGoda ? godaWeight : oppWeight}`}>
-              {homeName}
-            </span>
+          {/* Teams Row — always show team names (sự kiện thì hiển thị tiêu đề) */}
+          {match.eventTitle ? (
+            <div className="flex flex-col items-center gap-1 py-3 text-center">
+              <p className="font-display text-base font-extrabold text-goda-navy">
+                {match.eventTitle}
+              </p>
+              {match.eventDescription && (
+                <p className="text-xs leading-relaxed text-gray-500">
+                  {match.eventDescription}
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-3 py-3">
+              {/* Left team name */}
+              <span className={`flex-1 text-right font-display text-sm truncate ${leftIsGoda ? godaColor : oppColor} ${leftIsGoda ? godaWeight : oppWeight}`}>
+                {homeName}
+              </span>
             {/* Score or upcoming badge */}
             {isPostponed ? (
               <Badge className="bg-amber-500 text-white text-xs px-3 py-1 shrink-0">
@@ -146,11 +158,12 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                 </span>
               </>
             )}
-            {/* Right team name */}
-            <span className={`flex-1 text-left font-display text-sm truncate ${leftIsGoda ? oppColor : godaColor} ${leftIsGoda ? oppWeight : godaWeight}`}>
-              {awayName}
-            </span>
-          </div>
+              {/* Right team name */}
+              <span className={`flex-1 text-left font-display text-sm truncate ${leftIsGoda ? oppColor : godaColor} ${leftIsGoda ? oppWeight : godaWeight}`}>
+                {awayName}
+              </span>
+            </div>
+          )}
 
           {/* Lý do hoãn */}
           {isPostponed && match.postponedReason && (
@@ -165,7 +178,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
           )}
 
           {/* Trang phục cho trận sắp diễn ra */}
-          {isUpcoming && !isPostponed && (match.godaJerseyColor || match.opponentJerseyColor) && (
+          {isUpcoming && !isPostponed && !match.eventTitle && (match.godaJerseyColor || match.opponentJerseyColor) && (
             <div className="flex flex-col items-center gap-1.5">
               {match.godaJerseyColor && (
                 <div className="flex items-center justify-center gap-1.5">

@@ -36,17 +36,21 @@ export default async function TranDauDetailPage({
         </Link>
       </div>
 
-      <MatchLineup
-        godaLineup={match.godaLineup}
-        opponentLineup={match.opponentLineup}
-        opponentName={match.opponent}
-      />
+      {!match.eventTitle && (
+        <>
+          <MatchLineup
+            godaLineup={match.godaLineup}
+            opponentLineup={match.opponentLineup}
+            opponentName={match.opponent}
+          />
 
-      <Separator />
+          <Separator />
 
-      <MatchTimeline goals={match.goals} cards={match.cards} />
+          <MatchTimeline goals={match.goals} cards={match.cards} />
 
-      {match.mvp && <MatchMVP playerName={match.mvp} />}
+          {match.mvp && <MatchMVP playerName={match.mvp} />}
+        </>
+      )}
 
       {match.googleMapsUrl && (
         <section className="max-w-5xl mx-auto px-4 py-8 text-center">

@@ -54,38 +54,51 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
 
         {/* Score Row */}
         <div className="flex items-center justify-center gap-6 md:gap-10 mb-8">
-          {/* Home/Away Team */}
-          <div className="text-center flex-1">
-            <p className="font-display font-bold text-xl md:text-3xl text-white">
-              {homeName}
-            </p>
-          </div>
-
-          {/* Score */}
-          <div className="text-center">
-            {isUpcoming || isPostponed ? (
-              <span className="text-4xl md:text-5xl font-extrabold text-goda-yellow">
-                VS
-              </span>
-            ) : (
-              <div className="flex items-center gap-4">
-                <span className="text-5xl md:text-7xl font-extrabold text-white">
-                  {match.isHome ? match.godaScore : match.opponentScore}
-                </span>
-                <span className="text-3xl md:text-5xl text-gray-500">-</span>
-                <span className="text-5xl md:text-7xl font-extrabold text-gray-400">
-                  {match.isHome ? match.opponentScore : match.godaScore}
-                </span>
+          {match.eventTitle ? (
+            <div className="text-center">
+              <p className="font-display font-extrabold text-2xl md:text-3xl text-white">
+                {match.eventTitle}
+              </p>
+              {match.eventDescription && (
+                <p className="mt-2 text-sm text-gray-300">{match.eventDescription}</p>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* Home/Away Team */}
+              <div className="text-center flex-1">
+                <p className="font-display font-bold text-xl md:text-3xl text-white">
+                  {homeName}
+                </p>
               </div>
-            )}
-          </div>
 
-          {/* Away/Home Team */}
-          <div className="text-center flex-1">
-            <p className="font-display font-bold text-xl md:text-3xl text-gray-400">
-              {awayName}
-            </p>
-          </div>
+              {/* Score */}
+              <div className="text-center">
+                {isUpcoming || isPostponed ? (
+                  <span className="text-4xl md:text-5xl font-extrabold text-goda-yellow">
+                    VS
+                  </span>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <span className="text-5xl md:text-7xl font-extrabold text-white">
+                      {match.isHome ? match.godaScore : match.opponentScore}
+                    </span>
+                    <span className="text-3xl md:text-5xl text-gray-500">-</span>
+                    <span className="text-5xl md:text-7xl font-extrabold text-gray-400">
+                      {match.isHome ? match.opponentScore : match.godaScore}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Away/Home Team */}
+              <div className="text-center flex-1">
+                <p className="font-display font-bold text-xl md:text-3xl text-gray-400">
+                  {awayName}
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Match Info */}
@@ -107,7 +120,7 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
         </div>
 
         {/* Trang phục thi đấu cho trận chưa diễn ra */}
-        {isUpcoming && !isPostponed && (match.godaJerseyColor || match.opponentJerseyColor) && (
+        {isUpcoming && !isPostponed && !match.eventTitle && (match.godaJerseyColor || match.opponentJerseyColor) && (
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
             {match.godaJerseyColor && (
               <span>
