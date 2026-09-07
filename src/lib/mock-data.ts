@@ -1215,7 +1215,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     opponentLineup: OPP_LINEUP,
     goals: [
       { player: "Văn Long", minute: 7, assist: "Phùng Lục", side: "GODA" },
-      { player: "Trần Nguyên Bá", minute: 15, assist: "Long", side: "GODA" },
+      { player: "Trần Nguyên Bá", minute: 15, assist: "Hoàng", side: "GODA" },
       { player: "Vũ Ngọc Sơn", minute: 45, assist: "Dũng 5B", side: "GODA" },
       { player: "Cầu thủ Việt Nhật FC", minute: 30, side: "opponent" },
       { player: "Cầu thủ Việt Nhật FC", minute: 35, side: "opponent" },
