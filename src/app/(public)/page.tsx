@@ -33,13 +33,21 @@ export default function PublicHomePage() {
       const da = a.date.split("/").reverse().join("");
       const db = b.date.split("/").reverse().join("");
       if (da !== db) return db.localeCompare(da);
-      return (a.time ?? "99:99").localeCompare(b.time ?? "99:99");
+      return (b.time ?? "99:99").localeCompare(a.time ?? "99:99");
     }),
     []
   );
 
-  // Show latest 4 matches on homepage
+  // Show latest 4 matches on homepage — giảm dần theo thời gian
   const latestMatches = sortedMatches.slice(0, 4);
+
+  // Sự kiện sắp xếp theo thứ tự thời gian (giờ tăng dần)
+  const sortedEvents = [...MOCK_EVENTS].sort((a, b) => {
+    const da = a.date.split("/").reverse().join("");
+    const db = b.date.split("/").reverse().join("");
+    if (da !== db) return da.localeCompare(db);
+    return (a.time ?? "99:99").localeCompare(b.time ?? "99:99");
+  });
 
   return (
     <>
@@ -63,7 +71,7 @@ export default function PublicHomePage() {
       </div>
 
       {/* Birthday & Event Banner — shows when within 7 days */}
-      <BirthdayBanner members={MOCK_MEMBERS} events={MOCK_EVENTS} recentDonations={MOCK_RECENT_DONATIONS} />
+      <BirthdayBanner members={MOCK_MEMBERS} events={sortedEvents} recentDonations={MOCK_RECENT_DONATIONS} />
 
       {/* Section 2: Match Results — synced from /tran-dau */}
       <section className="py-16 md:py-20 bg-goda-warm-white">
@@ -111,7 +119,7 @@ export default function PublicHomePage() {
       <HistoryTeaser milestones={MOCK_HISTORY} />
 
       {/* Section 6: Events + Top Donate */}
-      <EventsDonateSection events={MOCK_EVENTS} donors={MOCK_DONORS} recentDonations={MOCK_RECENT_DONATIONS} members={MOCK_MEMBERS} />
+      <EventsDonateSection events={sortedEvents} donors={MOCK_DONORS} recentDonations={MOCK_RECENT_DONATIONS} members={MOCK_MEMBERS} />
 
       {/* Section 7: News */}
       <NewsSection news={sortNewsByDateDesc(MOCK_NEWS)} />
