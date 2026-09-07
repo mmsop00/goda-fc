@@ -12,7 +12,7 @@ export default function TranDauPage() {
       const da = a.date.split("/").reverse().join("");
       const db = b.date.split("/").reverse().join("");
       if (da !== db) return db.localeCompare(da);
-      return (a.time ?? "99:99").localeCompare(b.time ?? "99:99");
+      return (b.time ?? "99:99").localeCompare(a.time ?? "99:99");
     }),
     []
   );
