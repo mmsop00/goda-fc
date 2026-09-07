@@ -928,6 +928,15 @@ export interface MatchResult {
   eventDescription?: string;
 }
 
+// Trận có GODA tham gia (không phải sự kiện, không phải trận giữa các đội khác)
+export function isGodaMatch(m: MatchResult): boolean {
+  if (m.type === "Sự kiện") return false;
+  if (m.homeTeam && m.awayTeam) {
+    return m.homeTeam.includes("GODA") || m.awayTeam.includes("GODA");
+  }
+  return true;
+}
+
 // ═══════════════════════════════════════
 // TASK-007 — Mock Data
 // ═══════════════════════════════════════

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, Clock, MapPin, Award, ExternalLink } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
-import type { MatchResult } from "@/lib/mock-data";
+import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
 
 interface MatchCardProps {
   match?: MatchResult;
@@ -66,8 +66,13 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
 
   if (!match) return null;
 
-  const resultColor = getResultColor(match.godaScore, match.opponentScore);
-  const resultBg = getResultBg(match.godaScore, match.opponentScore);
+  // Trận không có GODA tham gia → không ghi Thắng/Hòa/Thua để tránh nhầm lẫn
+  const isNeutral = !isGodaMatch(match);
+
+  const resultColor = isNeutral
+    ? "border-l-gray-300"
+    : getResultColor(match.godaScore, match.opponentScore);
+  const resultBg = isNeutral ? "" : getResultBg(match.godaScore, match.opponentScore);
   const result =
     match.godaScore > match.opponentScore
       ? "W"
@@ -82,12 +87,12 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
 
   // Dynamic team name colors based on result
   const leftIsGoda = match.isHome;
-  const godaColor = isUpcoming || result === "D" ? "text-goda-navy" : result === "W" ? "text-goda-navy" : "text-gray-400";
-  const oppColor = isUpcoming || result === "D" ? "text-goda-navy" : result === "W" ? "text-gray-400" : "text-goda-navy";
-  const godaWeight = isUpcoming || result === "D" || result === "W" ? "font-semibold" : "font-normal";
-  const oppWeight = isUpcoming || result === "D" || result === "L" ? "font-semibold" : "font-normal";
-  const godaScoreColor = isUpcoming || result === "D" || result === "W" ? "text-goda-navy" : "text-gray-400";
-  const oppScoreColor = isUpcoming || result === "D" || result === "L" ? "text-goda-navy" : "text-gray-400";
+  const godaColor = isNeutral || isUpcoming || result === "D" ? "text-goda-navy" : result === "W" ? "text-goda-navy" : "text-gray-400";
+  const oppColor = isNeutral || isUpcoming || result === "D" ? "text-goda-navy" : result === "W" ? "text-gray-400" : "text-goda-navy";
+  const godaWeight = isNeutral || isUpcoming || result === "D" || result === "W" ? "font-semibold" : "font-normal";
+  const oppWeight = isNeutral || isUpcoming || result === "D" || result === "L" ? "font-semibold" : "font-normal";
+  const godaScoreColor = isNeutral || isUpcoming || result === "D" || result === "W" ? "text-goda-navy" : "text-gray-400";
+  const oppScoreColor = isNeutral || isUpcoming || result === "D" || result === "L" ? "text-goda-navy" : "text-gray-400";
 
   return (
     <div
@@ -138,26 +143,26 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
               <span className={`flex-1 text-right font-display text-sm truncate ${leftIsGoda ? godaColor : oppColor} ${leftIsGoda ? godaWeight : oppWeight}`}>
                 {homeName}
               </span>
-            {/* Score or upcoming badge */}
-            {isPostponed ? (
-              <Badge className="bg-amber-500 text-white text-xs px-3 py-1 shrink-0">
-                ⚠️ Hoãn
-              </Badge>
-            ) : isUpcoming ? (
-              <Badge className="bg-goda-navy text-white text-xs px-3 py-1 shrink-0">
-                ⏳ Chưa diễn ra
-              </Badge>
-            ) : (
-              <>
-                <span className={`text-2xl font-extrabold shrink-0 ${leftIsGoda ? godaScoreColor : oppScoreColor}`}>
-                  {match.isHome ? match.godaScore : match.opponentScore}
-                </span>
-                <span className="text-lg text-gray-400 shrink-0">-</span>
-                <span className={`text-2xl font-extrabold shrink-0 ${leftIsGoda ? oppScoreColor : godaScoreColor}`}>
-                  {match.isHome ? match.opponentScore : match.godaScore}
-                </span>
-              </>
-            )}
+              {/* Score or upcoming badge */}
+              {isPostponed ? (
+                <Badge className="bg-amber-500 text-white text-xs px-3 py-1 shrink-0">
+                  ⚠️ Hoãn
+                </Badge>
+              ) : isUpcoming ? (
+                <Badge className="bg-goda-navy text-white text-xs px-3 py-1 shrink-0">
+                  ⏳ Chưa diễn ra
+                </Badge>
+              ) : (
+                <>
+                  <span className={`text-2xl font-extrabold shrink-0 ${leftIsGoda ? godaScoreColor : oppScoreColor}`}>
+                    {match.isHome ? match.godaScore : match.opponentScore}
+                  </span>
+                  <span className="text-lg text-gray-400 shrink-0">-</span>
+                  <span className={`text-2xl font-extrabold shrink-0 ${leftIsGoda ? oppScoreColor : godaScoreColor}`}>
+                    {match.isHome ? match.opponentScore : match.godaScore}
+                  </span>
+                </>
+              )}
               {/* Right team name */}
               <span className={`flex-1 text-left font-display text-sm truncate ${leftIsGoda ? oppColor : godaColor} ${leftIsGoda ? oppWeight : godaWeight}`}>
                 {awayName}
@@ -235,8 +240,8 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             </div>
           )}
 
-          {/* Result Badge — only for completed matches */}
-          {!isUpcoming && (
+          {/* Result Badge — only for completed GODA matches */}
+          {!isUpcoming && !isNeutral && (
             <div className="flex justify-center">
               <Badge
                 className={`text-xs ${result === "W"

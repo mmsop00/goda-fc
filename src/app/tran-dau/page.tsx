@@ -4,16 +4,7 @@ import { useMemo } from "react";
 import { MatchCard } from "@/components/public/match-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Minus, X } from "lucide-react";
-import { MOCK_MATCH_RESULTS, type MatchResult } from "@/lib/mock-data";
-
-// Chỉ thống kê các trận có liên quan đến GODA (bỏ sự kiện và trận giữa các đội khác)
-const isGodaMatch = (m: MatchResult) => {
-  if (m.type === "Sự kiện") return false;
-  if (m.homeTeam && m.awayTeam) {
-    return m.homeTeam.includes("GODA") || m.awayTeam.includes("GODA");
-  }
-  return true;
-};
+import { MOCK_MATCH_RESULTS, isGodaMatch } from "@/lib/mock-data";
 
 export default function TranDauPage() {
   const sorted = useMemo(

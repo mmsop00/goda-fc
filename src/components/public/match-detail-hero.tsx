@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin } from "lucide-react";
-import type { MatchResult } from "@/lib/mock-data";
+import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
 
 interface MatchDetailHeroProps {
   match: MatchResult;
@@ -12,6 +12,7 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
     match.opponentScore === 0 &&
     match.goals.length === 0;
   const isPostponed = match.postponed === true;
+  const isNeutral = !isGodaMatch(match);
   const homeName = match.homeTeam ?? (match.isHome ? "GODA FC" : match.opponent);
   const awayName = match.awayTeam ?? (match.isHome ? match.opponent : "GODA FC");
 
@@ -38,18 +39,20 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
               {match.tournament}
             </Badge>
           )}
-          <Badge
-            className={`text-sm ${result === "Thắng"
-              ? "bg-goda-green text-white border-0"
-              : result === "Thua"
-                ? "bg-red-500 text-white border-0"
-                : result === "Hoãn"
-                  ? "bg-amber-500 text-white border-0"
-                  : "bg-goda-yellow text-goda-navy border-0"
-              }`}
-          >
-            {result}
-          </Badge>
+          {!isNeutral && (
+            <Badge
+              className={`text-sm ${result === "Thắng"
+                ? "bg-goda-green text-white border-0"
+                : result === "Thua"
+                  ? "bg-red-500 text-white border-0"
+                  : result === "Hoãn"
+                    ? "bg-amber-500 text-white border-0"
+                    : "bg-goda-yellow text-goda-navy border-0"
+                }`}
+            >
+              {result}
+            </Badge>
+          )}
         </div>
 
         {/* Score Row */}
