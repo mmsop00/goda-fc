@@ -54,6 +54,7 @@ export default async function NewsDetailPage({
             [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-goda-navy [&_h3]:mt-6 [&_h3]:mb-3
             [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1
             [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1
+            [&_a]:text-blue-600 [&_a]:underline [&_a]:underline-offset-2 [&_a]:font-medium [&_a]:break-words [&_a:hover]:text-blue-800
             [&_strong]:text-goda-navy [&_hr]:my-8"
           dangerouslySetInnerHTML={{ __html: article.content.replace(/\n\n/g, "<br/><br/>").replace(/\n/g, "<br/>") }}
         />
