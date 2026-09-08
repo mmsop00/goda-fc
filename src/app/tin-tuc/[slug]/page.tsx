@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { NewsDetailHero } from "@/components/public/news-detail-hero";
 import { RelatedNews } from "@/components/public/related-news";
+import { ArticleContent } from "@/components/public/article-content";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft } from "lucide-react";
 import { MOCK_NEWS, sortNewsByDateDesc } from "@/lib/mock-data";
@@ -43,7 +44,7 @@ export default async function NewsDetailPage({
 
       {/* Article Content */}
       <article className="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-12">
-        <div
+        <ArticleContent
           className="prose prose-gray max-w-none text-gray-700 leading-relaxed text-base md:text-lg
             [&_table]:w-full [&_table]:border-collapse [&_table]:my-4
             [&_th]:bg-goda-navy [&_th]:text-white [&_th]:px-3 [&_th]:py-2 [&_th]:text-xs [&_th]:font-semibold [&_th]:text-left
@@ -56,7 +57,7 @@ export default async function NewsDetailPage({
             [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1
             [&_a]:text-blue-600 [&_a]:underline [&_a]:underline-offset-2 [&_a]:font-medium [&_a]:break-words [&_a:hover]:text-blue-800
             [&_strong]:text-goda-navy [&_hr]:my-8"
-          dangerouslySetInnerHTML={{ __html: article.content.replace(/\n\n/g, "<br/><br/>").replace(/\n/g, "<br/>") }}
+          html={article.content.replace(/\n\n/g, "<br/><br/>").replace(/\n/g, "<br/>")}
         />
       </article>
 
