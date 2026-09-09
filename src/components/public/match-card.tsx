@@ -87,6 +87,12 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
 
   // Dynamic team name colors based on result
   const leftIsGoda = match.isHome;
+
+  // Jersey colors, attached directly under each side's name (left = home
+  // team, right = away team) instead of a separate list below.
+  const showJerseys = isUpcoming && !isPostponed && !match.eventTitle;
+  const leftJersey = leftIsGoda ? match.godaJerseyColor : match.opponentJerseyColor;
+  const rightJersey = leftIsGoda ? match.opponentJerseyColor : match.godaJerseyColor;
   const godaColor = isNeutral || isUpcoming || result === "D" ? "text-goda-navy" : result === "W" ? "text-goda-navy" : "text-gray-400";
   const oppColor = isNeutral || isUpcoming || result === "D" ? "text-goda-navy" : result === "W" ? "text-gray-400" : "text-goda-navy";
   const godaWeight = isNeutral || isUpcoming || result === "D" || result === "W" ? "font-semibold" : "font-normal";
@@ -139,10 +145,17 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             </div>
           ) : (
             <div className="flex items-center justify-center gap-3 py-3">
-              {/* Left team name */}
-              <span className={`flex-1 text-right font-display text-sm truncate ${leftIsGoda ? godaColor : oppColor} ${leftIsGoda ? godaWeight : oppWeight}`}>
-                {homeName}
-              </span>
+              {/* Left team: name + (upcoming) jersey color right underneath */}
+              <div className="flex flex-1 flex-col items-end gap-1 min-w-0">
+                <span className={`text-right font-display text-sm truncate ${leftIsGoda ? godaColor : oppColor} ${leftIsGoda ? godaWeight : oppWeight}`}>
+                  {homeName}
+                </span>
+                {showJerseys && leftJersey && (
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(leftJersey)}`}>
+                    👕 {leftJersey}
+                  </span>
+                )}
+              </div>
               {/* Score or upcoming badge */}
               {isPostponed ? (
                 <Badge className="bg-amber-500 text-white text-xs px-3 py-1 shrink-0">
@@ -163,10 +176,17 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                   </span>
                 </>
               )}
-              {/* Right team name */}
-              <span className={`flex-1 text-left font-display text-sm truncate ${leftIsGoda ? oppColor : godaColor} ${leftIsGoda ? oppWeight : godaWeight}`}>
-                {awayName}
-              </span>
+              {/* Right team: name + (upcoming) jersey color right underneath */}
+              <div className="flex flex-1 flex-col items-start gap-1 min-w-0">
+                <span className={`text-left font-display text-sm truncate ${leftIsGoda ? oppColor : godaColor} ${leftIsGoda ? oppWeight : godaWeight}`}>
+                  {awayName}
+                </span>
+                {showJerseys && rightJersey && (
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(rightJersey)}`}>
+                    👕 {rightJersey}
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
@@ -180,28 +200,6 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
           {/* Countdown for upcoming matches */}
           {isUpcoming && !isPostponed && match.time && (
             <CountdownTimer date={match.date} time={match.time} />
-          )}
-
-          {/* Trang phục cho trận sắp diễn ra */}
-          {isUpcoming && !isPostponed && !match.eventTitle && (match.godaJerseyColor || match.opponentJerseyColor) && (
-            <div className="flex flex-col items-center gap-1.5">
-              {match.godaJerseyColor && (
-                <div className="flex items-center justify-center gap-1.5">
-                  <span className="text-xs text-gray-500">👕 {match.isHome ? homeName : awayName} mặc:</span>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(match.godaJerseyColor)}`}>
-                    {match.godaJerseyColor}
-                  </span>
-                </div>
-              )}
-              {match.opponentJerseyColor && (
-                <div className="flex items-center justify-center gap-1.5">
-                  <span className="text-xs text-gray-500">👥 {match.isHome ? awayName : homeName} mặc:</span>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(match.opponentJerseyColor)}`}>
-                    {match.opponentJerseyColor}
-                  </span>
-                </div>
-              )}
-            </div>
           )}
 
           {/* Goal Scorers — under each team (completed matches only) */}
