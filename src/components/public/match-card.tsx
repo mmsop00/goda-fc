@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Clock, MapPin, Award, ExternalLink } from "lucide-react";
+import { Calendar, Clock, MapPin, Award, ExternalLink, Shirt } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
 import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
 
@@ -42,6 +42,16 @@ function jerseyBadgeClass(color: string): string {
   if (color.startsWith("Đỏ")) return "bg-red-200 text-red-800";
   if (color.startsWith("Trắng")) return "bg-gray-200 text-gray-800";
   return "bg-gray-100 text-gray-700";
+}
+
+// Màu icon áo — cùng cách phân loại với jerseyBadgeClass, để icon và nền
+// badge luôn khớp màu nhau.
+function jerseyIconColor(color: string): string {
+  if (color.startsWith("Vàng")) return "text-yellow-500";
+  if (color.startsWith("Xanh")) return "text-blue-500";
+  if (color.startsWith("Đỏ")) return "text-red-500";
+  if (color.startsWith("Trắng")) return "text-gray-400";
+  return "text-gray-500";
 }
 
 export function MatchCard({ match, isLoading }: MatchCardProps) {
@@ -151,8 +161,9 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                   {homeName}
                 </span>
                 {showJerseys && leftJersey && (
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(leftJersey)}`}>
-                    👕 {leftJersey}
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(leftJersey)}`}>
+                    <Shirt className={`size-3 shrink-0 ${jerseyIconColor(leftJersey)}`} fill="currentColor" fillOpacity={0.25} />
+                    {leftJersey}
                   </span>
                 )}
               </div>
@@ -182,8 +193,9 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                   {awayName}
                 </span>
                 {showJerseys && rightJersey && (
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(rightJersey)}`}>
-                    👕 {rightJersey}
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(rightJersey)}`}>
+                    <Shirt className={`size-3 shrink-0 ${jerseyIconColor(rightJersey)}`} fill="currentColor" fillOpacity={0.25} />
+                    {rightJersey}
                   </span>
                 )}
               </div>
