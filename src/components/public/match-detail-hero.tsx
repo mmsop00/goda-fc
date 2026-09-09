@@ -127,12 +127,12 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
             {match.godaJerseyColor && (
               <span>
-                👕 {homeName} mặc: <strong className="text-white">{match.godaJerseyColor}</strong>
+                👕 {match.isHome ? homeName : awayName} mặc: <strong className="text-white">{match.godaJerseyColor}</strong>
               </span>
             )}
             {match.opponentJerseyColor && (
               <span>
-                👥 {awayName} mặc: <strong className="text-white">{match.opponentJerseyColor}</strong>
+                👥 {match.isHome ? awayName : homeName} mặc: <strong className="text-white">{match.opponentJerseyColor}</strong>
               </span>
             )}
           </div>

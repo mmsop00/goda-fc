@@ -964,6 +964,25 @@ const OPP_LINEUP: MatchPlayer[] = [];
 
 export const MOCK_MATCH_RESULTS: MatchResult[] = [
   {
+    id: "mr-014",
+    season: "2026",
+    date: "13/09/2026",
+    time: "16h30",
+    venue: "Sân La Thành, Hà Nội",
+    type: "Giao hữu",
+    isHome: false,
+    opponent: "Đông Phong FC",
+    opponentScore: 0,
+    godaScore: 0,
+    godaJerseyColor: "Đỏ",
+    godaLineup: BASE_LINEUP,
+    opponentLineup: OPP_LINEUP,
+    goals: [],
+    cards: [],
+    imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+VS+%C4%90%C3%B4ng+Phong+FC",
+    googleMapsUrl: "https://maps.app.goo.gl/DTkNxGArmgyny5y88",
+  },
+  {
     id: "mr-005",
     season: "2026",
     date: "16/08/2026",

@@ -187,7 +187,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             <div className="flex flex-col items-center gap-1.5">
               {match.godaJerseyColor && (
                 <div className="flex items-center justify-center gap-1.5">
-                  <span className="text-xs text-gray-500">👕 {homeName} mặc:</span>
+                  <span className="text-xs text-gray-500">👕 {match.isHome ? homeName : awayName} mặc:</span>
                   <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(match.godaJerseyColor)}`}>
                     {match.godaJerseyColor}
                   </span>
@@ -195,7 +195,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
               )}
               {match.opponentJerseyColor && (
                 <div className="flex items-center justify-center gap-1.5">
-                  <span className="text-xs text-gray-500">👥 {awayName} mặc:</span>
+                  <span className="text-xs text-gray-500">👥 {match.isHome ? awayName : homeName} mặc:</span>
                   <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(match.opponentJerseyColor)}`}>
                     {match.opponentJerseyColor}
                   </span>
