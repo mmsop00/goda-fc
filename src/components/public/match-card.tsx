@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Clock, MapPin, Award, ExternalLink } from "lucide-react";
+import { Calendar, Clock, MapPin, Award, ExternalLink, Shirt } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
 import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
 
@@ -54,17 +54,6 @@ function jerseyIconColor(color: string): string {
   return "text-gray-500";
 }
 
-/** Icon bộ trang phục (áo + quần) — rõ ràng hơn icon áo đơn, tô màu theo currentColor. */
-function KitIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      {/* Áo — cổ tròn hơi khoét, tay ngắn buông xuống */}
-      <path d="M7.5 3 Q12 4.3 16.5 3 L19 4 L18 8 L15.5 6.5 L15.5 11 L8.5 11 L8.5 6.5 L6 8 L5 4 Z" />
-      {/* Quần short — có rãnh giữa 2 ống */}
-      <path d="M6 13 L18 13 L18 22 L13.5 22 L12 17.5 L10.5 22 L6 22 Z" />
-    </svg>
-  );
-}
 
 export function MatchCard({ match, isLoading }: MatchCardProps) {
   const router = useRouter();
@@ -174,7 +163,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                 </span>
                 {showJerseys && leftJersey && (
                   <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(leftJersey)}`}>
-                    <KitIcon className={`size-4 shrink-0 ${jerseyIconColor(leftJersey)}`} />
+                    <Shirt className={`size-3.5 shrink-0 ${jerseyIconColor(leftJersey)}`} fill="currentColor" strokeWidth={2.5} />
                     {leftJersey}
                   </span>
                 )}
@@ -206,7 +195,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                 </span>
                 {showJerseys && rightJersey && (
                   <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(rightJersey)}`}>
-                    <KitIcon className={`size-4 shrink-0 ${jerseyIconColor(rightJersey)}`} />
+                    <Shirt className={`size-3.5 shrink-0 ${jerseyIconColor(rightJersey)}`} fill="currentColor" strokeWidth={2.5} />
                     {rightJersey}
                   </span>
                 )}
