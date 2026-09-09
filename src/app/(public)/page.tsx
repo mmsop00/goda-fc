@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { HeroSection } from "@/components/public/hero-section";
 import { BirthdayBanner } from "@/components/public/birthday-banner";
 import { MatchCard } from "@/components/public/match-card";
@@ -25,9 +25,19 @@ import {
   MOCK_NEWS,
   MOCK_ALBUM,
   sortNewsByDateDesc,
+  isUpcomingEvent,
 } from "@/lib/mock-data";
 
 export default function PublicHomePage() {
+  // Ticks every second so an event whose countdown hits 0 (or that crosses
+  // midnight) automatically flips from "sắp tới" to "đã diễn ra" while the
+  // page is open, no refresh needed.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
   const sortedMatches = useMemo(
     () => [...MOCK_MATCH_RESULTS].sort((a, b) => {
       const da = a.date.split("/").reverse().join("");
@@ -41,13 +51,30 @@ export default function PublicHomePage() {
   // Show latest 4 matches on homepage — giảm dần theo thời gian
   const latestMatches = sortedMatches.slice(0, 4);
 
-  // Sự kiện sắp xếp theo thứ tự thời gian (giờ tăng dần)
-  const sortedEvents = [...MOCK_EVENTS].sort((a, b) => {
-    const da = a.date.split("/").reverse().join("");
-    const db = b.date.split("/").reverse().join("");
-    if (da !== db) return da.localeCompare(db);
-    return (a.time ?? "99:99").localeCompare(b.time ?? "99:99");
-  });
+  // Sự kiện sắp xếp theo thứ tự thời gian (giờ tăng dần), chỉ giữ sự kiện
+  // chưa diễn ra — tránh mục "Sự kiện sắp tới" hiển thị sự kiện đã qua.
+  // Re-filters on every `now` tick, so an event moves over the instant its
+  // countdown reaches 0.
+  const sortedEvents = [...MOCK_EVENTS]
+    .filter((e) => isUpcomingEvent(e.date, e.time, now))
+    .sort((a, b) => {
+      const da = a.date.split("/").reverse().join("");
+      const db = b.date.split("/").reverse().join("");
+      if (da !== db) return da.localeCompare(db);
+      return (a.time ?? "99:99").localeCompare(b.time ?? "99:99");
+    });
+
+  // Sự kiện đã diễn ra gần đây nhất (mới nhất trước) — hiển thị ở mục
+  // "Sự kiện đã diễn ra", tối đa 5 sự kiện.
+  const pastEvents = [...MOCK_EVENTS]
+    .filter((e) => !isUpcomingEvent(e.date, e.time, now))
+    .sort((a, b) => {
+      const da = a.date.split("/").reverse().join("");
+      const db = b.date.split("/").reverse().join("");
+      if (da !== db) return db.localeCompare(da);
+      return (b.time ?? "00:00").localeCompare(a.time ?? "00:00");
+    })
+    .slice(0, 5);
 
   return (
     <>
@@ -70,7 +97,8 @@ export default function PublicHomePage() {
         </Link>
       </div>
 
-      {/* Birthday & Event Banner — shows when within 7 days */}
+      {/* Birthday & Event ticker — chỉ sự kiện sắp tới + sinh nhật trong 7
+          ngày tới; sự kiện đã diễn ra chỉ hiện ở mục "Sự kiện & Đóng góp". */}
       <BirthdayBanner members={MOCK_MEMBERS} events={sortedEvents} recentDonations={MOCK_RECENT_DONATIONS} />
 
       {/* Section 2: Match Results — synced from /tran-dau */}
@@ -119,7 +147,7 @@ export default function PublicHomePage() {
       <HistoryTeaser milestones={MOCK_HISTORY} />
 
       {/* Section 6: Events + Top Donate */}
-      <EventsDonateSection events={sortedEvents} donors={MOCK_DONORS} recentDonations={MOCK_RECENT_DONATIONS} members={MOCK_MEMBERS} />
+      <EventsDonateSection events={sortedEvents} pastEvents={pastEvents} donors={MOCK_DONORS} recentDonations={MOCK_RECENT_DONATIONS} members={MOCK_MEMBERS} />
 
       {/* Section 7: News */}
       <NewsSection news={sortNewsByDateDesc(MOCK_NEWS)} />

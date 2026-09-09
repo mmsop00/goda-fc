@@ -2,12 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Trophy, Beer, Cake, Users, Star, Clock, Gift } from "lucide-react";
+import { Calendar, Trophy, Beer, Cake, Users, Star, Clock, Gift, History } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
 import type { UpcomingEvent, TopDonor, RecentDonation, MemberPublic } from "@/lib/mock-data";
 
 interface EventsDonateSectionProps {
   events: UpcomingEvent[];
+  pastEvents?: UpcomingEvent[];
   donors: TopDonor[];
   recentDonations?: RecentDonation[];
   members?: MemberPublic[];
@@ -58,6 +59,7 @@ function formatVND(index: number): string {
 
 export function EventsDonateSection({
   events,
+  pastEvents = [],
   donors,
   recentDonations = [],
   members = [],
@@ -92,7 +94,8 @@ export function EventsDonateSection({
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Events Column (2/3) */}
             <div className="lg:w-2/3 space-y-4">
-              <h3 className="font-display font-semibold text-xl text-goda-navy mb-4">
+              <h3 className="font-display font-semibold text-xl text-goda-navy mb-4 flex items-center gap-2">
+                <Calendar className="size-5 text-goda-yellow" />
                 Sự kiện sắp tới
               </h3>
               {events.length === 0 ? (
@@ -103,50 +106,98 @@ export function EventsDonateSection({
                   </CardContent>
                 </Card>
               ) : (
-                events.map((event) => (
-                  <Card key={event.id} className="p-0 flex flex-col sm:flex-row">
-                    <div className="flex-1 p-4 md:p-5">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge
-                          variant="outline"
-                          className={LEVEL_STYLES[event.level]}
-                        >
-                          {event.level === "MAJOR"
-                            ? "Quan trọng"
-                            : event.level === "NORMAL"
-                              ? "Thường kỳ"
-                              : "Nhỏ"}
-                        </Badge>
-                        <span className="flex items-center gap-1 text-xs text-gray-400">
-                          {EVENT_ICONS[event.type]}
-                          {event.type === "match"
-                            ? "Trận đấu"
-                            : event.type === "club_event"
-                              ? "Sự kiện CLB"
-                              : event.type === "social"
-                                ? "Giao lưu"
-                                : "Sinh nhật"}
+                <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
+                  {events.map((event) => (
+                    <Card key={event.id} className="p-0 flex flex-col sm:flex-row">
+                      <div className="flex-1 p-4 md:p-5">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge
+                            variant="outline"
+                            className={LEVEL_STYLES[event.level]}
+                          >
+                            {event.level === "MAJOR"
+                              ? "Quan trọng"
+                              : event.level === "NORMAL"
+                                ? "Thường kỳ"
+                                : "Nhỏ"}
+                          </Badge>
+                          <span className="flex items-center gap-1 text-xs text-gray-400">
+                            {EVENT_ICONS[event.type]}
+                            {event.type === "match"
+                              ? "Trận đấu"
+                              : event.type === "club_event"
+                                ? "Sự kiện CLB"
+                                : event.type === "social"
+                                  ? "Giao lưu"
+                                  : "Sinh nhật"}
+                          </span>
+                        </div>
+                        <CardTitle className="text-base mb-1">
+                          {event.title}
+                        </CardTitle>
+                        <p className="text-sm text-gray-500 line-clamp-2">
+                          {event.description}
+                        </p>
+                      </div>
+                      <div className="sm:w-36 bg-goda-soft-gray/50 flex sm:flex-col items-center justify-center gap-1 p-3 sm:p-4 text-center">
+                        <Calendar className="size-4 text-goda-navy sm:mb-1" />
+                        <span className="text-sm font-semibold text-goda-navy whitespace-nowrap">
+                          {event.date}
+                        </span>
+                        {/* Countdown for events with time */}
+                        {event.time && (
+                          <CountdownTimer date={event.date} time={event.time} />
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {/* Sự kiện đã diễn ra — mờ/xám hơn để phân biệt với sự kiện sắp tới */}
+              {pastEvents.length > 0 && (
+                <div className="pt-2 space-y-3">
+                  <h3 className="font-display font-semibold text-xl text-gray-500 mb-1 flex items-center gap-2">
+                    <History className="size-5 text-gray-400" />
+                    Sự kiện đã diễn ra
+                  </h3>
+                  <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+                  {pastEvents.map((event) => (
+                    <Card key={event.id} className="p-0 flex flex-col sm:flex-row bg-gray-50 border-gray-200">
+                      <div className="flex-1 p-4 md:p-5">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="outline" className="bg-gray-100 text-gray-500 border-gray-200">
+                            <History className="size-3 mr-1" />
+                            Đã diễn ra
+                          </Badge>
+                          <span className="flex items-center gap-1 text-xs text-gray-400">
+                            {EVENT_ICONS[event.type]}
+                            {event.type === "match"
+                              ? "Trận đấu"
+                              : event.type === "club_event"
+                                ? "Sự kiện CLB"
+                                : event.type === "social"
+                                  ? "Giao lưu"
+                                  : "Sinh nhật"}
+                          </span>
+                        </div>
+                        <CardTitle className="text-base mb-1 text-gray-600">
+                          {event.title}
+                        </CardTitle>
+                        <p className="text-sm text-gray-400 line-clamp-2">
+                          {event.description}
+                        </p>
+                      </div>
+                      <div className="sm:w-36 bg-gray-100/70 flex sm:flex-col items-center justify-center gap-1 p-3 sm:p-4 text-center">
+                        <History className="size-4 text-gray-400 sm:mb-1" />
+                        <span className="text-sm font-semibold text-gray-500 whitespace-nowrap">
+                          {event.date}
                         </span>
                       </div>
-                      <CardTitle className="text-base mb-1">
-                        {event.title}
-                      </CardTitle>
-                      <p className="text-sm text-gray-500 line-clamp-2">
-                        {event.description}
-                      </p>
-                    </div>
-                    <div className="sm:w-36 bg-goda-soft-gray/50 flex sm:flex-col items-center justify-center gap-1 p-3 sm:p-4 text-center">
-                      <Calendar className="size-4 text-goda-navy sm:mb-1" />
-                      <span className="text-sm font-semibold text-goda-navy whitespace-nowrap">
-                        {event.date}
-                      </span>
-                      {/* Countdown for events with time */}
-                      {event.time && (
-                        <CountdownTimer date={event.date} time={event.time} />
-                      )}
-                    </div>
-                  </Card>
-                ))
+                    </Card>
+                  ))}
+                  </div>
+                </div>
               )}
 
               {/* Sinh nhật thành viên */}

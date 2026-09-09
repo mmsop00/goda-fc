@@ -1,10 +1,16 @@
 "use client";
 
-import { useMemo } from "react";
-import type { MemberPublic, UpcomingEvent, RecentDonation } from "@/lib/mock-data";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Calendar, PartyPopper, Heart } from "lucide-react";
+import { type MemberPublic, type UpcomingEvent, type RecentDonation } from "@/lib/mock-data";
+
+// Tạm ẩn mục "5 nhà tài trợ gần đây nhất" khỏi bảng tin chạy — bật lại bằng
+// cách đổi giá trị này thành true khi cần.
+const SHOW_DONORS = false;
 
 interface BirthdayBannerProps {
   members: MemberPublic[];
+  /** Chỉ nên truyền sự kiện SẮP TỚI — sự kiện đã qua có mục riêng ở "Sự kiện & Đóng góp". */
   events: UpcomingEvent[];
   recentDonations?: RecentDonation[];
 }
@@ -28,103 +34,154 @@ function isWithinNextDays(dateStr: string, days: number): boolean {
   return false;
 }
 
-export function BirthdayBanner({ members, events, recentDonations = [] }: BirthdayBannerProps) {
-  const tickerItems = useMemo(() => {
-    const items: { label: string; date: string; section: "event" | "birthday" | "donor" | "header" }[] = [];
+// "DD/MM/YYYY" → "YYYYMMDD" so events sort chronologically as plain strings.
+function dateSortKey(dateStr: string): string {
+  const [d, m, y] = dateStr.split("/");
+  if (!d || !m || !y) return "00000000";
+  return `${y.padStart(4, "0")}${m.padStart(2, "0")}${d.padStart(2, "0")}`;
+}
 
-    // All club events
-    if (events.length > 0) {
-      items.push({ label: "── SỰ KIỆN SẮP TỚI ──", date: "", section: "header" });
-      events.forEach((e) => {
-        items.push({ label: `📅 ${e.title}`, date: e.date, section: "event" });
+function formatShortDate(dateStr: string): string {
+  const parts = dateStr.split("/");
+  return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : dateStr;
+}
+
+type Section = "upcoming" | "birthday" | "donor";
+
+interface TickerChip {
+  key: string;
+  section: Section;
+  label: string;
+  date?: string;
+  highlight?: boolean;
+}
+
+interface TickerGroup {
+  title: string;
+  icon: React.ReactNode;
+  items: TickerChip[];
+}
+
+const SECTION_STYLE: Record<Section, string> = {
+  upcoming: "bg-red-500/15 text-red-200 ring-1 ring-inset ring-red-400/30",
+  birthday: "bg-emerald-500/15 text-emerald-200 ring-1 ring-inset ring-emerald-400/30",
+  donor: "bg-amber-500/15 text-amber-200 ring-1 ring-inset ring-amber-400/30",
+};
+
+export function BirthdayBanner({ members, events, recentDonations = [] }: BirthdayBannerProps) {
+  const groups = useMemo<TickerGroup[]>(() => {
+    const result: TickerGroup[] = [];
+
+    // `events` is expected to already be upcoming-only (the page ticks a
+    // live clock and re-filters it every second), so just sort here.
+    const upcoming = [...events].sort((a, b) => dateSortKey(a.date).localeCompare(dateSortKey(b.date)));
+    if (upcoming.length > 0) {
+      result.push({
+        title: "Sự kiện sắp tới",
+        icon: <Calendar className="size-3.5" />,
+        items: upcoming.map((e) => ({
+          key: e.id,
+          section: "upcoming",
+          label: e.title,
+          date: e.date,
+          highlight: e.title.includes("Sinh nhật CLB"),
+        })),
       });
     }
 
-    // Birthdays within 7 days
     const bdays = members.filter((m) => m.birthday && isWithinNextDays(m.birthday, 7));
     if (bdays.length > 0) {
-      items.push({ label: "── SINH NHẬT THÀNH VIÊN SẮP TỚI ──", date: "", section: "header" });
-      bdays.forEach((m) => {
-        items.push({ label: `🎂 ${m.name}`, date: m.birthday!, section: "birthday" });
+      result.push({
+        title: "Sinh nhật thành viên sắp tới",
+        icon: <PartyPopper className="size-3.5" />,
+        items: bdays.map((m) => ({ key: m.id, section: "birthday", label: m.name, date: m.birthday! })),
       });
     }
 
-    // Top 5 recent donations
-    const top5 = recentDonations.slice(0, 5);
-    if (top5.length > 0) {
-      items.push({ label: "── 5 NHÀ TÀI TRỢ GẦN ĐÂY NHẤT ──", date: "", section: "header" });
-      top5.forEach((d) => {
-        items.push({ label: `💛 ${d.name}`, date: d.date, section: "donor" });
+    if (SHOW_DONORS && recentDonations.length > 0) {
+      const top5 = recentDonations.slice(0, 5);
+      result.push({
+        title: "5 nhà tài trợ gần đây nhất",
+        icon: <Heart className="size-3.5" />,
+        items: top5.map((d) => ({ key: d.id, section: "donor", label: d.name, date: d.date })),
       });
     }
 
-    return items;
+    return result;
   }, [members, events, recentDonations]);
 
-  if (tickerItems.length === 0) return null;
+  // Measure the track once rendered so the scroll speed stays constant
+  // (~70px/s) regardless of how much content is in it, instead of a fixed
+  // duration that crawls when there's little content or races when there's a lot.
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [duration, setDuration] = useState(28);
+  useEffect(() => {
+    if (trackRef.current) {
+      const width = trackRef.current.scrollWidth;
+      setDuration(Math.max(18, Math.round(width / 70)));
+    }
+  }, [groups]);
 
-  // Color by section
-  const sectionColor: Record<string, string> = {
-    header: "text-goda-navy font-extrabold",
-    event: "text-red-600 font-bold",
-    birthday: "text-goda-green",
-    donor: "text-amber-600",
-  };
+  if (groups.length === 0) return null;
 
-  // Check if an event title contains "Sinh nhật CLB"
-  const isClubBirthday = (label: string) => label.includes("Sinh nhật CLB");
-
-  // Build JSX segments
-  const renderTicker = () => {
-    const result: React.ReactNode[] = [];
-    tickerItems.forEach((item, i) => {
-      if (i > 0) {
-        // Add gap before headers
-        if (item.section === "header") {
-          result.push(<span key={`gap-${i}`} className="px-8" />);
-        } else {
-          result.push(<span key={`dot-${i}`} className="px-1.5">•</span>);
-        }
-      }
-      const dateStr = item.date
-        ? (() => {
-            const parts = item.date.split("/");
-            return parts.length >= 2 ? `(${parts[0]}/${parts[1]})` : `(${item.date})`;
-          })()
-        : "";
-      result.push(
-        <span key={i} className={isClubBirthday(item.label) ? "text-red-600 font-extrabold text-base" : (sectionColor[item.section] || "text-goda-navy")}>
-          {item.label} <span className="text-xs opacity-70">{dateStr}</span>
+  const renderChips = (copyKey: string) =>
+    groups.flatMap((group, gi) => [
+      <span
+        key={`${copyKey}-title-${gi}`}
+        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-goda-yellow text-goda-navy text-[11px] font-extrabold uppercase tracking-wider shrink-0"
+      >
+        {group.icon}
+        {group.title}
+      </span>,
+      ...group.items.map((item, ii) => (
+        <span
+          key={`${copyKey}-item-${gi}-${ii}`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs md:text-sm font-semibold shrink-0 transition-transform hover:scale-105 ${
+            item.highlight
+              ? "bg-gradient-to-r from-goda-yellow to-amber-400 text-goda-navy ring-1 ring-inset ring-goda-yellow/60 animate-pulse"
+              : SECTION_STYLE[item.section]
+          }`}
+        >
+          {item.label}
+          {item.date && <span className="opacity-70 font-normal">{formatShortDate(item.date)}</span>}
         </span>
-      );
-    });
-    return result;
-  };
-
-  const tickerContent = renderTicker();
+      )),
+    ]);
 
   return (
-    <div className="bg-gradient-to-r from-goda-yellow/25 via-goda-yellow/15 to-goda-yellow/25 border-b-2 border-goda-yellow overflow-hidden">
-      <div className="py-2.5 flex">
-        <div className="animate-marquee whitespace-nowrap text-sm md:text-base font-bold flex shrink-0">
-          {tickerContent}
-          <span className="px-10" />
+    <div className="gd-ticker relative bg-goda-navy border-y border-goda-yellow/40 overflow-hidden">
+      {/* Edge fades so chips don't hard-cut at the viewport edge */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-10 md:w-16 bg-gradient-to-r from-goda-navy to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 md:w-16 bg-gradient-to-l from-goda-navy to-transparent z-10" />
+
+      <div className="flex py-2.5">
+        <div ref={trackRef} className="gd-ticker-track flex items-center gap-2.5 shrink-0" style={{ animationDuration: `${duration}s` }}>
+          {renderChips("a")}
+          <span className="w-8 shrink-0" />
         </div>
-        <div className="animate-marquee whitespace-nowrap text-sm md:text-base font-bold flex shrink-0">
-          {tickerContent}
-          <span className="px-10" />
+        <div aria-hidden className="gd-ticker-track flex items-center gap-2.5 shrink-0" style={{ animationDuration: `${duration}s` }}>
+          {renderChips("b")}
+          <span className="w-8 shrink-0" />
         </div>
       </div>
+
       <style>{`
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-100%); }
         }
-        .animate-marquee {
-          animation: marquee 20s linear infinite;
+        .gd-ticker-track {
+          animation-name: marquee;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+        }
+        .gd-ticker:hover .gd-ticker-track {
+          animation-play-state: paused;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .gd-ticker-track { animation: none; }
         }
       `}</style>
     </div>
   );
 }
-
