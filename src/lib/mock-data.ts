@@ -1006,6 +1006,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     opponentScore: 0,
     godaScore: 0,
     godaJerseyColor: "Đỏ",
+    opponentJerseyColor: "Vàng",
     godaLineup: BASE_LINEUP,
     opponentLineup: OPP_LINEUP,
     goals: [],
