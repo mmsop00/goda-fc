@@ -219,14 +219,14 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
           {!isUpcoming && match.goals.length > 0 && (
             <div className="flex justify-center gap-3">
               {/* Left goals */}
-              <div className="flex-1 text-right space-y-0.5">
+              <div className="flex-1 min-w-0 text-right space-y-0.5">
                 {match.goals
                   .filter((g) => (match.isHome ? g.side === "GODA" : g.side !== "GODA"))
                   .map((g, i) => {
                     const playerDisplay = formatGoalPlayer(g.player);
                     const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
                     return (
-                      <p key={`lg-${i}`} className="text-xs text-gray-500 leading-tight font-normal">
+                      <p key={`lg-${i}`} className="text-xs text-gray-500 leading-tight font-normal truncate">
                         {g.minute}&apos; {playerDisplay}{assistDisplay}
                       </p>
                     );
@@ -235,14 +235,14 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
               {/* Score spacer */}
               <div className="shrink-0 w-[72px]" />
               {/* Right goals */}
-              <div className="flex-1 text-left space-y-0.5">
+              <div className="flex-1 min-w-0 text-left space-y-0.5">
                 {match.goals
                   .filter((g) => (match.isHome ? g.side !== "GODA" : g.side === "GODA"))
                   .map((g, i) => {
                     const playerDisplay = formatGoalPlayer(g.player);
                     const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
                     return (
-                      <p key={`rg-${i}`} className="text-xs text-gray-600 leading-tight font-normal">
+                      <p key={`rg-${i}`} className="text-xs text-gray-600 leading-tight font-normal truncate">
                         {g.minute}&apos; {playerDisplay}{assistDisplay}
                       </p>
                     );
