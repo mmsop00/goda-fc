@@ -443,6 +443,30 @@ export const MOCK_NEWS: NewsItem[] = [
     author: "Ban truyền thông GODA FC",
     thumbnailUrl: "/photos/tu-hung/goda-32-nam.jpg",
   },
+  {
+    id: "news-004",
+    slug: "goda-fc-tham-hoi-dong-vien-chu-binh",
+    title: "GODA FC thăm hỏi, động viên chú Bình sau biến cố sức khỏe",
+    summary: "Ngày 12/09/2026, đại diện Ban lãnh đạo cùng các thành viên CLB GODA đã đến thăm hỏi, động viên chú Bình trong thời gian chú điều trị, hồi phục sau một cơn tai biến.",
+    content:
+      "<p>Chiều <strong>12/09/2026</strong>, đại diện Ban lãnh đạo cùng nhiều thành viên CLB GODA đã cùng nhau đến thăm hỏi, động viên <strong>chú Bình</strong> — một người anh, người bạn thân thiết gắn bó lâu năm với CLB — trong thời gian chú đang điều trị, hồi phục sau một cơn tai biến.</p><img src='/photos/hoat-dong/tham-chu-binh-09-2026.jpg' alt='Đại diện GODA FC đến thăm hỏi, động viên chú Bình' /><p><em>Đại diện Ban lãnh đạo và thành viên CLB GODA đến thăm hỏi, động viên chú Bình.</em></p><p>Trong không khí ấm áp, cả đoàn đã dành thời gian trò chuyện, hỏi thăm sức khỏe và động viên tinh thần chú Bình cùng gia đình, mong chú sớm bình phục để có thể trở lại sân cỏ cùng anh em CLB trong thời gian tới.</p><p>Chú Bình và gia đình đã xúc động gửi lời cảm ơn chân thành đến Ban lãnh đạo cùng toàn thể thành viên CLB đã dành thời gian quan tâm, thăm hỏi trong lúc khó khăn.</p><p>Ban lãnh đạo CLB GODA cũng xin gửi lời cảm ơn tới gia đình chú Bình đã đón tiếp nồng hậu, đồng thời cảm ơn toàn thể anh em thành viên đã luôn quan tâm, đồng hành và dành tình cảm cho chú trong suốt thời gian qua. Đó chính là tinh thần đoàn kết, tương thân tương ái vốn có của gia đình GODA FC.</p><p>Kính chúc chú Bình sớm bình phục sức khỏe!</p>",
+    date: "12/09/2026",
+    category: "Tin CLB",
+    author: "Ban truyền thông GODA FC",
+    thumbnailUrl: "/photos/hoat-dong/tham-chu-binh-09-2026.jpg",
+  },
+  {
+    id: "news-005",
+    slug: "goda-fc-trao-qua-sinh-nhat-quy-3-2026",
+    title: "GODA FC trao quà sinh nhật quý 3/2026 cho các thành viên",
+    summary: "Ngày 13/09/2026, CLB GODA tổ chức trao quà chúc mừng sinh nhật đến các thành viên có ngày sinh trong quý 3 (tháng 7, 8, 9) năm 2026, mỗi phần quà trị giá 200.000đ.",
+    content:
+      "<p>Tối <strong>13/09/2026</strong>, CLB GODA đã tổ chức trao quà chúc mừng sinh nhật đến các thành viên có ngày sinh trong <strong>quý 3 (tháng 7, 8, 9) năm 2026</strong>. Đây là hoạt động thường niên của CLB, thể hiện sự quan tâm và gắn kết giữa các thành viên trong một gia đình GODA FC.</p><img src='/photos/hoat-dong/trao-qua-sinh-nhat-quy3-2026.jpg' alt='GODA FC trao quà sinh nhật thành viên quý 3/2026' /><p><em>Đại diện Ban lãnh đạo trao quà chúc mừng sinh nhật các thành viên quý 3/2026.</em></p><p>Mỗi thành viên có sinh nhật trong quý đã nhận một phần quà trị giá <strong>200.000đ</strong> kèm lời chúc mừng ấm áp từ Ban lãnh đạo và toàn thể anh em CLB. Danh sách thành viên nhận quà đợt này (theo thứ tự ngày sinh):</p><ul><li>Nguyễn Khắc Vĩnh — 18/07</li><li>Lê Thanh Hà — 01/08</li><li>Phạm Trung Thông — 07/08</li><li>Trần Tam Thịnh — 16/08</li><li>Nguyễn Văn Mạnh — 28/08</li><li>Trần Nguyên Bá — 04/09</li><li>Nguyễn Minh Quang — 26/09</li></ul><p>Tổng giá trị quà tặng đợt này là <strong>1.400.000đ</strong>, trích từ quỹ chung của CLB.</p><p>Xin chúc mừng sinh nhật toàn thể các thành viên — chúc mọi người luôn mạnh khỏe, hạnh phúc và tiếp tục đồng hành cùng GODA FC trên mọi chặng đường!</p>",
+    date: "13/09/2026",
+    category: "Sinh nhật",
+    author: "Ban truyền thông GODA FC",
+    thumbnailUrl: "/photos/hoat-dong/trao-qua-sinh-nhat-quy3-2026.jpg",
+  },
 ];
 
 /** Sắp xếp bài viết theo ngày giảm dần (DD/MM/YYYY). */
