@@ -1475,7 +1475,7 @@ export const MOCK_MEMBERS: MemberPublic[] = [
   { id: "m-003", name: "Huy Quang", nickname: "Quang", position: "Hậu vệ", number: 3, avatarUrl: "/avatars/huy-quang.jpg", matches: 95, goals: 6, assists: 18, mvp: 15, birthday: "xx/01/1970", joinYear: 1994, joinDate: "1994", status: "Đội phó" },
   { id: "m-004", name: "Hoàng Trọng Nội", nickname: "Nội", position: "Hậu vệ", number: 11, avatarUrl: "/avatars/hoang-trong-noi.jpg", matches: 88, goals: 4, assists: 15, mvp: 12, birthday: "23/05/1979", joinYear: 0, status: "Đội phó" },
   // ── Cầu thủ (sắp xếp theo tuổi, già nhất trước) ──
-  { id: "m-005", name: "Nguyễn Văn Bình", nickname: "Bình", position: "Tiền vệ", number: 55, avatarUrl: "", matches: 130, goals: 12, assists: 21, mvp: 14, birthday: "19/04/1955", joinYear: 0, status: "Đang thi đấu" },
+  { id: "m-005", name: "Nguyễn Văn Bình", nickname: "Bình", position: "Tiền vệ", number: 55, avatarUrl: "/avatars/nguyen-van-binh.jpg", matches: 130, goals: 12, assists: 21, mvp: 14, birthday: "19/04/1955", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-006", name: "Chu Triệu Thành", nickname: "Thầy giáo", position: "Tiền vệ", number: 56, avatarUrl: "/avatars/chu-trieu-thanh.jpg", matches: 156, goals: 15, assists: 28, mvp: 16, birthday: "25/02/1956", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-007", name: "Nguyễn Tiến Dũng", nickname: "Tiến Dũng", position: "Tiền vệ", number: 11, avatarUrl: "", matches: 45, goals: 1, assists: 6, mvp: 10, birthday: "25/06/1958", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-008", name: "Phạm Trung Thông", nickname: "Thông", position: "Hậu vệ", number: 33, avatarUrl: "/avatars/pham-trung-thong.jpg", matches: 230, goals: 6, assists: 20, mvp: 35, birthday: "07/08/1967", joinYear: 0, status: "Đang thi đấu" },
