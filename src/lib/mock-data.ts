@@ -374,7 +374,6 @@ export const MOCK_DONORS: TopDonor[] = [
   { id: "d-024", name: "Vũ Ngọc Sơn", amount: 0, month: "08/2026", anonymous: false },
   { id: "d-025", name: "Trần Nguyên Bá", amount: 0, month: "08/2026", anonymous: false },
   { id: "d-026", name: "Phan Hồng Thái", amount: 0, month: "08/2026", anonymous: false },
-  { id: "d-027", name: "Nguyễn Minh Quang", amount: 0, month: "08/2026", anonymous: false },
 ];
 
 export interface RecentDonation {
@@ -388,7 +387,7 @@ export interface RecentDonation {
 export const MOCK_RECENT_DONATIONS: RecentDonation[] = Array.from({ length: 50 }, (_, i) => {
   const names = [
     "Huy Quang", "Lê Thanh Hà", "Trần Đình Thanh", "Vũ Đăng Tuấn", "Nguyễn Văn Mạnh",
-    "Phan Hồng Thái", "Nguyễn Minh Quang", "Phạm Duy Thắng", "Vũ Ngọc Sơn", "Trần Nguyên Bá",
+    "Phan Hồng Thái", "Phạm Duy Thắng", "Vũ Ngọc Sơn", "Trần Nguyên Bá",
     "Đinh Thái Bình", "Nguyễn An", "Phạm Trung Thông", "Chu Triệu Thành", "Phan Trần Phương",
     "Nguyễn Khắc Vĩnh", "Đào Thanh Tùng", "Vũ Thái Thịnh", "Phùng Văn Lục", "Trương Quang Huy",
     "Nguyễn Văn Bình", "Nguyễn Việt Dũng", "Nguyễn Mạnh Tuấn", "Trần Tam Thịnh", "Hoàng Trọng Nội",
@@ -1008,7 +1007,6 @@ const BASE_LINEUP: MatchPlayer[] = [
   { name: "Chu Triệu Thành", number: 0, position: "TV" },
   { name: "Nguyễn An", number: 0, position: "TM" },
   { name: "Nguyễn Văn Bình", number: 0, position: "TV" },
-  { name: "Nguyễn Minh Quang", number: 0, position: "TV" },
   { name: "Đinh Thái Bình", number: 0, position: "TV" },
   { name: "Phạm Trung Thông", number: 0, position: "HV" },
   { name: "Phạm Hồng Thái", number: 0, position: "TV" },
@@ -1497,7 +1495,6 @@ export const MOCK_MEMBERS: MemberPublic[] = [
   { id: "m-024", name: "Vũ Ngọc Sơn", nickname: "Xuân Son", position: "Tiền vệ", number: 20, avatarUrl: "/avatars/vu-ngoc-son.jpg", matches: 98, goals: 26, assists: 34, mvp: 33, birthday: "20/01/1993", joinYear: 2025, joinDate: "10/01/2025", status: "Đang thi đấu" },
   { id: "m-025", name: "Trần Nguyên Bá", nickname: "Bá Nghệ", position: "Tiền đạo", number: 19, avatarUrl: "/avatars/tran-nguyen-ba.jpg", matches: 72, goals: 45, assists: 16, mvp: 44, birthday: "04/09/1994", joinYear: 0, status: "Đang thi đấu" },
   { id: "m-026", name: "Phan Hồng Thái", nickname: "Thái", position: "Tiền vệ", number: 38, avatarUrl: "/avatars/phan-hong-thai.jpg", matches: 220, goals: 78, assists: 28, mvp: 50, birthday: "03/02/1995", joinYear: 0, status: "Đang thi đấu" },
-  { id: "m-027", name: "Nguyễn Minh Quang", nickname: "Quang", position: "Tiền vệ", number: 2, avatarUrl: "", matches: 195, goals: 68, assists: 32, mvp: 47, birthday: "26/09/2003", joinYear: 0, status: "Đang thi đấu" },
 ];
 
 export const MOCK_ALBUM: AlbumPhoto[] = [
