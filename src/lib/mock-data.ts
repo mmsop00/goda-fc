@@ -995,22 +995,24 @@ export function isGodaMatch(m: MatchResult): boolean {
 // TASK-007 — Mock Data
 // ═══════════════════════════════════════
 
+// Số áo lấy đúng theo MOCK_MEMBERS (cột "Số áo" trong file xlsx) — luôn đồng
+// bộ với danh sách thành viên, không để số cũ/số 0 giữ chỗ.
 const BASE_LINEUP: MatchPlayer[] = [
-  { name: "Vũ Ngọc Sơn", number: 15, position: "TV" },
+  { name: "Vũ Ngọc Sơn", number: 20, position: "TV" },
   { name: "Phan Trần Phương", number: 5, position: "HV" },
   { name: "Vũ Đăng Tuấn", number: 80, position: "TV" },
-  { name: "Trần Nguyên Bá", number: 37, position: "TĐ" },
+  { name: "Trần Nguyên Bá", number: 19, position: "TĐ" },
   { name: "Lê Thanh Hà", number: 7, position: "HV" },
   { name: "Đào Thanh Tùng", number: 8, position: "TM" },
-  { name: "Nguyễn Khắc Vĩnh", number: 0, position: "HV" },
-  { name: "Nguyễn Văn Mạnh", number: 0, position: "HV" },
-  { name: "Chu Triệu Thành", number: 0, position: "TV" },
-  { name: "Nguyễn An", number: 0, position: "TM" },
-  { name: "Nguyễn Văn Bình", number: 0, position: "TV" },
-  { name: "Đinh Thái Bình", number: 0, position: "TV" },
-  { name: "Phạm Trung Thông", number: 0, position: "HV" },
-  { name: "Phạm Hồng Thái", number: 0, position: "TV" },
-  { name: "Trần Đình Thanh", number: 22, position: "TV" },
+  { name: "Nguyễn Khắc Vĩnh", number: 6, position: "HV" },
+  { name: "Nguyễn Văn Mạnh", number: 77, position: "HV" },
+  { name: "Chu Triệu Thành", number: 56, position: "TV" },
+  { name: "Nguyễn An", number: 37, position: "TM" },
+  { name: "Nguyễn Văn Bình", number: 55, position: "TV" },
+  { name: "Đinh Thái Bình", number: 10, position: "TV" },
+  { name: "Phạm Trung Thông", number: 33, position: "HV" },
+  { name: "Phạm Hồng Thái", number: 38, position: "TV" },
+  { name: "Trần Đình Thanh", number: 26, position: "TV" },
 ];
 
 const OPP_LINEUP: MatchPlayer[] = [];
