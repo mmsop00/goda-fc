@@ -108,7 +108,7 @@ export default function TinTucPage() {
       </section>
 
       {/* ── Section: Hình ảnh & Video ── */}
-      <section className="py-12 md:py-16 bg-white">
+      <section id="hinh-anh-video" className="py-12 md:py-16 bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           <h2 className="font-display font-bold text-3xl md:text-4xl text-goda-navy mb-2 text-center">
             🖼️ Hình ảnh & Video

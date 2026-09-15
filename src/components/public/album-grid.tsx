@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Image as ImageIcon, Play } from "lucide-react";
 import Image from "next/image";
@@ -21,15 +21,35 @@ const CATEGORIES: { label: string; value: AlbumCategory | "all" }[] = [
   { label: "🎬 Video", value: "Video" },
 ];
 
+const PAGE_SIZE = 24;
+
+function parseDate(d: string) {
+  const parts = d.split("/");
+  return new Date(+parts[2], +parts[1] - 1, +parts[0]).getTime();
+}
+
 export function AlbumGrid({ photos, isLoading }: AlbumGridProps) {
   const [category, setCategory] = useState<AlbumCategory | "all">("all");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const filtered =
-    category === "all" ? photos : photos.filter((p) => p.category === category);
+  // Mới nhất (theo ngày tải lên) lên trước
+  const sorted = useMemo(() => {
+    return [...photos].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+  }, [photos]);
+
+  const filtered = useMemo(() => {
+    return category === "all" ? sorted : sorted.filter((p) => p.category === category);
+  }, [sorted, category]);
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [category]);
+
+  const visible = filtered.slice(0, visibleCount);
 
   const selectedPhoto =
-    selectedIndex !== null ? filtered[selectedIndex] : null;
+    selectedIndex !== null ? visible[selectedIndex] : null;
 
   return (
     <section className="py-12 md:py-16 bg-goda-warm-white">
@@ -54,6 +74,13 @@ export function AlbumGrid({ photos, isLoading }: AlbumGridProps) {
           ))}
         </div>
 
+        {/* Số lượng */}
+        {!isLoading && filtered.length > 0 && (
+          <p className="text-center text-sm text-gray-400 mb-4">
+            Hiển thị {visible.length} / {filtered.length} ảnh &amp; video
+          </p>
+        )}
+
         {/* Grid */}
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -67,7 +94,7 @@ export function AlbumGrid({ photos, isLoading }: AlbumGridProps) {
           </p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {filtered.map((photo, i) => (
+            {visible.map((photo, i) => (
               <button
                 key={photo.id}
                 onClick={() => setSelectedIndex(i)}
@@ -108,6 +135,18 @@ export function AlbumGrid({ photos, isLoading }: AlbumGridProps) {
             ))}
           </div>
         )}
+
+        {/* Xem thêm */}
+        {visibleCount < filtered.length && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+              className="px-6 py-2.5 rounded-full text-sm font-medium bg-goda-navy text-white hover:bg-goda-navy/90 transition-colors"
+            >
+              Xem thêm ({filtered.length - visibleCount} ảnh &amp; video)
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Lightbox */}
@@ -121,12 +160,12 @@ export function AlbumGrid({ photos, isLoading }: AlbumGridProps) {
         }
         onNext={() =>
           setSelectedIndex((prev) =>
-            prev !== null ? Math.min(filtered.length - 1, prev + 1) : null
+            prev !== null ? Math.min(visible.length - 1, prev + 1) : null
           )
         }
         hasPrev={selectedIndex !== null && selectedIndex > 0}
         hasNext={
-          selectedIndex !== null && selectedIndex < filtered.length - 1
+          selectedIndex !== null && selectedIndex < visible.length - 1
         }
       />
     </section>

@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
@@ -13,6 +14,9 @@ interface GallerySectionProps {
   isLoading?: boolean;
 }
 
+// Trang chủ chỉ hiển thị bản xem nhanh (mới nhất); xem toàn bộ ở /tin-tuc
+const HOMEPAGE_LIMIT = 24;
+
 export function GallerySection({ items, isLoading }: GallerySectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -20,7 +24,7 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Sort by date descending (newest first) — timeline order
-  const sorted = useMemo(() => {
+  const sortedAll = useMemo(() => {
     return [...items].sort((a, b) => {
       const parse = (d: string) => {
         const parts = d.split("/");
@@ -29,6 +33,8 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
       return parse(b.date) - parse(a.date);
     });
   }, [items]);
+
+  const sorted = useMemo(() => sortedAll.slice(0, HOMEPAGE_LIMIT), [sortedAll]);
 
   const checkScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -61,7 +67,15 @@ export function GallerySection({ items, isLoading }: GallerySectionProps) {
               <span className="mr-2" aria-hidden="true">🖼️</span>
               Ảnh & Video
             </h2>
-            <p className="text-gray-500">Khoảnh khắc đáng nhớ của GODA FC — kéo để xem tất cả</p>
+            <p className="text-gray-500">Khoảnh khắc đáng nhớ của GODA FC — kéo để xem thêm</p>
+            {sortedAll.length > sorted.length && (
+              <Link
+                href="/tin-tuc#hinh-anh-video"
+                className="inline-block mt-2 text-sm font-medium text-goda-navy hover:text-goda-yellow underline underline-offset-2"
+              >
+                Xem tất cả {sortedAll.length} ảnh &amp; video →
+              </Link>
+            )}
           </div>
 
           {isLoading ? (
