@@ -81,6 +81,7 @@ export function AlbumGrid({ photos, isLoading }: AlbumGridProps) {
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-300"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    unoptimized={photo.thumbnailUrl.startsWith("http")}
                   />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-goda-navy/30 to-goda-green/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">

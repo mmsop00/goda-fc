@@ -111,6 +111,7 @@ export function Lightbox({
             className="object-contain"
             sizes="(max-width: 1280px) 100vw, 1152px"
             priority
+            unoptimized={photo.fullUrl.startsWith("http")}
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-goda-navy/50 to-goda-green/50 flex items-center justify-center rounded-xl">
