@@ -158,7 +158,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             <div className="flex items-center justify-center gap-3 py-3">
               {/* Left team: name + (upcoming) jersey color right underneath */}
               <div className="flex flex-1 flex-col items-end gap-1 min-w-0">
-                <span className={`text-right font-display text-sm truncate ${leftIsGoda ? godaColor : oppColor} ${leftIsGoda ? godaWeight : oppWeight}`}>
+                <span className={`block w-full text-right font-display text-sm truncate ${leftIsGoda ? godaColor : oppColor} ${leftIsGoda ? godaWeight : oppWeight}`}>
                   {homeName}
                 </span>
                 {showJerseys && leftJersey && (
@@ -190,7 +190,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
               )}
               {/* Right team: name + (upcoming) jersey color right underneath */}
               <div className="flex flex-1 flex-col items-start gap-1 min-w-0">
-                <span className={`text-left font-display text-sm truncate ${leftIsGoda ? oppColor : godaColor} ${leftIsGoda ? oppWeight : godaWeight}`}>
+                <span className={`block w-full text-left font-display text-sm truncate ${leftIsGoda ? oppColor : godaColor} ${leftIsGoda ? oppWeight : godaWeight}`}>
                   {awayName}
                 </span>
                 {showJerseys && rightJersey && (
