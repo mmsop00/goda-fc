@@ -26,6 +26,13 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
           ? "Thua"
           : "Hòa";
 
+  // Highlight the side that actually WON — not just "home team = brighter".
+  // Draw / upcoming / postponed / non-GODA matches: both names stay equally bright.
+  const hasClearResult = !isNeutral && !isUpcoming && !isPostponed && result !== "Hòa";
+  const homeWon = match.isHome ? match.godaScore > match.opponentScore : match.opponentScore > match.godaScore;
+  const homeNameColor = hasClearResult ? (homeWon ? "text-white" : "text-gray-400") : "text-white";
+  const awayNameColor = hasClearResult ? (homeWon ? "text-gray-400" : "text-white") : "text-white";
+
   return (
     <section className="bg-goda-navy">
       <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
@@ -70,7 +77,7 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
             <>
               {/* Home/Away Team */}
               <div className="text-center flex-1">
-                <p className="font-display font-bold text-xl md:text-3xl text-white">
+                <p className={`font-display font-bold text-xl md:text-3xl ${homeNameColor}`}>
                   {homeName}
                 </p>
               </div>
@@ -96,7 +103,7 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
 
               {/* Away/Home Team */}
               <div className="text-center flex-1">
-                <p className="font-display font-bold text-xl md:text-3xl text-gray-400">
+                <p className={`font-display font-bold text-xl md:text-3xl ${awayNameColor}`}>
                   {awayName}
                 </p>
               </div>
@@ -122,17 +129,18 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
           </span>
         </div>
 
-        {/* Trang phục thi đấu cho trận chưa diễn ra */}
+        {/* Trang phục thi đấu cho trận chưa diễn ra — đội nhà hiện trước, đội
+            khách hiện sau, thay vì luôn hiện GODA trước bất kể nhà/khách. */}
         {isUpcoming && !isPostponed && !match.eventTitle && (match.godaJerseyColor || match.opponentJerseyColor) && (
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
-            {match.godaJerseyColor && (
+            {(match.isHome ? match.godaJerseyColor : match.opponentJerseyColor) && (
               <span>
-                👕 {match.isHome ? homeName : awayName} mặc: <strong className="text-white">{match.godaJerseyColor}</strong>
+                👕 {homeName} mặc: <strong className="text-white">{match.isHome ? match.godaJerseyColor : match.opponentJerseyColor}</strong>
               </span>
             )}
-            {match.opponentJerseyColor && (
+            {(match.isHome ? match.opponentJerseyColor : match.godaJerseyColor) && (
               <span>
-                👥 {match.isHome ? awayName : homeName} mặc: <strong className="text-white">{match.opponentJerseyColor}</strong>
+                👥 {awayName} mặc: <strong className="text-white">{match.isHome ? match.opponentJerseyColor : match.godaJerseyColor}</strong>
               </span>
             )}
           </div>
