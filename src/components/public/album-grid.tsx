@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Play } from "lucide-react";
 import Image from "next/image";
 import { Lightbox } from "./lightbox";
 import type { AlbumPhoto, AlbumCategory } from "@/lib/mock-data";
@@ -87,6 +87,12 @@ export function AlbumGrid({ photos, isLoading }: AlbumGridProps) {
                   <div className="absolute inset-0 bg-gradient-to-br from-goda-navy/30 to-goda-green/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     {/* eslint-disable-next-line jsx-a11y/alt-text */}
                     <ImageIcon className="size-12 text-white/40" aria-hidden="true" />
+                  </div>
+                )}
+                {/* Video play icon */}
+                {photo.category === "Video" && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-goda-navy/20">
+                    <Play className="size-10 text-white fill-white opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" />
                   </div>
                 )}
                 {/* Hover overlay */}
