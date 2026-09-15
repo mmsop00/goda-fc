@@ -22,6 +22,13 @@ export default async function TranDauDetailPage({
 
   if (!match) notFound();
 
+  // Cùng cách tính tên đội nhà/khách như MatchDetailHero — dùng cho cả trận
+  // trung lập (GODA không thi đấu), thay vì mặc định coi 1 bên luôn là GODA.
+  const homeName = match.homeTeam ?? (match.isHome ? "GODA FC" : match.opponent);
+  const awayName = match.awayTeam ?? (match.isHome ? match.opponent : "GODA FC");
+  const godaLabel = match.isHome ? homeName : awayName;
+  const opponentLabel = match.isHome ? awayName : homeName;
+
   return (
     <>
       <MatchDetailHero match={match} />
@@ -41,13 +48,19 @@ export default async function TranDauDetailPage({
           <MatchLineup
             godaLineup={match.godaLineup}
             opponentLineup={match.opponentLineup}
-            opponentName={match.opponent}
+            homeName={homeName}
+            awayName={awayName}
             isHome={match.isHome}
           />
 
           <Separator />
 
-          <MatchTimeline goals={match.goals} cards={match.cards} />
+          <MatchTimeline
+            goals={match.goals}
+            cards={match.cards}
+            godaLabel={godaLabel}
+            opponentLabel={opponentLabel}
+          />
 
           {match.mvp && <MatchMVP playerName={match.mvp} />}
         </>

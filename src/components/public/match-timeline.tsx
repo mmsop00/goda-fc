@@ -5,6 +5,10 @@ import type { MatchGoal, MatchCard as MatchCardType } from "@/lib/mock-data";
 interface MatchTimelineProps {
   goals: MatchGoal[];
   cards: MatchCardType[];
+  /** Tên thật cho 2 phía "GODA"/"opponent" trong du lieu — de dung cho ca
+   * tran trung lap (GODA khong thi dau) thay vi in chu "GODA" cung. */
+  godaLabel: string;
+  opponentLabel: string;
 }
 
 interface TimelineEvent {
@@ -15,7 +19,7 @@ interface TimelineEvent {
   assist?: string;
 }
 
-export function MatchTimeline({ goals, cards }: MatchTimelineProps) {
+export function MatchTimeline({ goals, cards, godaLabel, opponentLabel }: MatchTimelineProps) {
   const events: TimelineEvent[] = [
     ...goals.map((g) => ({ type: "goal" as const, minute: g.minute, side: g.side, player: g.player, assist: g.assist })),
     ...cards.map((c) => ({ type: c.type, minute: c.minute, side: c.side, player: c.player })),
@@ -83,7 +87,7 @@ export function MatchTimeline({ goals, cards }: MatchTimelineProps) {
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs text-gray-400">{event.minute}&apos;</span>
                       <span className="text-xs font-medium text-goda-navy">
-                        {isGoda ? "GODA" : "Đối thủ"}
+                        {isGoda ? godaLabel : opponentLabel}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-goda-navy">

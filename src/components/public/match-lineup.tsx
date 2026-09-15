@@ -3,16 +3,24 @@ import type { MatchPlayer } from "@/lib/mock-data";
 interface MatchLineupProps {
   godaLineup: MatchPlayer[];
   opponentLineup: MatchPlayer[];
-  opponentName: string;
+  /** Tên đội nhà / đội khách thực tế — dùng cho cả trận có GODA lẫn trận
+   * trung lập (GODA không thi đấu), thay vì mặc định gán "GODA FC". */
+  homeName: string;
+  awayName: string;
   /** Which side GODA is on — must match the home/away order shown in the hero above. */
   isHome: boolean;
 }
 
-export function MatchLineup({ godaLineup, opponentLineup, opponentName, isHome }: MatchLineupProps) {
+export function MatchLineup({ godaLineup, opponentLineup, homeName, awayName, isHome }: MatchLineupProps) {
+  // "GODA slot" trong du lieu (godaLineup/opponentLineup) tuong ung voi doi
+  // nha hay doi khach tuy theo isHome - khong phai luon la "GODA FC".
+  const godaLabel = isHome ? homeName : awayName;
+  const opponentLabel = isHome ? awayName : homeName;
+
   const godaBlock = (
     <div>
       <h3 className="font-display font-semibold text-base text-goda-navy bg-goda-navy/5 px-4 py-2 rounded-lg mb-3 text-center">
-        GODA FC
+        {godaLabel}
       </h3>
       <div className="space-y-1">
         {godaLineup.map((player, i) => (
@@ -36,7 +44,7 @@ export function MatchLineup({ godaLineup, opponentLineup, opponentName, isHome }
   const opponentBlock = (
     <div>
       <h3 className="font-display font-semibold text-base text-gray-500 bg-gray-100 px-4 py-2 rounded-lg mb-3 text-center">
-        {opponentName}
+        {opponentLabel}
       </h3>
       <div className="space-y-1">
         {opponentLineup.map((player, i) => (
