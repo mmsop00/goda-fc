@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin } from "lucide-react";
+import { Calendar, Clock, MapPin, Shirt, ExternalLink } from "lucide-react";
 import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
+import { jerseyBadgeClass, jerseyIconColor } from "@/lib/jersey";
 
 interface MatchDetailHeroProps {
   match: MatchResult;
@@ -32,6 +33,10 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
   const homeWon = match.isHome ? match.godaScore > match.opponentScore : match.opponentScore > match.godaScore;
   const homeNameColor = hasClearResult ? (homeWon ? "text-white" : "text-gray-400") : "text-white";
   const awayNameColor = hasClearResult ? (homeWon ? "text-gray-400" : "text-white") : "text-white";
+
+  // Same left(home)/right(away) order as everything else on this page.
+  const homeJerseyColor = match.isHome ? match.godaJerseyColor : match.opponentJerseyColor;
+  const awayJerseyColor = match.isHome ? match.opponentJerseyColor : match.godaJerseyColor;
 
   return (
     <section className="bg-goda-navy">
@@ -123,24 +128,46 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
               {match.time}
             </span>
           )}
-          <span className="flex items-center gap-1">
-            <MapPin className="size-4" />
-            {match.venue}
-          </span>
+          {match.googleMapsUrl ? (
+            <a
+              href={match.googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-goda-yellow hover:underline"
+            >
+              <MapPin className="size-4" />
+              {match.venue}
+              <ExternalLink className="size-3" />
+            </a>
+          ) : (
+            <span className="flex items-center gap-1">
+              <MapPin className="size-4" />
+              {match.venue}
+            </span>
+          )}
         </div>
 
         {/* Trang phục thi đấu cho trận chưa diễn ra — đội nhà hiện trước, đội
-            khách hiện sau, thay vì luôn hiện GODA trước bất kể nhà/khách. */}
-        {isUpcoming && !isPostponed && !match.eventTitle && (match.godaJerseyColor || match.opponentJerseyColor) && (
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-300">
-            {(match.isHome ? match.godaJerseyColor : match.opponentJerseyColor) && (
-              <span>
-                👕 {homeName} mặc: <strong className="text-white">{match.isHome ? match.godaJerseyColor : match.opponentJerseyColor}</strong>
+            khách hiện sau (giống thứ tự đội ở trên), badge áo đồng bộ với
+            thẻ trận đấu ở trang danh sách. */}
+        {isUpcoming && !isPostponed && !match.eventTitle && (homeJerseyColor || awayJerseyColor) && (
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+            {homeJerseyColor && (
+              <span className="inline-flex items-center gap-1.5 text-xs text-gray-300">
+                {homeName} mặc
+                <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(homeJerseyColor)}`}>
+                  <Shirt className={`size-3.5 shrink-0 ${jerseyIconColor(homeJerseyColor)}`} fill="currentColor" strokeWidth={2.5} />
+                  {homeJerseyColor}
+                </span>
               </span>
             )}
-            {(match.isHome ? match.opponentJerseyColor : match.godaJerseyColor) && (
-              <span>
-                👥 {awayName} mặc: <strong className="text-white">{match.isHome ? match.opponentJerseyColor : match.godaJerseyColor}</strong>
+            {awayJerseyColor && (
+              <span className="inline-flex items-center gap-1.5 text-xs text-gray-300">
+                {awayName} mặc
+                <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${jerseyBadgeClass(awayJerseyColor)}`}>
+                  <Shirt className={`size-3.5 shrink-0 ${jerseyIconColor(awayJerseyColor)}`} fill="currentColor" strokeWidth={2.5} />
+                  {awayJerseyColor}
+                </span>
               </span>
             )}
           </div>

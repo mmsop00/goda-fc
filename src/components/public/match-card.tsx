@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, Clock, MapPin, Award, ExternalLink, Shirt } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
 import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
+import { jerseyBadgeClass, jerseyIconColor } from "@/lib/jersey";
 
 interface MatchCardProps {
   match?: MatchResult;
@@ -36,23 +37,6 @@ function formatGoalPlayer(name: string): string {
   return parts.slice(-2).join(" ");
 }
 
-function jerseyBadgeClass(color: string): string {
-  if (color.startsWith("Vàng")) return "bg-yellow-200 text-yellow-800";
-  if (color.startsWith("Xanh")) return "bg-blue-200 text-blue-800";
-  if (color.startsWith("Đỏ")) return "bg-red-200 text-red-800";
-  if (color.startsWith("Trắng")) return "bg-gray-200 text-gray-800";
-  return "bg-gray-100 text-gray-700";
-}
-
-// Màu icon áo — cùng cách phân loại với jerseyBadgeClass, để icon và nền
-// badge luôn khớp màu nhau.
-function jerseyIconColor(color: string): string {
-  if (color.startsWith("Vàng")) return "text-yellow-500";
-  if (color.startsWith("Xanh")) return "text-blue-500";
-  if (color.startsWith("Đỏ")) return "text-red-500";
-  if (color.startsWith("Trắng")) return "text-gray-400";
-  return "text-gray-500";
-}
 
 
 export function MatchCard({ match, isLoading }: MatchCardProps) {

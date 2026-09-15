@@ -42,6 +42,7 @@ export default async function TranDauDetailPage({
             godaLineup={match.godaLineup}
             opponentLineup={match.opponentLineup}
             opponentName={match.opponent}
+            isHome={match.isHome}
           />
 
           <Separator />
