@@ -1047,7 +1047,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     season: "2026",
     date: "19/09/2026",
     time: "16h00",
-    venue: "Sân 3 Hòa Phát, Hà Nội",
+    venue: "Sân Nguyên Dương, Hà Nội",
     type: "Giao hữu",
     isHome: false,
     opponent: "Thủ Đô Tây Hồ FC",
@@ -1060,7 +1060,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     goals: [],
     cards: [],
     imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+VS+Th%E1%BB%A7+%C4%90%C3%B4+T%C3%A2y+H%E1%BB%93+FC",
-    googleMapsUrl: "https://maps.app.goo.gl/S4a87o6VP4jk9vgW7",
+    googleMapsUrl: "https://maps.app.goo.gl/k9rrrGwQikdfVTDFA",
   },
   {
     id: "mr-005",
