@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, Clock, MapPin, Award, ExternalLink, Shirt } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
+import { WeatherForecast } from "./weather-forecast";
 import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
 import { jerseyBadgeClass, jerseyIconColor } from "@/lib/jersey";
 
@@ -194,9 +195,12 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             </p>
           )}
 
-          {/* Countdown for upcoming matches */}
+          {/* Countdown + dự kiến thời tiết cho trận chưa diễn ra */}
           {isUpcoming && !isPostponed && match.time && (
             <CountdownTimer date={match.date} time={match.time} />
+          )}
+          {isUpcoming && !isPostponed && (
+            <WeatherForecast date={match.date} time={match.time} variant="light" />
           )}
 
           {/* Goal Scorers — under each team (completed matches only) */}

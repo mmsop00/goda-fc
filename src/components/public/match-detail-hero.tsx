@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, Shirt, ExternalLink } from "lucide-react";
 import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
 import { jerseyBadgeClass, jerseyIconColor } from "@/lib/jersey";
+import { WeatherForecast } from "./weather-forecast";
 
 interface MatchDetailHeroProps {
   match: MatchResult;
@@ -146,6 +147,12 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
             </span>
           )}
         </div>
+
+        {/* Dự kiến thời tiết — chỉ hiện cho trận chưa diễn ra, và chỉ khi lấy
+            được dự báo (Open-Meteo tối đa 16 ngày tới); tự ẩn nếu quá xa. */}
+        {isUpcoming && !isPostponed && (
+          <WeatherForecast date={match.date} time={match.time} />
+        )}
 
         {/* Trang phục thi đấu cho trận chưa diễn ra — đội nhà hiện trước, đội
             khách hiện sau (giống thứ tự đội ở trên), badge áo đồng bộ với
