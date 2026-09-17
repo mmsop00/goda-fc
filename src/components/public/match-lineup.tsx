@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import type { MatchPlayer } from "@/lib/mock-data";
 
 interface MatchLineupProps {
@@ -11,11 +15,22 @@ interface MatchLineupProps {
   isHome: boolean;
 }
 
+// Số cầu thủ hiện sẵn trước khi phải bấm "Xem thêm" — đội hình đầy đủ (26
+// thành viên) sẽ dài nếu hiện hết ngay từ đầu.
+const PREVIEW_COUNT = 6;
+
 export function MatchLineup({ godaLineup, opponentLineup, homeName, awayName, isHome }: MatchLineupProps) {
+  const [expanded, setExpanded] = useState(false);
+
   // "GODA slot" trong du lieu (godaLineup/opponentLineup) tuong ung voi doi
   // nha hay doi khach tuy theo isHome - khong phai luon la "GODA FC".
   const godaLabel = isHome ? homeName : awayName;
   const opponentLabel = isHome ? awayName : homeName;
+
+  const maxCount = Math.max(godaLineup.length, opponentLineup.length);
+  const canCollapse = maxCount > PREVIEW_COUNT;
+  const visibleGoda = expanded || !canCollapse ? godaLineup : godaLineup.slice(0, PREVIEW_COUNT);
+  const visibleOpponent = expanded || !canCollapse ? opponentLineup : opponentLineup.slice(0, PREVIEW_COUNT);
 
   const godaBlock = (
     <div>
@@ -23,7 +38,7 @@ export function MatchLineup({ godaLineup, opponentLineup, homeName, awayName, is
         {godaLabel}
       </h3>
       <div className="space-y-1">
-        {godaLineup.map((player, i) => (
+        {visibleGoda.map((player, i) => (
           <div
             key={i}
             className="flex items-center gap-3 px-3 py-1.5 rounded hover:bg-goda-soft-gray transition-colors text-sm"
@@ -47,7 +62,7 @@ export function MatchLineup({ godaLineup, opponentLineup, homeName, awayName, is
         {opponentLabel}
       </h3>
       <div className="space-y-1">
-        {opponentLineup.map((player, i) => (
+        {visibleOpponent.map((player, i) => (
           <div
             key={i}
             className="flex items-center gap-3 px-3 py-1.5 rounded hover:bg-gray-50 transition-colors text-sm"
@@ -77,6 +92,27 @@ export function MatchLineup({ godaLineup, opponentLineup, homeName, awayName, is
           {isHome ? godaBlock : opponentBlock}
           {isHome ? opponentBlock : godaBlock}
         </div>
+
+        {canCollapse && (
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full text-sm font-medium bg-goda-soft-gray text-goda-navy hover:bg-goda-navy/10 transition-colors"
+            >
+              {expanded ? (
+                <>
+                  Thu gọn
+                  <ChevronUp className="size-4" />
+                </>
+              ) : (
+                <>
+                  Xem thêm cầu thủ ({maxCount - PREVIEW_COUNT})
+                  <ChevronDown className="size-4" />
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

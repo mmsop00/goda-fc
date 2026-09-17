@@ -6,7 +6,7 @@ import { MatchTimeline } from "@/components/public/match-timeline";
 import { MatchMVP } from "@/components/public/match-mvp";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, MapPin } from "lucide-react";
-import { MOCK_MATCH_RESULTS } from "@/lib/mock-data";
+import { MOCK_MATCH_RESULTS, getFullLineup } from "@/lib/mock-data";
 
 export function generateStaticParams() {
   return MOCK_MATCH_RESULTS.map((m) => ({ id: m.id }));
@@ -46,7 +46,7 @@ export default async function TranDauDetailPage({
       {!match.eventTitle && (
         <>
           <MatchLineup
-            godaLineup={match.godaLineup}
+            godaLineup={getFullLineup()}
             opponentLineup={match.opponentLineup}
             homeName={homeName}
             awayName={awayName}

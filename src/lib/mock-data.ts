@@ -1512,6 +1512,23 @@ export const MOCK_MEMBERS: MemberPublic[] = [
   { id: "m-026", name: "Phan Hồng Thái", nickname: "Thái", position: "Tiền vệ", number: 38, avatarUrl: "/avatars/phan-hong-thai.jpg", matches: 220, goals: 78, assists: 28, mvp: 50, birthday: "03/02/1995", joinYear: 0, status: "Đang thi đấu" },
 ];
 
+const MEMBER_POSITION_ABBR: Record<MemberPosition, string> = {
+  "Thủ môn": "TM",
+  "Hậu vệ": "HV",
+  "Tiền vệ": "TV",
+  "Tiền đạo": "TĐ",
+};
+
+/** Toàn bộ đội hình CLB (26 thành viên), dùng làm "Đội hình ra sân" cho mọi
+ * trận — không lưu riêng danh sách ra sân theo từng trận cụ thể. */
+export function getFullLineup(): MatchPlayer[] {
+  return MOCK_MEMBERS.map((m) => ({
+    name: m.name,
+    number: m.number,
+    position: MEMBER_POSITION_ABBR[m.position],
+  }));
+}
+
 export const MOCK_ALBUM: AlbumPhoto[] = [
   // ── Video: Kỷ niệm 30 năm thành lập GODA FC (28/09/2024) ──
   { id: "alb-v01", category: "Video", title: "Toàn cảnh Giải bóng đá Kỷ niệm 30 năm thành lập CLB GODA: GODA FC - 5T FC", date: "28/09/2024", thumbnailUrl: "https://img.youtube.com/vi/zum8IuoT4BA/hqdefault.jpg", fullUrl: "https://img.youtube.com/vi/zum8IuoT4BA/hqdefault.jpg", videoUrl: "https://www.youtube.com/watch?v=zum8IuoT4BA" },
