@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, Clock, MapPin, Award, ExternalLink, Shirt } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
 import { WeatherForecast } from "./weather-forecast";
-import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
+import { isGodaMatch, getWeekdayLabel, type MatchResult } from "@/lib/mock-data";
 import { jerseyBadgeClass, jerseyIconColor } from "@/lib/jersey";
 
 interface MatchCardProps {
@@ -81,6 +81,9 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
   const homeName = match.homeTeam ?? (match.isHome ? "GODA FC" : match.opponent);
   const awayName = match.awayTeam ?? (match.isHome ? match.opponent : "GODA FC");
 
+  // Chỉ trận sắp tới mới cần biết là thứ mấy để tiện sắp xếp lịch.
+  const weekday = isUpcoming ? getWeekdayLabel(match.date) : null;
+
   // Dynamic team name colors based on result
   const leftIsGoda = match.isHome;
 
@@ -116,7 +119,10 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             <div className="flex items-center gap-3">
               <span className="text-xs text-gray-400 flex items-center gap-1">
                 <Calendar className="size-3" />
-                {match.date}
+                <span>
+                  {weekday && <span className="font-semibold text-goda-navy">{weekday}, </span>}
+                  {match.date}
+                </span>
               </span>
               {match.time && (
                 <span className="text-xs text-gray-400 flex items-center gap-1">

@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, Shirt, ExternalLink } from "lucide-react";
-import { isGodaMatch, type MatchResult } from "@/lib/mock-data";
+import { isGodaMatch, getWeekdayLabel, type MatchResult } from "@/lib/mock-data";
 import { jerseyBadgeClass, jerseyIconColor } from "@/lib/jersey";
 import { WeatherForecast } from "./weather-forecast";
 
@@ -17,6 +17,9 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
   const isNeutral = !isGodaMatch(match);
   const homeName = match.homeTeam ?? (match.isHome ? "GODA FC" : match.opponent);
   const awayName = match.awayTeam ?? (match.isHome ? match.opponent : "GODA FC");
+
+  // Chỉ trận sắp tới mới cần biết là thứ mấy để tiện sắp xếp lịch.
+  const weekday = isUpcoming ? getWeekdayLabel(match.date) : null;
 
   const result = isPostponed
     ? "Hoãn"
@@ -121,7 +124,10 @@ export function MatchDetailHero({ match }: MatchDetailHeroProps) {
         <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-300">
           <span className="flex items-center gap-1">
             <Calendar className="size-4" />
-            {match.date}
+            <span>
+              {weekday && <span className="font-semibold text-goda-yellow">{weekday}, </span>}
+              {match.date}
+            </span>
           </span>
           {match.time && (
             <span className="flex items-center gap-1">

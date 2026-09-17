@@ -72,6 +72,19 @@ export function isUpcomingEvent(dateStr: string, timeStr?: string, referenceTime
   return target.getTime() >= referenceTime;
 }
 
+const WEEKDAY_LABELS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]; // Date.getDay(): 0 = Chủ Nhật
+
+/** "DD/MM/YYYY" → nhãn thứ trong tuần ("T2".."T7", "CN"), hoặc null nếu sai định dạng. */
+export function getWeekdayLabel(dateStr: string): string | null {
+  const parts = dateStr.split("/");
+  if (parts.length < 3) return null;
+  const [d, m, y] = parts.map((p) => parseInt(p, 10));
+  if (isNaN(d) || isNaN(m) || isNaN(y)) return null;
+  const dt = new Date(y, m - 1, d);
+  if (isNaN(dt.getTime())) return null;
+  return WEEKDAY_LABELS[dt.getDay()];
+}
+
 export interface TopDonor {
   id: string;
   name: string;
