@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Clock, MapPin, Award, ExternalLink, Shirt } from "lucide-react";
+import { Calendar, Clock, MapPin, Award, ExternalLink, Shirt, Play } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
 import { WeatherForecast } from "./weather-forecast";
+import { Lightbox } from "./lightbox";
 import { isGodaMatch, getWeekdayLabel, type MatchResult } from "@/lib/mock-data";
 import { jerseyBadgeClass, jerseyIconColor } from "@/lib/jersey";
 
@@ -42,6 +44,7 @@ function formatGoalPlayer(name: string): string {
 
 export function MatchCard({ match, isLoading }: MatchCardProps) {
   const router = useRouter();
+  const [openVideo, setOpenVideo] = useState<{ title: string; videoUrl: string } | null>(null);
 
   if (isLoading) {
     return (
@@ -100,6 +103,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
   const oppScoreColor = isNeutral || isUpcoming || result === "D" || result === "L" ? "text-goda-navy" : "text-gray-400";
 
   return (
+    <>
     <div
       onClick={() => router.push(`/tran-dau/${match.id}`)}
       role="link"
@@ -213,32 +217,60 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
           {!isUpcoming && match.goals.length > 0 && (
             <div className="flex justify-center gap-3">
               {/* Left goals */}
-              <div className="flex-1 min-w-0 text-right space-y-0.5">
+              <div className="flex-1 min-w-0 space-y-0.5">
                 {match.goals
                   .filter((g) => (match.isHome ? g.side === "GODA" : g.side !== "GODA"))
                   .map((g, i) => {
                     const playerDisplay = formatGoalPlayer(g.player);
                     const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
                     return (
-                      <p key={`lg-${i}`} className="text-xs text-gray-500 leading-tight font-normal truncate">
-                        {g.minute}&apos; {playerDisplay}{assistDisplay}
-                      </p>
+                      <div key={`lg-${i}`} className="flex items-center justify-end gap-1">
+                        {g.videoUrl && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenVideo({ title: `${g.player} ${g.minute}'`, videoUrl: g.videoUrl! });
+                            }}
+                            className="inline-flex items-center justify-center size-4 rounded-full bg-goda-yellow text-goda-navy hover:bg-goda-yellow/80 transition-colors shrink-0"
+                            aria-label="Xem video bàn thắng"
+                          >
+                            <Play className="size-2" fill="currentColor" />
+                          </button>
+                        )}
+                        <p className="text-xs text-gray-500 leading-tight font-normal truncate min-w-0">
+                          {g.minute}&apos; {playerDisplay}{assistDisplay}
+                        </p>
+                      </div>
                     );
                   })}
               </div>
               {/* Score spacer */}
               <div className="shrink-0 w-[72px]" />
               {/* Right goals */}
-              <div className="flex-1 min-w-0 text-left space-y-0.5">
+              <div className="flex-1 min-w-0 space-y-0.5">
                 {match.goals
                   .filter((g) => (match.isHome ? g.side !== "GODA" : g.side === "GODA"))
                   .map((g, i) => {
                     const playerDisplay = formatGoalPlayer(g.player);
                     const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
                     return (
-                      <p key={`rg-${i}`} className="text-xs text-gray-600 leading-tight font-normal truncate">
-                        {g.minute}&apos; {playerDisplay}{assistDisplay}
-                      </p>
+                      <div key={`rg-${i}`} className="flex items-center justify-start gap-1">
+                        <p className="text-xs text-gray-600 leading-tight font-normal truncate min-w-0">
+                          {g.minute}&apos; {playerDisplay}{assistDisplay}
+                        </p>
+                        {g.videoUrl && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenVideo({ title: `${g.player} ${g.minute}'`, videoUrl: g.videoUrl! });
+                            }}
+                            className="inline-flex items-center justify-center size-4 rounded-full bg-goda-yellow text-goda-navy hover:bg-goda-yellow/80 transition-colors shrink-0"
+                            aria-label="Xem video bàn thắng"
+                          >
+                            <Play className="size-2" fill="currentColor" />
+                          </button>
+                        )}
+                      </div>
                     );
                   })}
               </div>
@@ -290,5 +322,28 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
         </CardContent>
       </Card>
     </div>
+
+    {/* Video bàn thắng */}
+    <Lightbox
+      photo={
+        openVideo
+          ? {
+              id: "goal-video",
+              category: "Video",
+              title: openVideo.title,
+              date: "",
+              thumbnailUrl: "",
+              fullUrl: "",
+              videoUrl: openVideo.videoUrl,
+            }
+          : null
+      }
+      onClose={() => setOpenVideo(null)}
+      onPrev={() => {}}
+      onNext={() => {}}
+      hasPrev={false}
+      hasNext={false}
+    />
+    </>
   );
 }
