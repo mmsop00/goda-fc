@@ -237,7 +237,7 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                             <Play className="size-2" fill="currentColor" />
                           </button>
                         )}
-                        <p className="text-xs text-gray-500 leading-tight font-normal truncate min-w-0">
+                        <p className="text-xs text-gray-500 leading-tight font-normal min-w-0">
                           {g.minute}&apos; {playerDisplay}{assistDisplay}
                         </p>
                       </div>
@@ -255,9 +255,6 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                     const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
                     return (
                       <div key={`rg-${i}`} className="flex items-center justify-start gap-1">
-                        <p className="text-xs text-gray-600 leading-tight font-normal truncate min-w-0">
-                          {g.minute}&apos; {playerDisplay}{assistDisplay}
-                        </p>
                         {g.videoUrl && (
                           <button
                             onClick={(e) => {
@@ -270,6 +267,9 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                             <Play className="size-2" fill="currentColor" />
                           </button>
                         )}
+                        <p className="text-xs text-gray-600 leading-tight font-normal min-w-0">
+                          {g.minute}&apos; {playerDisplay}{assistDisplay}
+                        </p>
                       </div>
                     );
                   })}
