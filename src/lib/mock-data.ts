@@ -1064,15 +1064,21 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
     type: "Giao hữu",
     isHome: false,
     opponent: "Thủ Đô Tây Hồ FC",
-    opponentScore: 0,
-    godaScore: 0,
+    opponentScore: 2,
+    godaScore: 2,
     godaJerseyColor: "Đỏ",
     opponentJerseyColor: "Trắng",
     godaLineup: BASE_LINEUP,
     opponentLineup: OPP_LINEUP,
-    goals: [],
+    goals: [
+      { player: "Cầu thủ Thủ Đô Tây Hồ FC", minute: 55, side: "opponent" },
+      { player: "Cầu thủ Thủ Đô Tây Hồ FC", minute: 70, side: "opponent" },
+      { player: "Phan Hồng Thái", minute: 78, side: "GODA" },
+      { player: "Trần Nguyên Bá", minute: 88, assist: "Phan Hồng Thái", side: "GODA" },
+    ],
     cards: [],
-    imageUrl: "https://placehold.co/800x400/0B1E3A/F7C600?text=GODA+VS+Th%E1%BB%A7+%C4%90%C3%B4+T%C3%A2y+H%E1%BB%93+FC",
+    imageUrl: "https://lh3.googleusercontent.com/d/1flEFdWyAp_3tKzQkHq3EexHSqC1tVGfp=w1600",
+    videoUrl: "https://drive.google.com/file/d/1-Zfj6H8iM-vkRgTQjScZT4aFriDG-uFt/preview",
     googleMapsUrl: "https://maps.app.goo.gl/k9rrrGwQikdfVTDFA",
   },
   {
@@ -2895,4 +2901,8 @@ export const MOCK_ALBUM: AlbumPhoto[] = [
   // ── Ảnh từ 2 bài tin hoạt động thường niên (12–13/09/2026) ──
   { id: "alb-1335", category: "Sự kiện", title: "Thăm hỏi, động viên chú Bình", date: "12/09/2026", thumbnailUrl: "/photos/hoat-dong/tham-chu-binh-09-2026.jpg", fullUrl: "/photos/hoat-dong/tham-chu-binh-09-2026.jpg" },
   { id: "alb-1336", category: "Sự kiện", title: "Trao quà sinh nhật thành viên — Quý 3/2026", date: "13/09/2026", thumbnailUrl: "/photos/hoat-dong/trao-qua-sinh-nhat-quy3-2026.jpg", fullUrl: "/photos/hoat-dong/trao-qua-sinh-nhat-quy3-2026.jpg" },
+  // ── Trận GODA FC - Thủ Đô Tây Hồ FC (19/09/2026) — ảnh/video lưu trên
+  // Google Drive của CLB, không tải về host trên site. ──
+  { id: "alb-1337", category: "Trận đấu", title: "GODA FC 2-2 Thủ Đô Tây Hồ FC — Ăn mừng sau trận", date: "19/09/2026", thumbnailUrl: "https://lh3.googleusercontent.com/d/1flEFdWyAp_3tKzQkHq3EexHSqC1tVGfp=w800", fullUrl: "https://lh3.googleusercontent.com/d/1flEFdWyAp_3tKzQkHq3EexHSqC1tVGfp=w1600" },
+  { id: "vid-017", category: "Video", title: "GODA FC 2-2 Thủ Đô Tây Hồ FC — Video trận đấu", date: "19/09/2026", thumbnailUrl: "https://lh3.googleusercontent.com/d/1-Zfj6H8iM-vkRgTQjScZT4aFriDG-uFt=w500", fullUrl: "https://lh3.googleusercontent.com/d/1-Zfj6H8iM-vkRgTQjScZT4aFriDG-uFt=w500", videoUrl: "https://drive.google.com/file/d/1-Zfj6H8iM-vkRgTQjScZT4aFriDG-uFt/preview" },
 ];
