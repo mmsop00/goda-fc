@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Crosshair, Play } from "lucide-react";
 import type { MatchGoal, MatchCard as MatchCardType } from "@/lib/mock-data";
+import { isHomeSide } from "@/lib/mock-data";
 import { Lightbox } from "./lightbox";
 
 interface MatchTimelineProps {
@@ -13,6 +14,9 @@ interface MatchTimelineProps {
    * tran trung lap (GODA khong thi dau) thay vi in chu "GODA" cung. */
   godaLabel: string;
   opponentLabel: string;
+  /** Bắt buộc truyền — quyết định bên trái/phải là đội nhà hay đội khách.
+   * Xem quy tắc `isHomeSide()` trong mock-data.ts trước khi sửa file này. */
+  isHome: boolean;
 }
 
 interface TimelineEvent {
@@ -24,7 +28,7 @@ interface TimelineEvent {
   videoUrl?: string;
 }
 
-export function MatchTimeline({ goals, cards, godaLabel, opponentLabel }: MatchTimelineProps) {
+export function MatchTimeline({ goals, cards, godaLabel, opponentLabel, isHome }: MatchTimelineProps) {
   const [openVideo, setOpenVideo] = useState<{ title: string; videoUrl: string } | null>(null);
 
   const events: TimelineEvent[] = [
@@ -58,12 +62,15 @@ export function MatchTimeline({ goals, cards, godaLabel, opponentLabel }: MatchT
             {events.map((event, i) => {
               const isGoda = event.side === "GODA";
               const isGoal = event.type === "goal";
+              // Vị trí trái/phải phải theo đội NHÀ/KHÁCH thực tế, không phải
+              // theo "có phải GODA không" — xem isHomeSide() trong mock-data.ts.
+              const isHomeEvent = isHomeSide({ isHome }, event.side);
 
               return (
                 <div
                   key={i}
                   className={`relative pl-10 md:pl-0 md:w-1/2 ${
-                    isGoda ? "md:pr-8 md:ml-0" : "md:pl-8 md:ml-auto"
+                    isHomeEvent ? "md:pr-8 md:ml-0" : "md:pl-8 md:ml-auto"
                   }`}
                 >
                   {/* Icon */}

@@ -60,6 +60,7 @@ export default async function TranDauDetailPage({
             cards={match.cards}
             godaLabel={godaLabel}
             opponentLabel={opponentLabel}
+            isHome={match.isHome}
           />
 
           {match.mvp && <MatchMVP playerName={match.mvp} />}

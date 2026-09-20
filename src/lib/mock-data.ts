@@ -967,6 +967,20 @@ export interface MatchCard {
   side: "GODA" | "opponent";
 }
 
+// ⚠️ QUY TẮC — đọc trước khi dùng `side` ở bất kỳ đâu (goal, card, ...):
+// `side: "GODA" | "opponent"` KHÔNG có nghĩa "đây có phải GODA hay không".
+// Đây chỉ là nhãn theo tên gọi lịch sử, và ý nghĩa thật của nó phụ thuộc vào
+// `match.isHome`: khi GODA đá sân nhà, "GODA" = đội nhà; khi GODA đá sân
+// khách, "GODA" = đội khách. Vì vậy KHÔNG được suy ra đội nhà/đội khách chỉ
+// từ `side` một mình — luôn phải đối chiếu với `match.isHome` (dùng hàm
+// `isHomeSide()` dưới đây), nếu không sẽ bị đảo ngược bên mỗi khi GODA đá
+// sân khách. Lỗi này đã xảy ra ở MatchCard và MatchTimeline (09/2026) do
+// từng nơi tự viết lại phép so sánh này — dùng chung `isHomeSide()` thay vì
+// viết `side === "GODA"` trực tiếp để tránh lặp lại.
+export function isHomeSide(match: { isHome: boolean }, side: "GODA" | "opponent"): boolean {
+  return match.isHome ? side === "GODA" : side !== "GODA";
+}
+
 export interface MatchResult {
   id: string;
   season: string;

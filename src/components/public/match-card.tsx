@@ -9,7 +9,7 @@ import { Calendar, Clock, MapPin, Award, ExternalLink, Shirt, Play } from "lucid
 import { CountdownTimer } from "./countdown-timer";
 import { WeatherForecast } from "./weather-forecast";
 import { Lightbox } from "./lightbox";
-import { isGodaMatch, getWeekdayLabel, type MatchResult } from "@/lib/mock-data";
+import { isGodaMatch, getWeekdayLabel, isHomeSide, type MatchResult } from "@/lib/mock-data";
 import { jerseyBadgeClass, jerseyIconColor } from "@/lib/jersey";
 
 interface MatchCardProps {
@@ -255,13 +255,13 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
               <div className="flex justify-center gap-2">
                 <div className="flex-1 min-w-0 space-y-0.5">
                   {match.goals
-                    .filter((g) => (match.isHome ? g.side === "GODA" : g.side !== "GODA"))
+                    .filter((g) => isHomeSide(match, g.side))
                     .map((g, i) => renderGoalRow(g, i, true))}
                 </div>
                 <div className="shrink-0 w-[56px]" />
                 <div className="flex-1 min-w-0 space-y-0.5">
                   {match.goals
-                    .filter((g) => (match.isHome ? g.side !== "GODA" : g.side === "GODA"))
+                    .filter((g) => !isHomeSide(match, g.side))
                     .map((g, i) => renderGoalRow(g, i, false))}
                 </div>
               </div>
