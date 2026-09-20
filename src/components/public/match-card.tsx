@@ -221,14 +221,18 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
               {[...match.goals]
                 .sort((a, b) => a.minute - b.minute)
                 .map((g, i) => {
-                  const isGoda = g.side === "GODA";
+                  // "side" chỉ là nhãn theo VỊ TRÍ (đội nhà/đội khách), gắn
+                  // với match.isHome — không phải lúc nào "GODA" cũng là đội
+                  // nhà, nên phải đối chiếu với isHome mới ra đúng bên.
+                  const isHomeGoal = match.isHome ? g.side === "GODA" : g.side !== "GODA";
                   const playerDisplay = formatGoalPlayer(g.player);
                   const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
                   return (
                     <div key={i} className="flex items-center gap-1.5">
                       <span
-                        className={`size-1.5 rounded-full shrink-0 ${isGoda ? "bg-goda-navy" : "bg-gray-300"}`}
+                        className={`size-1.5 rounded-full shrink-0 ${isHomeGoal ? "bg-goda-navy" : "bg-gray-300"}`}
                         aria-hidden="true"
+                        title={isHomeGoal ? homeName : awayName}
                       />
                       {/* Ô cố định cho icon — luôn chiếm chỗ (dù rỗng) để số phút
                           các dòng thẳng hàng với nhau, có video hay không. */}
@@ -248,8 +252,9 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
                       </span>
                       <p
                         className={`text-xs leading-tight truncate flex-1 min-w-0 ${
-                          isGoda ? "text-goda-navy font-medium" : "text-gray-500 font-normal"
+                          isHomeGoal ? "text-goda-navy font-medium" : "text-gray-500 font-normal"
                         }`}
+                        title={isHomeGoal ? homeName : awayName}
                       >
                         {g.minute}&apos; {playerDisplay}{assistDisplay}
                       </p>
