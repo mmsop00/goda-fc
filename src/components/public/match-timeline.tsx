@@ -1,6 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Crosshair } from "lucide-react";
+import { Crosshair, Play } from "lucide-react";
 import type { MatchGoal, MatchCard as MatchCardType } from "@/lib/mock-data";
+import { Lightbox } from "./lightbox";
 
 interface MatchTimelineProps {
   goals: MatchGoal[];
@@ -17,11 +21,14 @@ interface TimelineEvent {
   side: "GODA" | "opponent";
   player: string;
   assist?: string;
+  videoUrl?: string;
 }
 
 export function MatchTimeline({ goals, cards, godaLabel, opponentLabel }: MatchTimelineProps) {
+  const [openVideo, setOpenVideo] = useState<{ title: string; videoUrl: string } | null>(null);
+
   const events: TimelineEvent[] = [
-    ...goals.map((g) => ({ type: "goal" as const, minute: g.minute, side: g.side, player: g.player, assist: g.assist })),
+    ...goals.map((g) => ({ type: "goal" as const, minute: g.minute, side: g.side, player: g.player, assist: g.assist, videoUrl: g.videoUrl })),
     ...cards.map((c) => ({ type: c.type, minute: c.minute, side: c.side, player: c.player })),
   ].sort((a, b) => a.minute - b.minute);
 
@@ -90,9 +97,25 @@ export function MatchTimeline({ goals, cards, godaLabel, opponentLabel }: MatchT
                         {isGoda ? godaLabel : opponentLabel}
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-goda-navy">
-                      {event.player}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-goda-navy flex-1">
+                        {event.player}
+                      </p>
+                      {isGoal && event.videoUrl && (
+                        <button
+                          onClick={() =>
+                            setOpenVideo({
+                              title: `${event.player} ${event.minute}'`,
+                              videoUrl: event.videoUrl!,
+                            })
+                          }
+                          className="inline-flex items-center justify-center size-6 rounded-full bg-goda-yellow text-goda-navy hover:bg-goda-yellow/80 transition-colors shrink-0"
+                          aria-label="Xem video bàn thắng"
+                        >
+                          <Play className="size-3" fill="currentColor" />
+                        </button>
+                      )}
+                    </div>
                     {isGoal && event.assist && (
                       <p className="text-xs text-gray-400 mt-0.5">
                         Kiến tạo: {event.assist}
@@ -110,6 +133,28 @@ export function MatchTimeline({ goals, cards, godaLabel, opponentLabel }: MatchT
           </div>
         </div>
       </div>
+
+      {/* Video bàn thắng */}
+      <Lightbox
+        photo={
+          openVideo
+            ? {
+                id: "goal-video",
+                category: "Video",
+                title: openVideo.title,
+                date: "",
+                thumbnailUrl: "",
+                fullUrl: "",
+                videoUrl: openVideo.videoUrl,
+              }
+            : null
+        }
+        onClose={() => setOpenVideo(null)}
+        onPrev={() => {}}
+        onNext={() => {}}
+        hasPrev={false}
+        hasNext={false}
+      />
     </section>
   );
 }

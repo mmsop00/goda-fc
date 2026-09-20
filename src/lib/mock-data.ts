@@ -956,6 +956,8 @@ export interface MatchGoal {
   minute: number;
   assist?: string;
   side: "GODA" | "opponent";
+  /** Video riêng cho bàn thắng này (nếu có) — hiện nút play cạnh sự kiện. */
+  videoUrl?: string;
 }
 
 export interface MatchCard {
@@ -1074,7 +1076,7 @@ export const MOCK_MATCH_RESULTS: MatchResult[] = [
       { player: "Cầu thủ Thủ Đô Tây Hồ FC", minute: 55, side: "opponent" },
       { player: "Cầu thủ Thủ Đô Tây Hồ FC", minute: 70, side: "opponent" },
       { player: "Phan Hồng Thái", minute: 78, side: "GODA" },
-      { player: "Trần Nguyên Bá", minute: 88, assist: "Phan Hồng Thái", side: "GODA" },
+      { player: "Trần Nguyên Bá", minute: 88, assist: "Phan Hồng Thái", side: "GODA", videoUrl: "https://drive.google.com/file/d/1-Zfj6H8iM-vkRgTQjScZT4aFriDG-uFt/preview" },
     ],
     cards: [],
     imageUrl: "https://lh3.googleusercontent.com/d/1flEFdWyAp_3tKzQkHq3EexHSqC1tVGfp=w1600",
