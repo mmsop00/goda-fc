@@ -213,75 +213,49 @@ export function MatchCard({ match, isLoading }: MatchCardProps) {
             <WeatherForecast date={match.date} time={match.time} variant="light" />
           )}
 
-          {/* Goal Scorers — under each team (completed matches only) */}
+          {/* Goal Scorers — 1 dòng/bàn theo thứ tự thời gian, full-width để
+              tên cầu thủ + kiến tạo luôn vừa 1 dòng (không tràn dòng 2, không
+              bị cắt chữ) thay vì chia 2 cột hẹp theo phe như trước. */}
           {!isUpcoming && match.goals.length > 0 && (
-            <div className="flex justify-center gap-3">
-              {/* Left goals */}
-              <div className="flex-1 min-w-0 space-y-0.5">
-                {match.goals
-                  .filter((g) => (match.isHome ? g.side === "GODA" : g.side !== "GODA"))
-                  .map((g, i) => {
-                    const playerDisplay = formatGoalPlayer(g.player);
-                    const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
-                    return (
-                      <div key={`lg-${i}`} className="flex items-center justify-end gap-1">
-                        {/* Ô cố định cho icon — luôn chiếm chỗ (dù rỗng) để số phút
-                            các dòng thẳng hàng với nhau, có video hay không. */}
-                        <span className="inline-flex items-center justify-center size-4 shrink-0">
-                          {g.videoUrl && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setOpenVideo({ title: `${g.player} ${g.minute}'`, videoUrl: g.videoUrl! });
-                              }}
-                              className="inline-flex items-center justify-center size-4 rounded-full bg-goda-yellow text-goda-navy hover:bg-goda-yellow/80 transition-colors"
-                              aria-label="Xem video bàn thắng"
-                            >
-                              <Play className="size-2" fill="currentColor" />
-                            </button>
-                          )}
-                        </span>
-                        <p className="text-xs text-gray-500 leading-tight font-normal min-w-0">
-                          {g.minute}&apos; {playerDisplay}{assistDisplay}
-                        </p>
-                      </div>
-                    );
-                  })}
-              </div>
-              {/* Score spacer */}
-              <div className="shrink-0 w-[72px]" />
-              {/* Right goals */}
-              <div className="flex-1 min-w-0 space-y-0.5">
-                {match.goals
-                  .filter((g) => (match.isHome ? g.side !== "GODA" : g.side === "GODA"))
-                  .map((g, i) => {
-                    const playerDisplay = formatGoalPlayer(g.player);
-                    const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
-                    return (
-                      <div key={`rg-${i}`} className="flex items-center justify-start gap-1">
-                        {/* Ô cố định cho icon — luôn chiếm chỗ (dù rỗng) để số phút
-                            các dòng thẳng hàng với nhau, có video hay không. */}
-                        <span className="inline-flex items-center justify-center size-4 shrink-0">
-                          {g.videoUrl && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setOpenVideo({ title: `${g.player} ${g.minute}'`, videoUrl: g.videoUrl! });
-                              }}
-                              className="inline-flex items-center justify-center size-4 rounded-full bg-goda-yellow text-goda-navy hover:bg-goda-yellow/80 transition-colors"
-                              aria-label="Xem video bàn thắng"
-                            >
-                              <Play className="size-2" fill="currentColor" />
-                            </button>
-                          )}
-                        </span>
-                        <p className="text-xs text-gray-600 leading-tight font-normal min-w-0">
-                          {g.minute}&apos; {playerDisplay}{assistDisplay}
-                        </p>
-                      </div>
-                    );
-                  })}
-              </div>
+            <div className="space-y-1">
+              {[...match.goals]
+                .sort((a, b) => a.minute - b.minute)
+                .map((g, i) => {
+                  const isGoda = g.side === "GODA";
+                  const playerDisplay = formatGoalPlayer(g.player);
+                  const assistDisplay = g.assist ? ` (${formatGoalPlayer(g.assist)})` : "";
+                  return (
+                    <div key={i} className="flex items-center gap-1.5">
+                      <span
+                        className={`size-1.5 rounded-full shrink-0 ${isGoda ? "bg-goda-navy" : "bg-gray-300"}`}
+                        aria-hidden="true"
+                      />
+                      {/* Ô cố định cho icon — luôn chiếm chỗ (dù rỗng) để số phút
+                          các dòng thẳng hàng với nhau, có video hay không. */}
+                      <span className="inline-flex items-center justify-center size-4 shrink-0">
+                        {g.videoUrl && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenVideo({ title: `${g.player} ${g.minute}'`, videoUrl: g.videoUrl! });
+                            }}
+                            className="inline-flex items-center justify-center size-4 rounded-full bg-goda-yellow text-goda-navy hover:bg-goda-yellow/80 transition-colors"
+                            aria-label="Xem video bàn thắng"
+                          >
+                            <Play className="size-2" fill="currentColor" />
+                          </button>
+                        )}
+                      </span>
+                      <p
+                        className={`text-xs leading-tight truncate flex-1 min-w-0 ${
+                          isGoda ? "text-goda-navy font-medium" : "text-gray-500 font-normal"
+                        }`}
+                      >
+                        {g.minute}&apos; {playerDisplay}{assistDisplay}
+                      </p>
+                    </div>
+                  );
+                })}
             </div>
           )}
 
