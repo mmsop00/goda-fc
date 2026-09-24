@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { HeroSection } from "@/components/public/hero-section";
+import { TrungThuBanner } from "@/components/public/trung-thu-banner";
 import { BirthdayBanner } from "@/components/public/birthday-banner";
 import { MatchCard } from "@/components/public/match-card";
 import { AboutSection } from "@/components/public/about-section";
@@ -80,6 +81,9 @@ export default function PublicHomePage() {
     <>
       {/* Section 1: Hero */}
       <HeroSection />
+
+      {/* Trang trí Tết Trung Thu — banner theo mùa */}
+      <TrungThuBanner />
 
       {/* Mobile CTA buttons — visible only on mobile, right below hero */}
       <div className="sm:hidden flex gap-3 px-4 py-4 bg-goda-warm-white justify-center">

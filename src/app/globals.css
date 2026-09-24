@@ -155,6 +155,22 @@
   }
 }
 
+/* ─── Trung Thu decorations ─── */
+@keyframes lantern-float {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-16px) rotate(4deg); }
+}
+@keyframes sparkle-twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+@utility animate-lantern-float {
+  animation: lantern-float 5s ease-in-out infinite;
+}
+@utility animate-sparkle-twinkle {
+  animation: sparkle-twinkle 2.4s ease-in-out infinite;
+}
+
 /* ─── GODA Utilities ─── */
 @utility card-goda {
   border-radius: 18px;

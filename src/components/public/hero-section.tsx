@@ -31,6 +31,13 @@ export function HeroSection() {
             own caption treatment and wash it out). */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-goda-navy/5 to-goda-navy/65" />
 
+        {/* Trang trí Trung Thu — đèn lồng + trăng trôi nhẹ, chỉ trang trí. */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <span className="absolute right-[6%] top-[8%] text-4xl sm:text-6xl opacity-90 drop-shadow-lg animate-lantern-float [animation-delay:0.3s]">🌕</span>
+          <span className="absolute left-[5%] top-[12%] text-3xl sm:text-5xl opacity-80 animate-lantern-float [animation-delay:0.9s]">🏮</span>
+          <span className="absolute left-[14%] top-[38%] text-xl sm:text-3xl opacity-70 animate-lantern-float [animation-delay:1.6s]">🏮</span>
+        </div>
+
         {/* CTA buttons only — desktop. The "GODA FC" / anniversary copy that
             used to live here is now printed on the photo itself (top of the
             image); keeping both would duplicate and visually overlap it. */}
