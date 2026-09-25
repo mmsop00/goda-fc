@@ -1,6 +1,6 @@
 {
   "installCommand": "npm install --legacy-peer-deps",
-  "buildCommand": "npx prisma generate && (if [ -n \"$DIRECT_URL\" ]; then npx prisma db push; fi) && next build",
+  "buildCommand": "export DIRECT_URL=\"${DIRECT_URL:-$DATABASE_URL}\"; npx prisma generate && (if [ -n \"$DIRECT_URL\" ]; then npx prisma db push --skip-generate && (if [ -n \"$MEMBER_PHONES_JSON\" ]; then npx tsx scripts/sync-members-finance.ts; fi); fi) && next build",
   "crons": [
     { "path": "/api/cron/cleanup-receipts", "schedule": "0 3 * * *" }
   ]

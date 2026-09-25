@@ -25,6 +25,7 @@ export async function GET() {
   }
 
   const members = await prisma.member.findMany({
+    where: { phone: { not: null } },
     select: {
       id: true,
       name: true,

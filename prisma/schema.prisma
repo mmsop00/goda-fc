@@ -89,7 +89,9 @@ model Member {
   updatedAt DateTime @updatedAt
 
   // ─── Cổng tài chính (đăng nhập bằng số điện thoại) ───
-  phone              String?   @unique // đăng nhập cổng thành viên
+  // Không @unique: db push chạy non-interactive trên Vercel sẽ dừng vì cảnh
+  // báo "data loss" khi thêm unique; script đồng bộ tự kiểm tra trùng số.
+  phone              String?   // đăng nhập cổng thành viên
   passwordHash       String?
   mustChangePassword Boolean   @default(false) // chỉ true cho chủ tịch lần đầu
   financeRole        String    @default("member") // member | chairman

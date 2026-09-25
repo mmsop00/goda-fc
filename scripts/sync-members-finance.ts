@@ -2,24 +2,20 @@
 // GODA FC — Đồng bộ 26 thành viên thật (MOCK_MEMBERS) vào Prisma Member,
 // gắn số điện thoại + mật khẩu mặc định cho cổng tài chính thành viên.
 //
-// Chỉ set các cột liên quan tới tài chính (phone/passwordHash/financeRole/
-// mustChangePassword) khi thành viên đã có sẵn trong DB — KHÔNG ghi đè
-// name/nickname/số áo/thống kê đã chỉnh qua /admin. Với thành viên hoàn
-// toàn chưa có trong DB thì tạo mới đầy đủ từ MOCK_MEMBERS.
+// Chạy tự động mỗi lần build trên Vercel nên PHẢI an toàn khi chạy lặp lại:
+// - Thành viên đã có mật khẩu → giữ nguyên mật khẩu & cờ đổi mật khẩu.
+// - Không ghi đè tên/số áo/thống kê đã chỉnh qua /admin.
 //
-// Chạy 1 lần: npx tsx scripts/sync-members-finance.ts
+// Số điện thoại (dữ liệu cá nhân, repo public) lấy từ biến môi trường
+// MEMBER_PHONES_JSON trên Vercel, hoặc file scripts/name_phone_map.json
+// (không commit) khi chạy trên máy: npx tsx scripts/sync-members-finance.ts
 // ═══════════════════════════════════════
 
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { MOCK_MEMBERS } from "../src/lib/mock-data";
-
-// Số điện thoại cá nhân — file chỉ nằm trên máy, KHÔNG commit (repo public).
-const phoneMapJson = JSON.parse(
-  readFileSync(join(__dirname, "name_phone_map.json"), "utf8")
-);
 
 const prisma = new PrismaClient();
 
@@ -34,10 +30,31 @@ function normalizePhone(raw: string): string {
   return s;
 }
 
+function loadPhoneMap(): Record<string, string> {
+  if (process.env.MEMBER_PHONES_JSON) {
+    return JSON.parse(process.env.MEMBER_PHONES_JSON);
+  }
+  const file = join(__dirname, "name_phone_map.json");
+  if (existsSync(file)) return JSON.parse(readFileSync(file, "utf8"));
+  throw new Error("Thiếu MEMBER_PHONES_JSON hoặc scripts/name_phone_map.json");
+}
+
+const maskPhone = (p: string) => p.slice(0, 3) + "****" + p.slice(-3);
+
 async function main() {
-  console.log("🌱 Đồng bộ thành viên cho cổng tài chính...\n");
+  console.log("🌱 Đồng bộ thành viên cho cổng tài chính...");
+  const phoneMap = loadPhoneMap();
+
+  const seen = new Map<string, string>();
+  for (const [name, raw] of Object.entries(phoneMap)) {
+    const p = normalizePhone(raw);
+    if (seen.has(p)) throw new Error(`Trùng số điện thoại: ${seen.get(p)} & ${name}`);
+    seen.set(p, name);
+  }
+
   const passwordHash = await hash(DEFAULT_PASSWORD, 10);
-  const phoneMap = phoneMapJson as Record<string, string>;
+  let created = 0;
+  let updated = 0;
 
   for (const m of MOCK_MEMBERS) {
     const rawPhone = phoneMap[m.name];
@@ -46,40 +63,49 @@ async function main() {
       continue;
     }
     const phone = normalizePhone(rawPhone);
-    const isChairman = m.name === CHAIRMAN_NAME;
-    const id = `seed-${m.name.replace(/\s/g, "-").toLowerCase()}`;
+    const financeRole = m.name === CHAIRMAN_NAME ? "chairman" : "member";
 
-    const financeFields = {
-      phone,
-      passwordHash,
-      financeRole: isChairman ? "chairman" : "member",
-      mustChangePassword: isChairman,
-    };
-
-    await prisma.member.upsert({
-      where: { id },
-      update: financeFields,
-      create: {
-        id,
-        name: m.name,
-        nickname: m.nickname,
-        position: m.position,
-        number: m.number,
-        avatarUrl: m.avatarUrl,
-        matches: m.matches,
-        goals: m.goals,
-        assists: m.assists,
-        mvp: m.mvp,
-        birthday: m.birthday ?? null,
-        joinYear: m.joinYear ?? null,
-        status: m.status ?? "Đang thi đấu",
-        ...financeFields,
-      },
-    });
-    console.log(`✅ ${m.name} — ${phone}${isChairman ? " (chủ tịch)" : ""}`);
+    const existing = await prisma.member.findFirst({ where: { name: m.name } });
+    if (existing) {
+      await prisma.member.update({
+        where: { id: existing.id },
+        data: {
+          phone,
+          financeRole,
+          ...(existing.passwordHash
+            ? {}
+            : { passwordHash, mustChangePassword: financeRole === "chairman" }),
+        },
+      });
+      updated++;
+    } else {
+      await prisma.member.create({
+        data: {
+          id: `seed-${m.name.replace(/\s/g, "-").toLowerCase()}`,
+          name: m.name,
+          nickname: m.nickname,
+          position: m.position,
+          number: m.number,
+          avatarUrl: m.avatarUrl,
+          matches: m.matches,
+          goals: m.goals,
+          assists: m.assists,
+          mvp: m.mvp,
+          birthday: m.birthday ?? null,
+          joinYear: m.joinYear ?? null,
+          status: m.status ?? "Đang thi đấu",
+          phone,
+          financeRole,
+          passwordHash,
+          mustChangePassword: financeRole === "chairman",
+        },
+      });
+      created++;
+    }
+    console.log(`✅ ${m.name} — ${maskPhone(phone)}${financeRole === "chairman" ? " (chủ tịch)" : ""}`);
   }
 
-  console.log("\n🎉 Đồng bộ hoàn tất!");
+  console.log(`🎉 Xong: ${created} tạo mới, ${updated} cập nhật`);
 }
 
 main()

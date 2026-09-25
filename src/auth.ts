@@ -67,7 +67,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         try {
           const phone = normalizePhone(credentials.phone as string);
-          const member = await prisma.member.findUnique({ where: { phone } });
+          const member = await prisma.member.findFirst({ where: { phone } });
 
           if (!member || !member.passwordHash) return null;
 

@@ -14,7 +14,12 @@ export async function createBill(params: {
   dueDate?: string | null;
   createdByMemberId: string;
 }) {
-  const members = await prisma.member.findMany({ select: { id: true } });
+  // Chỉ thành viên có tài khoản cổng tài chính (đã gán SĐT) — bảng Member
+  // còn vài dòng seed cũ không phải thành viên thật.
+  const members = await prisma.member.findMany({
+    where: { phone: { not: null } },
+    select: { id: true },
+  });
   return prisma.$transaction(async (tx) => {
     const bill = await tx.bill.create({
       data: {
