@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function ChangePasswordPage() {
-  const router = useRouter();
   const { data: session, update } = useSession();
   const mustChange = session?.user?.mustChangePassword === true;
 
@@ -49,7 +47,8 @@ export default function ChangePasswordPage() {
       }
       await update();
       setSuccess(true);
-      setTimeout(() => router.push("/member"), 1200);
+      // Tải lại hẳn trang: router cache còn giữ redirect cũ "/member → đổi mật khẩu".
+      setTimeout(() => window.location.replace("/member"), 1200);
     } catch {
       setError("Lỗi kết nối, vui lòng thử lại");
       setLoading(false);
@@ -121,8 +120,7 @@ export default function ChangePasswordPage() {
                   className="w-full"
                   onClick={async () => {
                     await signOut({ redirect: false });
-                    router.push("/member/login");
-                    router.refresh();
+                    window.location.replace("/member/login");
                   }}
                 >
                   Đăng xuất

@@ -76,6 +76,8 @@ export function NavBar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  // Không prefetch khu đăng nhập: kết quả lúc chưa đăng nhập bị cache lại.
+                  prefetch={item.href.startsWith("/member") ? false : undefined}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive(item.href)
                       ? "text-goda-yellow bg-white/10"

@@ -1,11 +1,9 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export function MemberLogoutButton() {
-  const router = useRouter();
   return (
     <Button
       size="sm"
@@ -13,9 +11,9 @@ export function MemberLogoutButton() {
       className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white"
       onClick={async () => {
         // redirect: false — callbackUrl của NextAuth bị đổi sang domain AUTH_URL.
+        // Tải lại hẳn trang để xoá router cache còn giữ dữ liệu của người vừa thoát.
         await signOut({ redirect: false });
-        router.push("/member/login");
-        router.refresh();
+        window.location.replace("/member/login");
       }}
     >
       Đăng xuất

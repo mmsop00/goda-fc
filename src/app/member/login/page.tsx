@@ -6,7 +6,7 @@
 
 import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/member";
+  const rawCallback = searchParams.get("callbackUrl");
+  // Chỉ nhận đường dẫn nội bộ — tránh bị lợi dụng chuyển hướng sang web khác.
+  const callbackUrl =
+    rawCallback && rawCallback.startsWith("/") && !rawCallback.startsWith("//")
+      ? rawCallback
+      : "/member";
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -38,8 +42,10 @@ function LoginForm() {
       setError("Số điện thoại hoặc mật khẩu không đúng. Vui lòng thử lại.");
       setLoading(false);
     } else {
-      router.push(callbackUrl);
-      router.refresh();
+      // Tải lại hẳn trang: router cache của Next còn giữ kết quả prefetch cũ
+      // "/member → /member/login" (lúc chưa đăng nhập), router.push sẽ dùng lại
+      // nó và kẹt ở trang đăng nhập.
+      window.location.replace(callbackUrl);
     }
   }
 

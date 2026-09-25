@@ -65,6 +65,7 @@ export function MobileNav({ open, onClose, items, currentPath }: MobileNavProps)
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  prefetch={item.href.startsWith("/member") ? false : undefined}
                   onClick={onClose}
                   className={`flex items-center px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                     isActive(item.href)
