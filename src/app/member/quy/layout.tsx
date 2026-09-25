@@ -9,8 +9,7 @@ const MEMBER_TABS = [
 const CHAIRMAN_TABS = [
   ...MEMBER_TABS,
   { label: "Duyệt đóng tiền", href: "/member/quy/chu-tich/duyet" },
-  { label: "Tạo khoản thu", href: "/member/quy/chu-tich/tao-khoan-thu" },
-  { label: "Ghi thu chi", href: "/member/quy/chu-tich/ghi-thu-chi" },
+  { label: "Thu chi", href: "/member/quy/chu-tich/thu-chi" },
 ];
 
 export default async function FundLayout({ children }: { children: React.ReactNode }) {

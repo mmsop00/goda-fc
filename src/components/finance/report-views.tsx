@@ -1,7 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { AlertCircle, ArrowDownLeft, ArrowUpRight, CheckCircle2, Clock, Search, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  AlertCircle,
+  ArrowDownLeft,
+  ArrowLeft,
+  ArrowUpRight,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatIsoDate, formatVnd } from "@/lib/finance/format";
 import {
@@ -13,8 +24,15 @@ import {
   ProgressMeter,
   type MonthPoint,
 } from "@/components/finance/charts";
-import type { FinanceReport, LedgerRow } from "@/lib/finance/report";
+import type { BillProgress, FinanceReport, ItemStatus, LedgerRow } from "@/lib/finance/report-core";
 
+// ─── Chi tiết khi bấm vào 1 mục ────────────────────────
+export type Detail =
+  | { kind: "rows"; title: string; rows: LedgerRow[] }
+  | { kind: "bill"; billId: string }
+  | { kind: "member"; memberId: string };
+
+type OpenDetail = (d: Detail) => void;
 
 const selectClass =
   "h-8 rounded-lg border border-input bg-white px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -35,8 +53,7 @@ function buildMonths(ledger: LedgerRow[], year: string): MonthPoint[] {
   let from: string;
   let to: string;
   if (year === "all") {
-    const first = ledger.reduce((min, r) => (r.date.slice(0, 7) < min ? r.date.slice(0, 7) : min), nowKey);
-    from = first;
+    from = ledger.reduce((min, r) => (r.date.slice(0, 7) < min ? r.date.slice(0, 7) : min), nowKey);
     to = nowKey;
   } else {
     from = `${year}-01`;
@@ -62,27 +79,72 @@ function buildMonths(ledger: LedgerRow[], year: string): MonthPoint[] {
   return out;
 }
 
-function groupBy(rows: LedgerRow[]) {
+function groupByCategory(rows: LedgerRow[]) {
   const map = new Map<string, number>();
   for (const r of rows) map.set(r.categoryLabel, (map.get(r.categoryLabel) ?? 0) + r.amount);
   return [...map].map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value);
 }
 
-function StatTile({ label, value, hint }: { label: string; value: string; hint?: string }) {
+type DisplayRow = LedgerRow & { count?: number };
+
+/** Gộp tiền thành viên đóng thành 1 dòng mỗi khoản thu (mỗi tháng 20+ dòng giống nhau). */
+function groupMemberPayments(rows: LedgerRow[]): DisplayRow[] {
+  const groups = new Map<string, DisplayRow>();
+  const out: DisplayRow[] = [];
+  for (const r of rows) {
+    if (!r.billId) {
+      out.push(r);
+      continue;
+    }
+    const g = groups.get(r.billId);
+    if (g) {
+      g.amount += r.amount;
+      g.count = (g.count ?? 1) + 1;
+      if (r.date > g.date) g.date = r.date;
+    } else {
+      const ng: DisplayRow = { ...r, id: `g:${r.billId}`, count: 1 };
+      groups.set(r.billId, ng);
+      out.push(ng);
+    }
+  }
+  for (const g of groups.values()) g.memberName = `${g.count} người đóng`;
+  return out.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+const sumOf = (rows: LedgerRow[], dir: "thu" | "chi") => rows.filter((r) => r.direction === dir).reduce((s, r) => s + r.amount, 0);
+
+// ─── Các mảnh giao diện dùng chung ─────────────────────
+function Clickable({ onClick, className = "", children }: { onClick?: () => void; className?: string; children: React.ReactNode }) {
+  if (!onClick) return <div className={className}>{children}</div>;
   return (
-    <Card size="sm">
-      <CardContent>
-        <p className="text-xs text-gray-500">{label}</p>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`block w-full text-left transition-colors hover:bg-goda-navy/[0.03] focus-visible:bg-goda-navy/[0.05] outline-none ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function StatTile({ label, value, hint, onClick }: { label: string; value: string; hint?: string; onClick?: () => void }) {
+  return (
+    <Card size="sm" className="py-0">
+      <Clickable onClick={onClick} className="px-3 py-3 rounded-xl">
+        <p className="flex items-center justify-between text-xs text-gray-500">
+          {label}
+          {onClick && <ChevronRight className="size-3.5 text-gray-400" />}
+        </p>
         <p className="mt-1 text-xl font-semibold text-gray-900">{value}</p>
         {hint && <p className="mt-0.5 text-xs text-gray-500">{hint}</p>}
-      </CardContent>
+      </Clickable>
     </Card>
   );
 }
 
 export function Segmented<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: [T, string][] }) {
   return (
-    <div className="inline-flex rounded-lg bg-white p-0.5 ring-1 ring-black/10">
+    <div className="inline-flex flex-wrap rounded-lg bg-white p-0.5 ring-1 ring-black/10">
       {options.map(([v, label]) => (
         <button
           key={v}
@@ -99,8 +161,268 @@ export function Segmented<T extends string>({ value, onChange, options }: { valu
   );
 }
 
+function LedgerItem({
+  row,
+  grouped,
+  onOpen,
+  onDelete,
+  reserveDeleteSlot,
+}: {
+  row: DisplayRow;
+  grouped: boolean;
+  onOpen?: OpenDetail;
+  onDelete?: (r: LedgerRow) => void;
+  reserveDeleteSlot?: boolean;
+}) {
+  const openBill = grouped && row.billId && onOpen ? () => onOpen({ kind: "bill", billId: row.billId! }) : undefined;
+  return (
+    <li className="relative">
+      <Clickable onClick={openBill} className="grid grid-cols-[1.75rem_minmax(0,1fr)_auto] gap-x-3 px-4 py-2.5">
+        <span
+          className={`row-span-2 mt-0.5 flex size-7 items-center justify-center rounded-full ${
+            row.direction === "thu" ? "bg-blue-50 text-blue-700" : "bg-orange-50 text-orange-700"
+          }`}
+          aria-label={row.direction === "thu" ? "Thu" : "Chi"}
+        >
+          {row.direction === "thu" ? <ArrowDownLeft className="size-4" /> : <ArrowUpRight className="size-4" />}
+        </span>
+        <p className="text-sm font-medium text-gray-900">
+          {row.title}
+          {row.memberName && <span className="font-normal text-gray-600"> — {row.memberName}</span>}
+        </p>
+        <span className="flex items-start gap-1">
+          <span
+            className={`whitespace-nowrap text-sm font-semibold tabular-nums ${
+              row.direction === "thu" ? "text-[#006300]" : "text-gray-900"
+            }`}
+          >
+            {row.direction === "thu" ? "+" : "−"}
+            {formatVnd(row.amount)}
+          </span>
+          {openBill && <ChevronRight className="mt-0.5 size-4 text-gray-400" />}
+          {/* Chừa chỗ nút xoá (đặt tuyệt đối bên ngoài nút bấm) để số tiền thẳng cột */}
+          {reserveDeleteSlot && !openBill && <span className="w-6 shrink-0" aria-hidden />}
+        </span>
+        <p className="col-span-2 text-xs text-gray-500">
+          {grouped && row.billId ? "Gần nhất " : ""}
+          {formatIsoDate(row.date)} · {row.categoryLabel}
+          {row.note && ` · ${row.note}`}
+        </p>
+      </Clickable>
+      {onDelete && row.source === "so_quy" && (
+        <button
+          type="button"
+          onClick={() => onDelete(row)}
+          title="Xoá dòng này"
+          className="absolute right-3 top-2 p-1 text-gray-400 hover:text-red-600"
+        >
+          <Trash2 className="size-4" />
+        </button>
+      )}
+    </li>
+  );
+}
+
+const STATUS = {
+  chua_dong: { label: "Chưa đóng", icon: AlertCircle, cls: "text-[#b42318]" },
+  cho_duyet: { label: "Chờ duyệt", icon: Clock, cls: "text-[#9a6700]" },
+  da_dong: { label: "Đã đóng", icon: CheckCircle2, cls: "text-[#006300]" },
+} as const;
+
+function StatusLabel({ status, text }: { status: ItemStatus; text?: string }) {
+  const s = STATUS[status];
+  const Icon = s.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs ${s.cls}`}>
+      <Icon className="size-3.5" />
+      {text ?? s.label}
+    </span>
+  );
+}
+
+// ─── Bảng chi tiết (trượt lên trên điện thoại, giữa màn hình trên máy tính) ───
+export function DetailSheet({
+  report,
+  stack,
+  onOpen,
+  onBack,
+  onClose,
+}: {
+  report: FinanceReport;
+  stack: Detail[];
+  onOpen: OpenDetail;
+  onBack: () => void;
+  onClose: () => void;
+}) {
+  const detail = stack[stack.length - 1];
+
+  useEffect(() => {
+    if (!detail) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [detail, onClose]);
+
+  if (!detail) return null;
+
+  let title = "";
+  let body: React.ReactNode = null;
+
+  if (detail.kind === "rows") {
+    title = detail.title;
+    const thu = sumOf(detail.rows, "thu");
+    const chi = sumOf(detail.rows, "chi");
+    const display = groupMemberPayments(detail.rows);
+    body = (
+      <>
+        <div className="grid grid-cols-3 gap-2 px-4 pb-3 text-center">
+          {[
+            ["Thu", formatVnd(thu)],
+            ["Chi", formatVnd(chi)],
+            ["Chênh lệch", formatVnd(thu - chi)],
+          ].map(([l, v]) => (
+            <div key={l} className="rounded-lg bg-goda-soft-gray px-2 py-2">
+              <p className="text-[11px] text-gray-500">{l}</p>
+              <p className="text-sm font-semibold text-gray-900 tabular-nums">{v}</p>
+            </div>
+          ))}
+        </div>
+        {display.length === 0 ? (
+          <p className="px-4 py-6 text-center text-sm text-gray-400">Không có khoản nào.</p>
+        ) : (
+          <ul className="divide-y divide-border/60 border-t border-border/60">
+            {display.map((r) => (
+              <LedgerItem key={r.id} row={r} grouped onOpen={onOpen} />
+            ))}
+          </ul>
+        )}
+      </>
+    );
+  } else if (detail.kind === "bill") {
+    const bill = report.bills.find((b) => b.id === detail.billId);
+    title = bill?.title ?? "Khoản thu";
+    body = bill ? <BillDetail bill={bill} onOpen={onOpen} /> : <p className="p-4 text-sm text-gray-500">Không tìm thấy khoản thu.</p>;
+  } else {
+    const member = report.members.find((m) => m.memberId === detail.memberId);
+    title = member?.name ?? "Thành viên";
+    const items = report.bills.flatMap((b) =>
+      b.items.filter((it) => it.memberId === detail.memberId).map((it) => ({ ...it, bill: b }))
+    );
+    body = (
+      <>
+        {member && (
+          <div className="grid grid-cols-3 gap-2 px-4 pb-3 text-center">
+            {[
+              ["Đã đóng", formatVnd(member.daDong)],
+              ["Chờ duyệt", formatVnd(member.choDuyet)],
+              ["Còn nợ", formatVnd(member.chuaDong)],
+            ].map(([l, v]) => (
+              <div key={l} className="rounded-lg bg-goda-soft-gray px-2 py-2">
+                <p className="text-[11px] text-gray-500">{l}</p>
+                <p className="text-sm font-semibold text-gray-900 tabular-nums">{v}</p>
+              </div>
+            ))}
+          </div>
+        )}
+        {items.length === 0 ? (
+          <p className="px-4 py-6 text-center text-sm text-gray-400">Chưa có khoản thu nào.</p>
+        ) : (
+          <ul className="divide-y divide-border/60 border-t border-border/60">
+            {items.map((it) => (
+              <li key={it.bill.id}>
+                <Clickable onClick={() => onOpen({ kind: "bill", billId: it.bill.id })} className="flex items-center gap-3 px-4 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900">{it.bill.title}</p>
+                    <StatusLabel
+                      status={it.status}
+                      text={it.status === "da_dong" && it.paidDate ? `Đã đóng ${formatIsoDate(it.paidDate)}` : undefined}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold tabular-nums text-gray-900">{formatVnd(it.amount)}</span>
+                  <ChevronRight className="size-4 text-gray-400" />
+                </Clickable>
+              </li>
+            ))}
+          </ul>
+        )}
+      </>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label={title}>
+      <button type="button" aria-label="Đóng" className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl sm:max-w-lg sm:rounded-2xl">
+        <div className="flex items-center gap-2 px-4 pt-4 pb-3">
+          {stack.length > 1 && (
+            <button type="button" onClick={onBack} className="-ml-1 rounded-md p-1 text-gray-500 hover:bg-gray-100" aria-label="Quay lại">
+              <ArrowLeft className="size-5" />
+            </button>
+          )}
+          <h2 className="min-w-0 flex-1 truncate font-semibold text-gray-900">{title}</h2>
+          <button type="button" onClick={onClose} className="rounded-md p-1 text-gray-500 hover:bg-gray-100" aria-label="Đóng">
+            <X className="size-5" />
+          </button>
+        </div>
+        <div className="overflow-y-auto pb-4">{body}</div>
+      </div>
+    </div>
+  );
+}
+
+function BillDetail({ bill, onOpen }: { bill: BillProgress; onOpen: OpenDetail }) {
+  const groups: [ItemStatus, string][] = [
+    ["da_dong", "Đã đóng"],
+    ["cho_duyet", "Chờ duyệt"],
+    ["chua_dong", "Chưa đóng"],
+  ];
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1.5 px-4">
+        <p className="text-sm text-gray-600 tabular-nums">
+          Đã thu <strong className="text-gray-900">{formatVnd(bill.collected)}</strong> / {formatVnd(bill.expected)}
+        </p>
+        <ProgressMeter expected={bill.expected} collected={bill.collected} pending={bill.pending} />
+        <p className="text-xs text-gray-500">
+          {bill.paidCount}/{bill.memberCount} người đã đóng · Tạo {formatIsoDate(bill.createdAt)}
+          {bill.dueDate && ` · Hạn ${bill.dueDate}`}
+        </p>
+      </div>
+      {groups.map(([status, label]) => {
+        const items = bill.items.filter((it) => it.status === status);
+        if (items.length === 0) return null;
+        return (
+          <section key={status}>
+            <h3 className="flex items-center justify-between border-y border-border/60 bg-goda-soft-gray/60 px-4 py-1.5 text-xs font-medium text-gray-600">
+              <StatusLabel status={status} text={`${label} (${items.length})`} />
+              <span className="tabular-nums">{formatVnd(items.reduce((s, it) => s + it.amount, 0))}</span>
+            </h3>
+            <ul className="divide-y divide-border/60">
+              {items.map((it) => (
+                <li key={it.memberId}>
+                  <Clickable onClick={() => onOpen({ kind: "member", memberId: it.memberId })} className="flex items-center gap-3 px-4 py-2">
+                    <span className="min-w-0 flex-1 truncate text-sm text-gray-900">{it.memberName}</span>
+                    {it.paidDate && <span className="text-xs text-gray-500">{formatIsoDate(it.paidDate)}</span>}
+                    <span className="text-sm tabular-nums text-gray-900">{formatVnd(it.amount)}</span>
+                    <ChevronRight className="size-4 text-gray-400" />
+                  </Clickable>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Tổng quan ─────────────────────────────────────────
-export function Overview({ report }: { report: FinanceReport }) {
+export function Overview({ report, onOpen }: { report: FinanceReport; onOpen: OpenDetail }) {
   const years = useMemo(() => {
     const set = new Set([currentMonthKey().slice(0, 4)]);
     for (const r of report.ledger) set.add(r.date.slice(0, 4));
@@ -115,11 +437,14 @@ export function Overview({ report }: { report: FinanceReport }) {
   const rows = report.ledger.filter((r) => inPeriod(r.date));
   const thu = rows.filter((r) => r.direction === "thu");
   const chi = rows.filter((r) => r.direction === "chi");
-  const totalThu = thu.reduce((s, r) => s + r.amount, 0);
-  const totalChi = chi.reduce((s, r) => s + r.amount, 0);
+  const totalThu = sumOf(rows, "thu");
+  const totalChi = sumOf(rows, "chi");
   const months = buildMonths(report.ledger, year);
   const bills = report.bills.filter((b) => inPeriod(b.createdAt));
   const periodLabel = year === "all" ? "từ trước tới nay" : `năm ${year}`;
+
+  const openMonth = (i: number) =>
+    onOpen({ kind: "rows", title: `Thu chi ${months[i].title.toLowerCase()}`, rows: report.ledger.filter((r) => r.date.startsWith(months[i].key)) });
 
   return (
     <div className="space-y-4">
@@ -153,12 +478,27 @@ export function Overview({ report }: { report: FinanceReport }) {
           ))}
           <option value="all">Tất cả thời gian</option>
         </select>
+        <span className="text-xs text-gray-400">Bấm vào số liệu, cột hoặc hạng mục để xem chi tiết</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <StatTile label={`Tổng thu ${periodLabel}`} value={formatVnd(totalThu)} hint={`${thu.length} lượt thu`} />
-        <StatTile label={`Tổng chi ${periodLabel}`} value={formatVnd(totalChi)} hint={`${chi.length} khoản chi`} />
-        <StatTile label="Chênh lệch thu − chi" value={formatVnd(totalThu - totalChi)} />
+        <StatTile
+          label={`Tổng thu ${periodLabel}`}
+          value={formatVnd(totalThu)}
+          hint={`${thu.length} lượt thu`}
+          onClick={() => onOpen({ kind: "rows", title: `Các khoản thu ${periodLabel}`, rows: thu })}
+        />
+        <StatTile
+          label={`Tổng chi ${periodLabel}`}
+          value={formatVnd(totalChi)}
+          hint={`${chi.length} khoản chi`}
+          onClick={() => onOpen({ kind: "rows", title: `Các khoản chi ${periodLabel}`, rows: chi })}
+        />
+        <StatTile
+          label="Chênh lệch thu − chi"
+          value={formatVnd(totalThu - totalChi)}
+          onClick={() => onOpen({ kind: "rows", title: `Thu chi ${periodLabel}`, rows })}
+        />
       </div>
 
       <Card>
@@ -172,7 +512,7 @@ export function Overview({ report }: { report: FinanceReport }) {
           />
         </CardHeader>
         <CardContent>
-          <MonthlyCashflowChart data={months} />
+          <MonthlyCashflowChart data={months} onSelect={openMonth} />
           <button type="button" onClick={() => setShowTable((v) => !v)} className="mt-2 text-xs text-goda-navy underline">
             {showTable ? "Ẩn bảng số liệu" : "Xem dạng bảng"}
           </button>
@@ -188,9 +528,9 @@ export function Overview({ report }: { report: FinanceReport }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {months.map((m) => (
-                    <tr key={m.key} className="border-b border-border/50">
-                      <td className="py-1.5 pr-2">{m.title}</td>
+                  {months.map((m, i) => (
+                    <tr key={m.key} className="cursor-pointer border-b border-border/50 hover:bg-goda-navy/[0.03]" onClick={() => openMonth(i)}>
+                      <td className="py-1.5 pr-2 text-goda-navy underline-offset-2 hover:underline">{m.title}</td>
                       <td className="py-1.5 px-2 text-right">{formatVnd(m.thu)}</td>
                       <td className="py-1.5 px-2 text-right">{formatVnd(m.chi)}</td>
                       <td className="py-1.5 pl-2 text-right">{formatVnd(m.balance)}</td>
@@ -208,7 +548,7 @@ export function Overview({ report }: { report: FinanceReport }) {
           <CardTitle>Số dư quỹ cuối mỗi tháng</CardTitle>
         </CardHeader>
         <CardContent>
-          <BalanceChart data={months} />
+          <BalanceChart data={months} onSelect={openMonth} />
         </CardContent>
       </Card>
 
@@ -218,7 +558,11 @@ export function Overview({ report }: { report: FinanceReport }) {
             <CardTitle>Chi theo hạng mục</CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
-            <CategoryBars data={groupBy(chi)} color={COLORS.chi} />
+            <CategoryBars
+              data={groupByCategory(chi)}
+              color={COLORS.chi}
+              onSelect={(label) => onOpen({ kind: "rows", title: `Chi: ${label}`, rows: chi.filter((r) => r.categoryLabel === label) })}
+            />
           </CardContent>
         </Card>
         <Card>
@@ -226,7 +570,11 @@ export function Overview({ report }: { report: FinanceReport }) {
             <CardTitle>Thu theo nguồn</CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
-            <CategoryBars data={groupBy(thu)} color={COLORS.thu} />
+            <CategoryBars
+              data={groupByCategory(thu)}
+              color={COLORS.thu}
+              onSelect={(label) => onOpen({ kind: "rows", title: `Thu: ${label}`, rows: thu.filter((r) => r.categoryLabel === label) })}
+            />
           </CardContent>
         </Card>
       </div>
@@ -242,25 +590,30 @@ export function Overview({ report }: { report: FinanceReport }) {
             ]}
           />
         </CardHeader>
-        <CardContent className="space-y-4">
-          {bills.length === 0 && <p className="text-sm text-gray-400">Chưa có khoản thu nào trong kỳ này.</p>}
-          {(showAllBills ? bills : bills.slice(0, 5)).map((b) => (
-            <div key={b.id} className="space-y-1.5">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-sm">
-                <p className="font-medium text-gray-900">{b.title}</p>
-                <p className="text-gray-600 tabular-nums">
-                  <strong className="text-gray-900">{formatVnd(b.collected)}</strong> / {formatVnd(b.expected)}
-                </p>
-              </div>
-              <ProgressMeter expected={b.expected} collected={b.collected} pending={b.pending} />
-              <p className="text-xs text-gray-500">
-                {b.paidCount}/{b.memberCount} người đã đóng
-                {b.dueDate && ` · Hạn ${b.dueDate}`}
-              </p>
-            </div>
-          ))}
+        <CardContent className="px-0">
+          {bills.length === 0 && <p className="px-4 text-sm text-gray-400">Chưa có khoản thu nào trong kỳ này.</p>}
+          <ul>
+            {(showAllBills ? bills : bills.slice(0, 5)).map((b) => (
+              <li key={b.id}>
+                <Clickable onClick={() => onOpen({ kind: "bill", billId: b.id })} className="space-y-1.5 px-4 py-2.5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-sm">
+                    <p className="font-medium text-gray-900">{b.title}</p>
+                    <p className="flex items-center gap-1 text-gray-600 tabular-nums">
+                      <strong className="text-gray-900">{formatVnd(b.collected)}</strong> / {formatVnd(b.expected)}
+                      <ChevronRight className="size-4 text-gray-400" />
+                    </p>
+                  </div>
+                  <ProgressMeter expected={b.expected} collected={b.collected} pending={b.pending} />
+                  <p className="text-xs text-gray-500">
+                    {b.paidCount}/{b.memberCount} người đã đóng
+                    {b.dueDate && ` · Hạn ${b.dueDate}`}
+                  </p>
+                </Clickable>
+              </li>
+            ))}
+          </ul>
           {bills.length > 5 && (
-            <button type="button" onClick={() => setShowAllBills((v) => !v)} className="text-xs text-goda-navy underline">
+            <button type="button" onClick={() => setShowAllBills((v) => !v)} className="mx-4 mt-1 text-xs text-goda-navy underline">
               {showAllBills ? "Thu gọn" : `Xem tất cả ${bills.length} khoản`}
             </button>
           )}
@@ -271,7 +624,16 @@ export function Overview({ report }: { report: FinanceReport }) {
 }
 
 // ─── Sổ thu chi ────────────────────────────────────────
-export function Ledger({ report, isChairman, onDeleted }: { report: FinanceReport; isChairman: boolean; onDeleted: () => void }) {
+export function Ledger({
+  report,
+  onOpen,
+  onDelete,
+}: {
+  report: FinanceReport;
+  onOpen: OpenDetail;
+  /** Chỉ truyền khi là chủ tịch và đang xem dữ liệu thật */
+  onDelete?: (r: LedgerRow) => void;
+}) {
   const [q, setQ] = useState("");
   const [direction, setDirection] = useState<"all" | "thu" | "chi">("all");
   const [category, setCategory] = useState("all");
@@ -294,43 +656,9 @@ export function Ledger({ report, isChairman, onDeleted }: { report: FinanceRepor
       (month === "all" || r.date.startsWith(month)) &&
       (!needle || [r.title, r.memberName, r.note, r.categoryLabel].some((s) => s?.toLowerCase().includes(needle)))
   );
-  const sumThu = rows.filter((r) => r.direction === "thu").reduce((s, r) => s + r.amount, 0);
-  const sumChi = rows.filter((r) => r.direction === "chi").reduce((s, r) => s + r.amount, 0);
-
-  // Gộp tiền thành viên đóng thành 1 dòng mỗi khoản thu (mỗi tháng 20+ dòng giống nhau).
   // Đang tìm theo tên thì bỏ gộp để thấy được từng người.
   const isGrouped = grouped && !needle;
-  const display = (() => {
-    if (!isGrouped) return rows;
-    const groups = new Map<string, LedgerRow & { count: number }>();
-    const out: LedgerRow[] = [];
-    for (const r of rows) {
-      const billId = r.billId;
-      if (!billId) {
-        out.push(r);
-        continue;
-      }
-      const g = groups.get(billId);
-      if (g) {
-        g.amount += r.amount;
-        g.count++;
-        if (r.date > g.date) g.date = r.date;
-      } else {
-        const ng = { ...r, id: `g:${billId}`, count: 1 };
-        groups.set(billId, ng);
-        out.push(ng);
-      }
-    }
-    for (const g of groups.values()) g.memberName = `${g.count} người đóng`;
-    return out.sort((a, b) => b.date.localeCompare(a.date));
-  })();
-
-  async function remove(r: LedgerRow) {
-    if (!confirm(`Xoá "${r.title}" (${formatVnd(r.amount)}) khỏi sổ quỹ?`)) return;
-    const res = await fetch(`/api/finance/entries/${r.id}`, { method: "DELETE" });
-    if (res.ok) onDeleted();
-    else alert("Không xoá được, vui lòng thử lại");
-  }
+  const display: DisplayRow[] = isGrouped ? groupMemberPayments(rows) : rows;
 
   return (
     <div className="space-y-3">
@@ -378,76 +706,25 @@ export function Ledger({ report, isChairman, onDeleted }: { report: FinanceRepor
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-gray-600">
-          {rows.length} giao dịch · Thu <strong className="text-gray-900">{formatVnd(sumThu)}</strong> · Chi{" "}
-          <strong className="text-gray-900">{formatVnd(sumChi)}</strong>
+          {rows.length} giao dịch · Thu <strong className="text-gray-900">{formatVnd(sumOf(rows, "thu"))}</strong> · Chi{" "}
+          <strong className="text-gray-900">{formatVnd(sumOf(rows, "chi"))}</strong>
         </p>
         <label className={`flex items-center gap-2 text-sm text-gray-600 ${needle ? "opacity-50" : "cursor-pointer"}`}>
-          <input
-            type="checkbox"
-            className="size-4"
-            checked={isGrouped}
-            disabled={!!needle}
-            onChange={(e) => setGrouped(e.target.checked)}
-          />
+          <input type="checkbox" className="size-4" checked={isGrouped} disabled={!!needle} onChange={(e) => setGrouped(e.target.checked)} />
           Gộp theo khoản thu
         </label>
       </div>
 
-      <Card>
-        <CardContent className="px-0">
-          {display.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-gray-400">Không có giao dịch phù hợp.</p>
-          ) : (
-            <ul className="divide-y divide-border/60">
-              {display.slice(0, limit).map((r) => (
-                <li key={r.id} className="grid grid-cols-[1.75rem_minmax(0,1fr)_auto] gap-x-3 px-4 py-2.5">
-                  <span
-                    className={`row-span-2 mt-0.5 flex size-7 items-center justify-center rounded-full ${
-                      r.direction === "thu" ? "bg-blue-50 text-blue-700" : "bg-orange-50 text-orange-700"
-                    }`}
-                    aria-label={r.direction === "thu" ? "Thu" : "Chi"}
-                  >
-                    {r.direction === "thu" ? <ArrowDownLeft className="size-4" /> : <ArrowUpRight className="size-4" />}
-                  </span>
-                  <p className="text-sm font-medium text-gray-900">
-                    {r.title}
-                    {r.memberName && <span className="font-normal text-gray-600"> — {r.memberName}</span>}
-                  </p>
-                  <div className="flex items-start gap-1">
-                    <span
-                      className={`whitespace-nowrap text-sm font-semibold tabular-nums ${
-                        r.direction === "thu" ? "text-[#006300]" : "text-gray-900"
-                      }`}
-                    >
-                      {r.direction === "thu" ? "+" : "−"}
-                      {formatVnd(r.amount)}
-                    </span>
-                    {isChairman &&
-                      (r.source === "so_quy" ? (
-                        <button
-                          type="button"
-                          onClick={() => remove(r)}
-                          title="Xoá dòng này"
-                          className="-mt-0.5 p-1 text-gray-400 hover:text-red-600"
-                        >
-                          <Trash2 className="size-4" />
-                        </button>
-                      ) : (
-                        // Giữ chỗ để cột số tiền thẳng hàng với các dòng có nút xoá
-                        <span className="w-6 shrink-0" aria-hidden />
-                      ))}
-                  </div>
-                  {/* Dòng phụ trải qua cả phần dưới số tiền cho đỡ chật trên điện thoại */}
-                  <p className="col-span-2 text-xs text-gray-500">
-                    {isGrouped && r.source === "dong_quy" ? "Gần nhất " : ""}
-                    {formatIsoDate(r.date)} · {r.categoryLabel}
-                    {r.note && ` · ${r.note}`}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
+      <Card className="py-0">
+        {display.length === 0 ? (
+          <p className="px-4 py-6 text-center text-sm text-gray-400">Không có giao dịch phù hợp.</p>
+        ) : (
+          <ul className="divide-y divide-border/60">
+            {display.slice(0, limit).map((r) => (
+              <LedgerItem key={r.id} row={r} grouped={isGrouped} onOpen={onOpen} onDelete={onDelete} reserveDeleteSlot={!!onDelete} />
+            ))}
+          </ul>
+        )}
       </Card>
       {display.length > limit && (
         <button type="button" onClick={() => setLimit((l) => l + 40)} className="w-full text-sm text-goda-navy underline">
@@ -461,7 +738,7 @@ export function Ledger({ report, isChairman, onDeleted }: { report: FinanceRepor
 // ─── Thành viên ────────────────────────────────────────
 type MemberFilter = "all" | "no" | "cho" | "du";
 
-export function Members({ report }: { report: FinanceReport }) {
+export function Members({ report, onOpen }: { report: FinanceReport; onOpen: OpenDetail }) {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<MemberFilter>("all");
   const statusOf = (m: FinanceReport["members"][number]): Exclude<MemberFilter, "all"> =>
@@ -477,11 +754,10 @@ export function Members({ report }: { report: FinanceReport }) {
     (s, m) => ({ daDong: s.daDong + m.daDong, choDuyet: s.choDuyet + m.choDuyet, chuaDong: s.chuaDong + m.chuaDong }),
     { daDong: 0, choDuyet: 0, chuaDong: 0 }
   );
-
-  const STATUS = {
-    no: { label: "Còn nợ", icon: AlertCircle, cls: "text-[#b42318]" },
-    cho: { label: "Chờ duyệt", icon: Clock, cls: "text-[#9a6700]" },
-    du: { label: "Đã đủ", icon: CheckCircle2, cls: "text-[#006300]" },
+  const STANDING = {
+    no: { status: "chua_dong", label: "Còn nợ" },
+    cho: { status: "cho_duyet", label: "Chờ duyệt" },
+    du: { status: "da_dong", label: "Đã đủ" },
   } as const;
 
   return (
@@ -509,7 +785,7 @@ export function Members({ report }: { report: FinanceReport }) {
         />
       </div>
 
-      <Card>
+      <Card className="py-0">
         <CardContent className="overflow-x-auto px-0">
           <table className="w-full text-sm">
             <thead>
@@ -522,19 +798,24 @@ export function Members({ report }: { report: FinanceReport }) {
             </thead>
             <tbody className="tabular-nums">
               {rows.map((m) => {
-                const s = STATUS[statusOf(m)];
-                const Icon = s.icon;
+                const st = statusOf(m);
                 return (
-                  <tr key={m.memberId} className="border-b border-border/50">
+                  <tr
+                    key={m.memberId}
+                    className="cursor-pointer border-b border-border/50 hover:bg-goda-navy/[0.03]"
+                    onClick={() => onOpen({ kind: "member", memberId: m.memberId })}
+                  >
                     <td className="px-4 py-2">
-                      <p className="font-medium text-gray-900">{m.name}</p>
-                      <p className={`flex flex-wrap items-center gap-1 text-xs ${s.cls}`}>
-                        <Icon className="size-3.5" />
-                        {s.label}
+                      {/* Nút thật để bấm bằng bàn phím; cả hàng cũng bấm được */}
+                      <button type="button" className="text-left font-medium text-gray-900 outline-none focus-visible:underline">
+                        {m.name}
+                      </button>
+                      <p className="flex flex-wrap items-center gap-1">
+                        <StatusLabel status={STANDING[st].status} text={STANDING[st].label} />
                         {/* Điện thoại ẩn cột "Chờ duyệt" nên hiện số tiền ngay đây */}
-                        {statusOf(m) === "cho" && <span className="sm:hidden">· {formatVnd(m.choDuyet)}</span>}
+                        {st === "cho" && <span className="text-xs text-[#9a6700] sm:hidden">· {formatVnd(m.choDuyet)}</span>}
                       </p>
-                      {statusOf(m) === "no" && m.choDuyet > 0 && (
+                      {st === "no" && m.choDuyet > 0 && (
                         <p className="text-xs text-gray-500 sm:hidden">Chờ duyệt {formatVnd(m.choDuyet)}</p>
                       )}
                     </td>
@@ -559,4 +840,3 @@ export function Members({ report }: { report: FinanceReport }) {
     </div>
   );
 }
-

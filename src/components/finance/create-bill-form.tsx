@@ -31,7 +31,7 @@ const YEARS = [now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1];
 const selectClass =
   "h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
-export default function CreateBillPage() {
+export function CreateBillForm() {
   const router = useRouter();
   const [kind, setKind] = useState<Kind>("quy_thang");
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -122,10 +122,10 @@ export default function CreateBillPage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto p-4 sm:p-6">
+    <div>
       <Card>
         <CardHeader>
-          <CardTitle>Tạo khoản thu mới</CardTitle>
+          <CardTitle>Tạo khoản thu thành viên</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">

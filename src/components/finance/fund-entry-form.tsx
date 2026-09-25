@@ -26,8 +26,8 @@ const todayIso = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
-export default function FundEntryPage() {
-  const [direction, setDirection] = useState<Direction>("chi");
+/** Ghi 1 dòng sổ quỹ (khoản chi, hoặc thu ngoài). Đổi `direction` thì truyền `key` để form mới. */
+export function FundEntryForm({ direction }: { direction: Direction }) {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
@@ -39,6 +39,7 @@ export default function FundEntryPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
 
   const categories = direction === "chi" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
+  const recent = entries.filter((e) => e.direction === direction);
 
   function loadEntries() {
     fetch("/api/finance/entries")
@@ -87,13 +88,15 @@ export default function FundEntryPage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto p-4 sm:p-6 space-y-4">
+    <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Ghi thu chi</CardTitle>
-          <p className="text-sm text-gray-500">
-            Tiền thành viên đóng quỹ đã tự vào sổ khi được duyệt — ở đây chỉ ghi khoản chi và các khoản thu ngoài.
-          </p>
+          <CardTitle>{direction === "chi" ? "Ghi khoản chi" : "Ghi khoản thu ngoài"}</CardTitle>
+          {direction === "thu" && (
+            <p className="text-sm text-gray-500">
+              Tiền không qua thành viên đóng quỹ: tài trợ, khách mời, số dư chuyển sang...
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -107,31 +110,6 @@ export default function FundEntryPage() {
                 <AlertDescription>{saved}</AlertDescription>
               </Alert>
             )}
-
-            <div className="grid grid-cols-2 gap-2">
-              {(
-                [
-                  ["chi", "Khoản chi"],
-                  ["thu", "Thu ngoài (tài trợ, số dư…)"],
-                ] as const
-              ).map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => {
-                    setDirection(value);
-                    setCategory("");
-                  }}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                    direction === value
-                      ? "border-goda-navy bg-goda-navy text-white"
-                      : "border-border bg-white text-goda-navy hover:bg-goda-navy/5"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
 
             <div className="space-y-2">
               <Label>Hạng mục</Label>
@@ -186,14 +164,14 @@ export default function FundEntryPage() {
         </CardContent>
       </Card>
 
-      {entries.length > 0 && (
+      {recent.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Vừa ghi gần đây</CardTitle>
           </CardHeader>
           <CardContent className="px-0">
             <ul className="divide-y divide-border/60">
-              {entries.map((e) => (
+              {recent.map((e) => (
                 <li key={e.id} className="flex items-center gap-3 px-4 py-2.5">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900">{e.title}</p>

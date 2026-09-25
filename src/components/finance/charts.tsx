@@ -171,7 +171,14 @@ function XLabels({ data, cx, active }: { data: MonthPoint[]; cx: (i: number) => 
 }
 
 /** Cột đôi Thu/Chi theo tháng. Rê chuột (hoặc Tab) vào cả cột tháng để xem số. */
-export function MonthlyCashflowChart({ data }: { data: MonthPoint[] }) {
+const activateKeys = (fn: () => void) => (e: React.KeyboardEvent) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    fn();
+  }
+};
+
+export function MonthlyCashflowChart({ data, onSelect }: { data: MonthPoint[]; onSelect?: (index: number) => void }) {
   const [ref, width] = useWidth<HTMLDivElement>();
   const [active, setActive] = useState<number | null>(null);
   const height = PAD.top + PLOT_H + PAD.bottom;
@@ -202,7 +209,10 @@ export function MonthlyCashflowChart({ data }: { data: MonthPoint[] }) {
                 fill="transparent"
                 tabIndex={0}
                 aria-label={`${d.title}: thu ${formatVnd(d.thu)}, chi ${formatVnd(d.chi)}`}
-                className="outline-none"
+                role={onSelect ? "button" : undefined}
+                className={`outline-none ${onSelect ? "cursor-pointer" : ""}`}
+                onClick={onSelect && (() => onSelect(i))}
+                onKeyDown={onSelect && activateKeys(() => onSelect(i))}
                 onPointerEnter={() => setActive(i)}
                 onPointerLeave={() => setActive(null)}
                 onFocus={() => setActive(i)}
@@ -230,7 +240,7 @@ export function MonthlyCashflowChart({ data }: { data: MonthPoint[] }) {
 }
 
 /** Đường số dư cuối mỗi tháng, có vạch dò theo tháng (crosshair). */
-export function BalanceChart({ data }: { data: MonthPoint[] }) {
+export function BalanceChart({ data, onSelect }: { data: MonthPoint[]; onSelect?: (index: number) => void }) {
   const [ref, width] = useWidth<HTMLDivElement>();
   const [active, setActive] = useState<number | null>(null);
   const height = PAD.top + PLOT_H + PAD.bottom;
@@ -284,14 +294,24 @@ export function BalanceChart({ data }: { data: MonthPoint[] }) {
             fill="transparent"
             tabIndex={0}
             aria-label="Số dư theo tháng — dùng phím mũi tên để xem từng tháng"
-            className="outline-none"
+            className={`outline-none ${onSelect ? "cursor-pointer" : ""}`}
             onPointerMove={(e) => pick(e.clientX, e.currentTarget.ownerSVGElement!.getBoundingClientRect())}
+            onClick={(e) => {
+              if (!onSelect) return;
+              const rect = e.currentTarget.ownerSVGElement!.getBoundingClientRect();
+              const i = Math.round((e.clientX - rect.left - PAD.left - band / 2) / band);
+              onSelect(Math.max(0, Math.min(last, i)));
+            }}
             onPointerLeave={() => setActive(null)}
             onFocus={() => setActive(last)}
             onBlur={() => setActive(null)}
             onKeyDown={(e) => {
               if (e.key === "ArrowLeft") setActive((a) => Math.max(0, (a ?? last) - 1));
               if (e.key === "ArrowRight") setActive((a) => Math.min(last, (a ?? last) + 1));
+              if (onSelect && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                onSelect(active ?? last);
+              }
             }}
           />
         </svg>
@@ -309,7 +329,15 @@ export function BalanceChart({ data }: { data: MonthPoint[] }) {
 }
 
 /** Cột ngang theo hạng mục, 1 màu (màu của Thu hoặc Chi), số ở đầu cột. */
-export function CategoryBars({ data, color }: { data: { label: string; value: number }[]; color: string }) {
+export function CategoryBars({
+  data,
+  color,
+  onSelect,
+}: {
+  data: { label: string; value: number }[];
+  color: string;
+  onSelect?: (label: string) => void;
+}) {
   const [active, setActive] = useState<number | null>(null);
   const total = data.reduce((s, d) => s + d.value, 0);
   const max = Math.max(...data.map((d) => d.value), 1);
@@ -320,7 +348,12 @@ export function CategoryBars({ data, color }: { data: { label: string; value: nu
         <li
           key={d.label}
           tabIndex={0}
-          className="relative grid grid-cols-[minmax(0,9rem)_1fr] items-center gap-3 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-goda-navy/30"
+          role={onSelect ? "button" : undefined}
+          onClick={onSelect && (() => onSelect(d.label))}
+          onKeyDown={onSelect && activateKeys(() => onSelect(d.label))}
+          className={`relative grid grid-cols-[minmax(0,9rem)_1fr] items-center gap-3 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-goda-navy/30 ${
+            onSelect ? "cursor-pointer" : ""
+          }`}
           onPointerEnter={() => setActive(i)}
           onPointerLeave={() => setActive(null)}
           onFocus={() => setActive(i)}
