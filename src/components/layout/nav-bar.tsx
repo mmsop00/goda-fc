@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { label: "Hall of Fame", href: "/hall-of-fame" },
   { label: "Tin tức & Hình ảnh", href: "/tin-tuc" },
   { label: "Thành viên", href: "/thanh-vien" },
+  { label: "Quỹ CLB", href: "/member" },
   { label: "Đăng nhập", href: "/admin" },
 ];
 

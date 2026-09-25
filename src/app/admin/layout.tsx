@@ -7,9 +7,10 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  
-  // Not logged in — redirect to login
-  if (!session) {
+
+  // Không đăng nhập, hoặc đăng nhập bằng tài khoản thành viên (kind !==
+  // "admin") — cả 2 đều không được vào khu quản trị nội dung.
+  if (!session || session.user?.kind !== "admin") {
     redirect("/login");
   }
 

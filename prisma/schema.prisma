@@ -87,6 +87,96 @@ model Member {
   status    String   @default("Đang thi đấu")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // ─── Cổng tài chính (đăng nhập bằng số điện thoại) ───
+  phone              String?   @unique // đăng nhập cổng thành viên
+  passwordHash       String?
+  mustChangePassword Boolean   @default(false) // chỉ true cho chủ tịch lần đầu
+  financeRole        String    @default("member") // member | chairman
+
+  billsCreated   Bill[]          @relation("BillsCreated")
+  paymentItems   PaymentItem[]   @relation("MemberPaymentItems")
+  paymentIntents PaymentIntent[] @relation("MemberPaymentIntents")
+}
+
+// ═══════════════════════════════════════
+// Club Finance — Cổng thành viên & chủ tịch
+// ═══════════════════════════════════════
+
+model Bill {
+  id                String   @id @default(cuid())
+  title             String
+  amountPerMember   Int
+  dueDate           String?  // DD/MM/YYYY
+  createdByMemberId String
+  createdAt         DateTime @default(now())
+
+  createdBy Member        @relation("BillsCreated", fields: [createdByMemberId], references: [id])
+  items     PaymentItem[]
+}
+
+model PaymentItem {
+  id                  String    @id @default(cuid())
+  billId              String
+  memberId            String
+  amount              Int       // snapshot lúc tạo, không đổi theo Bill sau này
+  status              String    @default("chua_dong") // chua_dong | cho_duyet | da_dong
+  paidIntentId        String?
+  confirmedAt         DateTime?
+  confirmedByMemberId String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  bill       Bill           @relation(fields: [billId], references: [id], onDelete: Cascade)
+  member     Member         @relation("MemberPaymentItems", fields: [memberId], references: [id], onDelete: Cascade)
+  paidIntent PaymentIntent? @relation("ClaimedItems", fields: [paidIntentId], references: [id])
+
+  intentLinks PaymentIntentItem[]
+
+  @@unique([billId, memberId])
+}
+
+model PaymentIntent {
+  id                  String    @id @default(cuid())
+  memberId            String
+  code                String    @unique // vd "GODA7K3PQ2" — nhúng vào nội dung CK
+  totalAmount         Int
+  status              String    @default("cho_bien_lai") // cho_bien_lai | cho_duyet | da_xac_nhan | tu_choi
+  ocrHint             String?   // likely_match | needs_review
+  ocrRawText          String?
+  confirmedAt         DateTime?
+  confirmedByMemberId String?
+  rejectionNote       String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  member   Member              @relation("MemberPaymentIntents", fields: [memberId], references: [id], onDelete: Cascade)
+  items    PaymentIntentItem[]
+  claimed  PaymentItem[]       @relation("ClaimedItems")
+  receipts PaymentReceipt[]
+}
+
+// Bảng nối: 1 mã QR/intent có thể gộp nhiều khoản (PaymentItem) cùng lúc.
+model PaymentIntentItem {
+  id              String @id @default(cuid())
+  paymentIntentId String
+  paymentItemId   String
+
+  paymentIntent PaymentIntent @relation(fields: [paymentIntentId], references: [id], onDelete: Cascade)
+  paymentItem   PaymentItem   @relation(fields: [paymentItemId], references: [id], onDelete: Cascade)
+
+  @@unique([paymentIntentId, paymentItemId])
+}
+
+model PaymentReceipt {
+  id              String   @id @default(cuid())
+  paymentIntentId String
+  imageData       Bytes
+  mimeType        String   @default("image/jpeg")
+  uploadedAt      DateTime @default(now())
+  expiresAt       DateTime // uploadedAt + 90 ngày — cron + lazy-read sẽ xoá khi quá hạn
+
+  paymentIntent PaymentIntent @relation(fields: [paymentIntentId], references: [id], onDelete: Cascade)
 }
 
 model Match {
