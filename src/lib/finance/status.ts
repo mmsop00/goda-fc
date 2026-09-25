@@ -7,34 +7,30 @@
 import { prisma } from "@/lib/prisma";
 import { generatePaymentCode } from "./code";
 
-/** Tạo khoản thu mới + fan-out 1 dòng cho MỌI thành viên (kể cả người tạo). */
+/** Tạo khoản thu + 1 dòng cần đóng cho từng thành viên được chọn (số tiền riêng
+ * từng người). Danh sách đã được route kiểm tra hợp lệ trước khi gọi. */
 export async function createBill(params: {
   title: string;
+  kind: string;
+  period: string | null;
   amountPerMember: number;
-  dueDate?: string | null;
+  dueDate: string | null;
   createdByMemberId: string;
+  items: { memberId: string; amount: number }[];
 }) {
-  // Chỉ thành viên có tài khoản cổng tài chính (đã gán SĐT) — bảng Member
-  // còn vài dòng seed cũ không phải thành viên thật.
-  const members = await prisma.member.findMany({
-    where: { phone: { not: null } },
-    select: { id: true },
-  });
   return prisma.$transaction(async (tx) => {
     const bill = await tx.bill.create({
       data: {
         title: params.title,
+        kind: params.kind,
+        period: params.period,
         amountPerMember: params.amountPerMember,
-        dueDate: params.dueDate ?? null,
+        dueDate: params.dueDate,
         createdByMemberId: params.createdByMemberId,
       },
     });
     await tx.paymentItem.createMany({
-      data: members.map((m) => ({
-        billId: bill.id,
-        memberId: m.id,
-        amount: params.amountPerMember,
-      })),
+      data: params.items.map((it) => ({ billId: bill.id, memberId: it.memberId, amount: it.amount })),
     });
     return bill;
   });

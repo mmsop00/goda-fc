@@ -108,7 +108,9 @@ model Member {
 model Bill {
   id                String   @id @default(cuid())
   title             String
-  amountPerMember   Int
+  kind              String   @default("khac") // quy_thang | khac
+  period            String?  // YYYY-MM — chỉ với quỹ tháng, chặn tạo trùng tháng
+  amountPerMember   Int      // số tiền mặc định; từng người có thể khác (PaymentItem.amount)
   dueDate           String?  // DD/MM/YYYY
   createdByMemberId String
   createdAt         DateTime @default(now())
