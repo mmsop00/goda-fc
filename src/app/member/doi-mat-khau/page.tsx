@@ -119,7 +119,10 @@ export default function ChangePasswordPage() {
                   type="button"
                   variant="ghost"
                   className="w-full"
-                  onClick={() => signOut({ callbackUrl: "/member/login" })}
+                  onClick={async () => {
+                    await signOut({ redirect: false });
+                    window.location.href = "/member/login";
+                  }}
                 >
                   Đăng xuất
                 </Button>
