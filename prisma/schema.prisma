@@ -163,7 +163,7 @@ model PaymentIntent {
   memberId            String
   code                String    @unique // vd "GODA7K3PQ2" — nhúng vào nội dung CK
   totalAmount         Int
-  status              String    @default("cho_bien_lai") // cho_bien_lai | cho_duyet | da_xac_nhan | tu_choi
+  status              String    @default("cho_bien_lai") // cho_bien_lai | cho_duyet | da_xac_nhan | tu_choi | da_huy (khoản bị chủ tịch sửa)
   ocrHint             String?   // likely_match | needs_review
   ocrRawText          String?
   confirmedAt         DateTime?

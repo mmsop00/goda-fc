@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,8 +33,9 @@ const todayIso = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
-/** Ghi 1 dòng sổ quỹ (khoản chi, hoặc thu ngoài). Đổi `direction` thì truyền `key` để form mới. */
-export function FundEntryForm({ direction }: { direction: Direction }) {
+/** Ghi 1 dòng sổ quỹ (khoản chi, hoặc thu ngoài). Đổi `direction` thì truyền `key` để form mới.
+ * `editId`: mở sẵn dòng đó để sửa (vd bấm "Sửa" từ sổ thu chi). */
+export function FundEntryForm({ direction, editId }: { direction: Direction; editId?: string }) {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
@@ -47,6 +48,7 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
   const [saved, setSaved] = useState("");
   const [loading, setLoading] = useState(false);
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const categories = direction === "chi" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
   const recent = entries.filter((e) => e.direction === direction);
@@ -58,6 +60,36 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
   }
   useEffect(loadEntries, []);
 
+  function startEdit(entry: Entry) {
+    setEditingId(entry.id);
+    setCategory(entry.category);
+    setTitle(entry.title);
+    setAmount(String(entry.amount));
+    setDate(entry.date);
+    setPeriod(entry.period ?? monthOf(entry.date));
+    setNote(entry.note ?? "");
+    setError("");
+    setSaved("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function stopEdit() {
+    setEditingId(null);
+    setCategory("");
+    setTitle("");
+    setAmount("");
+    setDate(todayIso());
+    setPeriod(null);
+    setNote("");
+  }
+
+  useEffect(() => {
+    if (!editId) return;
+    fetch(`/api/finance/entries/${editId}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((entry: Entry | null) => (entry ? startEdit(entry) : setError("Không tìm thấy dòng cần sửa")));
+  }, [editId]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -68,8 +100,8 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/finance/entries", {
-        method: "POST",
+      const res = await fetch(editingId ? `/api/finance/entries/${editingId}` : "/api/finance/entries", {
+        method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ direction, category, title, amount: Number(amount), date, period: effectivePeriod, note }),
       });
@@ -78,10 +110,16 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
         setError(json.error || "Không lưu được");
         return;
       }
-      setSaved(`Đã ghi ${direction === "chi" ? "khoản chi" : "khoản thu"} "${title.trim()}" · ${formatVnd(Number(amount))}`);
-      setTitle("");
-      setAmount("");
-      setNote("");
+      setSaved(
+        `${editingId ? "Đã lưu thay đổi" : `Đã ghi ${direction === "chi" ? "khoản chi" : "khoản thu"}`} "${title.trim()}" · ${formatVnd(Number(amount))}`
+      );
+      if (editingId) {
+        stopEdit();
+      } else {
+        setTitle("");
+        setAmount("");
+        setNote("");
+      }
       loadEntries();
     } catch {
       setError("Lỗi kết nối, vui lòng thử lại");
@@ -93,6 +131,7 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
   async function remove(entry: Entry) {
     if (!confirm(`Xoá "${entry.title}" (${formatVnd(entry.amount)}) khỏi sổ quỹ?`)) return;
     const res = await fetch(`/api/finance/entries/${entry.id}`, { method: "DELETE" });
+    if (entry.id === editingId) stopEdit();
     if (res.ok) loadEntries();
     else alert("Không xoá được, vui lòng thử lại");
   }
@@ -101,7 +140,15 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>{direction === "chi" ? "Ghi khoản chi" : "Ghi khoản thu ngoài"}</CardTitle>
+          <CardTitle>
+            {editingId
+              ? direction === "chi"
+                ? "Sửa khoản chi"
+                : "Sửa khoản thu ngoài"
+              : direction === "chi"
+                ? "Ghi khoản chi"
+                : "Ghi khoản thu ngoài"}
+          </CardTitle>
           {direction === "thu" && (
             <p className="text-sm text-gray-500">
               Tiền không qua thành viên đóng quỹ: tài trợ, khách mời, số dư chuyển sang...
@@ -200,8 +247,13 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
             </div>
 
             <Button type="submit" disabled={loading} className="w-full bg-goda-navy hover:bg-goda-navy/90">
-              {loading ? "Đang lưu..." : direction === "chi" ? "Ghi khoản chi" : "Ghi khoản thu"}
+              {loading ? "Đang lưu..." : editingId ? "Lưu thay đổi" : direction === "chi" ? "Ghi khoản chi" : "Ghi khoản thu"}
             </Button>
+            {editingId && (
+              <button type="button" onClick={stopEdit} className="text-sm text-gray-600 underline">
+                Huỷ, không sửa nữa
+              </button>
+            )}
           </form>
         </CardContent>
       </Card>
@@ -214,7 +266,7 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
           <CardContent className="px-0">
             <ul className="divide-y divide-border/60">
               {recent.map((e) => (
-                <li key={e.id} className="flex items-center gap-3 px-4 py-2.5">
+                <li key={e.id} className={`flex items-center gap-3 px-4 py-2.5 ${e.id === editingId ? "bg-amber-50" : ""}`}>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900">{e.title}</p>
                     <p className="text-xs text-gray-500">
@@ -229,6 +281,9 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
                     {e.direction === "thu" ? "+" : "−"}
                     {formatVnd(e.amount)}
                   </span>
+                  <button type="button" onClick={() => startEdit(e)} title="Sửa" className="p-1 text-gray-400 hover:text-goda-navy">
+                    <Pencil className="size-4" />
+                  </button>
                   <button type="button" onClick={() => remove(e)} title="Xoá" className="p-1 text-gray-400 hover:text-red-600">
                     <Trash2 className="size-4" />
                   </button>

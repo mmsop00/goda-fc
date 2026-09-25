@@ -127,7 +127,7 @@ export default function FinanceReportPage() {
         {view === "thanh-vien" && <Members report={data} onOpen={open} />}
       </div>
 
-      <DetailSheet report={data} stack={stack} onOpen={open} onBack={back} onClose={close} />
+      <DetailSheet report={data} stack={stack} onOpen={open} onBack={back} onClose={close} canEdit={isChairman && !sample} />
     </div>
   );
 }

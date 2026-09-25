@@ -4,6 +4,7 @@
 // (PaymentIntent & PaymentItem) không bao giờ lệch nhau.
 // ═══════════════════════════════════════
 
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { generatePaymentCode } from "./code";
 
@@ -33,6 +34,82 @@ export async function createBill(params: {
       data: params.items.map((it) => ({ billId: bill.id, memberId: it.memberId, amount: it.amount })),
     });
     return bill;
+  });
+}
+
+/** Lỗi nghiệp vụ hiển thị thẳng cho người dùng (vd sửa khoản đã có người đóng). */
+export class FinanceRuleError extends Error {}
+
+const LOCKED_STATUSES = new Set(["cho_duyet", "da_dong"]);
+
+/** Huỷ các mã QR chưa gửi bill có chứa những khoản vừa bị sửa/xoá — số tiền trên
+ * QR cũ không còn đúng. Thành viên sẽ phải tạo mã mới. */
+async function cancelOpenIntents(tx: Prisma.TransactionClient, paymentItemIds: string[]) {
+  if (paymentItemIds.length === 0) return;
+  const links = await tx.paymentIntentItem.findMany({
+    where: { paymentItemId: { in: paymentItemIds }, paymentIntent: { status: "cho_bien_lai" } },
+    select: { paymentIntentId: true },
+  });
+  const ids = [...new Set(links.map((l) => l.paymentIntentId))];
+  if (ids.length) {
+    await tx.paymentIntent.updateMany({ where: { id: { in: ids }, status: "cho_bien_lai" }, data: { status: "da_huy" } });
+  }
+}
+
+/** Chủ tịch sửa khoản thu. Người đã đóng / chờ duyệt bị khoá: phải còn trong danh
+ * sách với đúng số tiền cũ. Ai bị bỏ ra hoặc đổi tiền thì QR chưa dùng của họ bị huỷ. */
+export async function updateBill(
+  billId: string,
+  input: { title: string; period: string; amountPerMember: number; dueDate: string | null; items: { memberId: string; amount: number }[] }
+) {
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.paymentItem.findMany({
+      where: { billId },
+      include: { member: { select: { name: true } } },
+    });
+    const desired = new Map(input.items.map((it) => [it.memberId, it.amount]));
+
+    for (const item of existing) {
+      if (!LOCKED_STATUSES.has(item.status)) continue;
+      const verb = item.status === "da_dong" ? "đã đóng" : "đang chờ duyệt";
+      if (!desired.has(item.memberId)) throw new FinanceRuleError(`${item.member.name} ${verb}, không bỏ ra được`);
+      if (desired.get(item.memberId) !== item.amount) {
+        throw new FinanceRuleError(`${item.member.name} ${verb}, không đổi số tiền được`);
+      }
+    }
+
+    const byMember = new Map(existing.map((it) => [it.memberId, it]));
+    const toDelete = existing.filter((it) => !LOCKED_STATUSES.has(it.status) && !desired.has(it.memberId));
+    const toUpdate = existing.filter(
+      (it) => !LOCKED_STATUSES.has(it.status) && desired.has(it.memberId) && desired.get(it.memberId) !== it.amount
+    );
+    const toCreate = input.items.filter((it) => !byMember.has(it.memberId));
+
+    await cancelOpenIntents(tx, [...toDelete, ...toUpdate].map((it) => it.id));
+    if (toDelete.length) await tx.paymentItem.deleteMany({ where: { id: { in: toDelete.map((it) => it.id) } } });
+    for (const it of toUpdate) {
+      await tx.paymentItem.update({ where: { id: it.id }, data: { amount: desired.get(it.memberId)! } });
+    }
+    if (toCreate.length) {
+      await tx.paymentItem.createMany({ data: toCreate.map((it) => ({ billId, memberId: it.memberId, amount: it.amount })) });
+    }
+
+    return tx.bill.update({
+      where: { id: billId },
+      data: { title: input.title, period: input.period, amountPerMember: input.amountPerMember, dueDate: input.dueDate },
+    });
+  });
+}
+
+/** Xoá khoản thu — chỉ khi chưa ai đóng hoặc chờ duyệt. */
+export async function deleteBill(billId: string) {
+  return prisma.$transaction(async (tx) => {
+    const items = await tx.paymentItem.findMany({ where: { billId }, select: { id: true, status: true } });
+    if (items.some((it) => LOCKED_STATUSES.has(it.status))) {
+      throw new FinanceRuleError("Đã có người đóng hoặc chờ duyệt — không xoá được, chỉ sửa được");
+    }
+    await cancelOpenIntents(tx, items.map((it) => it.id));
+    await tx.bill.delete({ where: { id: billId } });
   });
 }
 

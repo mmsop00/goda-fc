@@ -9,10 +9,12 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock,
+  Pencil,
   Search,
   Trash2,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatIsoDate, formatPeriod, formatVnd } from "@/lib/finance/format";
 import {
@@ -206,7 +208,7 @@ function LedgerItem({
           </span>
           {openBill && <ChevronRight className="mt-0.5 size-4 text-gray-400" />}
           {/* Chừa chỗ nút xoá (đặt tuyệt đối bên ngoài nút bấm) để số tiền thẳng cột */}
-          {reserveDeleteSlot && !openBill && <span className="w-6 shrink-0" aria-hidden />}
+          {reserveDeleteSlot && !openBill && <span className="w-14 shrink-0" aria-hidden />}
         </span>
         <p className="col-span-2 text-xs text-gray-500">
           {grouped && row.billId ? "Gần nhất " : ""}
@@ -216,14 +218,18 @@ function LedgerItem({
         </p>
       </Clickable>
       {onDelete && row.source === "so_quy" && (
-        <button
-          type="button"
-          onClick={() => onDelete(row)}
-          title="Xoá dòng này"
-          className="absolute right-3 top-2 p-1 text-gray-400 hover:text-red-600"
-        >
-          <Trash2 className="size-4" />
-        </button>
+        <span className="absolute right-3 top-2 flex">
+          <Link
+            href={`/member/quy/chu-tich/thu-chi?entry=${row.id}`}
+            title="Sửa dòng này"
+            className="p-1 text-gray-400 hover:text-goda-navy"
+          >
+            <Pencil className="size-4" />
+          </Link>
+          <button type="button" onClick={() => onDelete(row)} title="Xoá dòng này" className="p-1 text-gray-400 hover:text-red-600">
+            <Trash2 className="size-4" />
+          </button>
+        </span>
       )}
     </li>
   );
@@ -253,12 +259,15 @@ export function DetailSheet({
   onOpen,
   onBack,
   onClose,
+  canEdit = false,
 }: {
   report: FinanceReport;
   stack: Detail[];
   onOpen: OpenDetail;
   onBack: () => void;
   onClose: () => void;
+  /** Chủ tịch, đang xem số liệu thật → hiện nút sửa */
+  canEdit?: boolean;
 }) {
   const detail = stack[stack.length - 1];
 
@@ -312,7 +321,11 @@ export function DetailSheet({
   } else if (detail.kind === "bill") {
     const bill = report.bills.find((b) => b.id === detail.billId);
     title = bill?.title ?? "Khoản thu";
-    body = bill ? <BillDetail bill={bill} onOpen={onOpen} /> : <p className="p-4 text-sm text-gray-500">Không tìm thấy khoản thu.</p>;
+    body = bill ? (
+      <BillDetail bill={bill} onOpen={onOpen} canEdit={canEdit} />
+    ) : (
+      <p className="p-4 text-sm text-gray-500">Không tìm thấy khoản thu.</p>
+    );
   } else {
     const member = report.members.find((m) => m.memberId === detail.memberId);
     title = member?.name ?? "Thành viên";
@@ -381,7 +394,7 @@ export function DetailSheet({
   );
 }
 
-function BillDetail({ bill, onOpen }: { bill: BillProgress; onOpen: OpenDetail }) {
+function BillDetail({ bill, onOpen, canEdit }: { bill: BillProgress; onOpen: OpenDetail; canEdit: boolean }) {
   const groups: [ItemStatus, string][] = [
     ["da_dong", "Đã đóng"],
     ["cho_duyet", "Chờ duyệt"],
@@ -398,6 +411,15 @@ function BillDetail({ bill, onOpen }: { bill: BillProgress; onOpen: OpenDetail }
           {bill.paidCount}/{bill.memberCount} người đã đóng · Tạo {formatIsoDate(bill.createdAt)}
           {bill.dueDate && ` · Hạn ${bill.dueDate}`}
         </p>
+        {canEdit && (
+          <Link
+            href={`/member/quy/chu-tich/thu-chi?bill=${bill.id}`}
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-goda-navy ring-1 ring-goda-navy/20 hover:bg-goda-navy/5"
+          >
+            <Pencil className="size-4" />
+            Sửa khoản thu
+          </Link>
+        )}
       </div>
       {groups.map(([status, label]) => {
         const items = bill.items.filter((it) => it.status === status);

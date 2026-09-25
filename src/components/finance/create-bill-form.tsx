@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, RotateCcw } from "lucide-react";
+import { ChevronDown, Lock, RotateCcw, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,12 +26,24 @@ interface RowState {
   amount?: string;
 }
 
+interface BillForEdit {
+  id: string;
+  kind: Kind;
+  title: string;
+  period: string; // YYYY-MM
+  amountPerMember: number;
+  dueDate: string | null; // DD/MM/YYYY
+  items: { memberId: string; amount: number; status: string }[];
+}
+
 const now = new Date();
-const YEARS = [now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1];
 const selectClass =
   "h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
-export function CreateBillForm() {
+const LOCK_LABEL: Record<string, string> = { da_dong: "Đã đóng", cho_duyet: "Chờ duyệt" };
+
+/** Tạo khoản thu mới, hoặc sửa khoản đang có khi truyền `editId`. */
+export function CreateBillForm({ editId, onDone }: { editId?: string; onDone?: () => void }) {
   const router = useRouter();
   const [kind, setKind] = useState<Kind>("quy_thang");
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -41,18 +53,46 @@ export function CreateBillForm() {
   const [dueDate, setDueDate] = useState(""); // YYYY-MM-DD từ ô chọn ngày
   const [members, setMembers] = useState<FinanceMember[] | null>(null);
   const [rows, setRows] = useState<Record<string, RowState>>({});
+  /** memberId → trạng thái, với người đã đóng / chờ duyệt (không sửa được) */
+  const [locked, setLocked] = useState<Map<string, string>>(new Map());
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/finance/members")
-      .then((r) => r.json())
-      .then((list: FinanceMember[]) => {
-        setMembers(list);
+    const membersReq = fetch("/api/finance/members").then((r) => r.json() as Promise<FinanceMember[]>);
+    const billReq = editId ? fetch(`/api/finance/bills/${editId}`).then((r) => r.json() as Promise<BillForEdit>) : null;
+    Promise.all([membersReq, billReq]).then(([list, bill]) => {
+      if (!Array.isArray(list)) return setError("Không tải được danh sách thành viên");
+      if (!bill) {
         setRows(Object.fromEntries(list.map((m) => [m.id, { checked: true }])));
-      });
-  }, []);
+        setMembers(list);
+        return;
+      }
+      if (!bill.items) return setError("Không tìm thấy khoản thu");
+      const [y, m] = bill.period.split("-").map(Number);
+      setKind(bill.kind);
+      setYear(y);
+      setMonth(m);
+      setTitle(bill.kind === "khac" ? bill.title : "");
+      setAmount(String(bill.amountPerMember));
+      setDueDate(bill.dueDate ? bill.dueDate.split("/").reverse().join("-") : "");
+      const items = new Map(bill.items.map((it) => [it.memberId, it]));
+      setLocked(new Map(bill.items.filter((it) => it.status !== "chua_dong").map((it) => [it.memberId, it.status])));
+      setRows(
+        Object.fromEntries(
+          list.map((mb) => {
+            const it = items.get(mb.id);
+            const custom = it && (it.status !== "chua_dong" || it.amount !== bill.amountPerMember);
+            return [mb.id, { checked: !!it, amount: custom ? String(it.amount) : undefined }];
+          })
+        )
+      );
+      // Mở sẵn danh sách khi sửa — thường là để sửa người
+      setExpanded(true);
+      setMembers(list);
+    });
+  }, [editId]);
 
   // id → lý do được miễn (chỉ áp dụng cho quỹ tháng)
   const exempt = useMemo(() => {
@@ -66,19 +106,22 @@ export function CreateBillForm() {
     return map;
   }, [kind, members, year, month]);
 
-  const isChecked = (id: string) => !exempt.has(id) && (rows[id]?.checked ?? false);
+  const isLocked = (id: string) => locked.has(id);
+  const isExempt = (id: string) => !isLocked(id) && exempt.has(id);
+  const isChecked = (id: string) => isLocked(id) || (!exempt.has(id) && (rows[id]?.checked ?? false));
   const amountOf = (id: string) => rows[id]?.amount ?? amount;
 
   const selected = (members ?? []).filter((m) => isChecked(m.id));
   const total = selected.reduce((s, m) => s + (Number(amountOf(m.id)) || 0), 0);
-  const selectable = (members ?? []).filter((m) => !exempt.has(m.id));
+  const selectable = (members ?? []).filter((m) => !isExempt(m.id) && !isLocked(m.id));
+  const selectedSelectable = selectable.filter((m) => isChecked(m.id));
 
   function updateRow(id: string, patch: Partial<RowState>) {
     setRows((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
   }
 
   function setAll(checked: boolean) {
-    setRows((prev) => Object.fromEntries(Object.entries(prev).map(([id, r]) => [id, { ...r, checked }])));
+    setRows((prev) => Object.fromEntries(Object.entries(prev).map(([id, r]) => [id, locked.has(id) ? r : { ...r, checked }])));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -95,8 +138,8 @@ export function CreateBillForm() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/finance/bills", {
-        method: "POST",
+      const res = await fetch(editId ? `/api/finance/bills/${editId}` : "/api/finance/bills", {
+        method: editId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           kind,
@@ -111,22 +154,46 @@ export function CreateBillForm() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error || "Không tạo được khoản thu");
+        setError(json.error || (editId ? "Không lưu được thay đổi" : "Không tạo được khoản thu"));
         setLoading(false);
         return;
       }
-      router.push("/member/quy/bao-cao");
+      if (onDone) onDone();
+      else router.push("/member/quy/bao-cao");
     } catch {
       setError("Lỗi kết nối, vui lòng thử lại");
       setLoading(false);
     }
   }
 
+  async function handleDelete() {
+    if (!editId) return;
+    const name = kind === "quy_thang" ? `Quỹ tháng ${String(month).padStart(2, "0")}/${year}` : title;
+    if (!confirm(`Xoá khoản thu "${name}"? Khoản này sẽ biến mất khỏi danh sách cần đóng của mọi người.`)) return;
+    setLoading(true);
+    const res = await fetch(`/api/finance/bills/${editId}`, { method: "DELETE" });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(json.error || "Không xoá được");
+      setLoading(false);
+      return;
+    }
+    if (onDone) onDone();
+    else router.push("/member/quy/bao-cao");
+  }
+
+  const years = [...new Set([now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1, year])].sort();
+
   return (
     <div>
       <Card>
         <CardHeader>
-          <CardTitle>Tạo khoản thu thành viên</CardTitle>
+          <CardTitle>{editId ? "Sửa khoản thu" : "Tạo khoản thu thành viên"}</CardTitle>
+          {editId && locked.size > 0 && (
+            <p className="text-sm text-gray-500">
+              {locked.size} người đã đóng hoặc đang chờ duyệt — giữ nguyên, không bỏ ra hay đổi tiền được.
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -136,30 +203,36 @@ export function CreateBillForm() {
               </Alert>
             )}
 
-            <div className="space-y-2">
-              <Label>Loại thu</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {(
-                  [
-                    ["quy_thang", "Quỹ tháng"],
-                    ["khac", "Khác"],
-                  ] as const
-                ).map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setKind(value)}
-                    className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                      kind === value
-                        ? "border-goda-navy bg-goda-navy text-white"
-                        : "border-border bg-white text-goda-navy hover:bg-goda-navy/5"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
+            {editId ? (
+              <p className="text-sm text-gray-600">
+                Loại thu: <strong>{kind === "quy_thang" ? "Quỹ tháng" : "Khác"}</strong>
+              </p>
+            ) : (
+              <div className="space-y-2">
+                <Label>Loại thu</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(
+                    [
+                      ["quy_thang", "Quỹ tháng"],
+                      ["khac", "Khác"],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setKind(value)}
+                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                        kind === value
+                          ? "border-goda-navy bg-goda-navy text-white"
+                          : "border-border bg-white text-goda-navy hover:bg-goda-navy/5"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {kind === "khac" && (
               <div className="space-y-2">
@@ -188,7 +261,7 @@ export function CreateBillForm() {
               <div className="space-y-2">
                 <Label htmlFor="year">Năm</Label>
                 <select id="year" value={year} onChange={(e) => setYear(Number(e.target.value))} className={selectClass}>
-                  {YEARS.map((y) => (
+                  {years.map((y) => (
                     <option key={y} value={y}>
                       {y}
                     </option>
@@ -236,9 +309,9 @@ export function CreateBillForm() {
                       <input
                         type="checkbox"
                         className="size-4"
-                        checked={selectable.length > 0 && selected.length === selectable.length}
+                        checked={selectable.length > 0 && selectedSelectable.length === selectable.length}
                         ref={(el) => {
-                          if (el) el.indeterminate = selected.length > 0 && selected.length < selectable.length;
+                          if (el) el.indeterminate = selectedSelectable.length > 0 && selectedSelectable.length < selectable.length;
                         }}
                         onChange={(e) => setAll(e.target.checked)}
                       />
@@ -251,40 +324,47 @@ export function CreateBillForm() {
                   ) : (
                     <ul className="max-h-96 overflow-y-auto divide-y divide-border/60">
                       {members.map((m) => {
-                        const isExempt = exempt.has(m.id);
+                        const exemptRow = isExempt(m.id);
+                        const lockedRow = isLocked(m.id);
                         const checked = isChecked(m.id);
                         const custom = rows[m.id]?.amount !== undefined;
                         return (
-                          <li key={m.id} className={`flex items-center gap-3 px-3 py-2 ${isExempt ? "opacity-60" : ""}`}>
+                          <li key={m.id} className={`flex items-center gap-3 px-3 py-2 ${exemptRow ? "opacity-60" : ""}`}>
                             <label className="flex flex-1 min-w-0 items-center gap-2 cursor-pointer">
                               <input
                                 type="checkbox"
                                 className="size-4 shrink-0"
                                 checked={checked}
-                                disabled={isExempt}
+                                disabled={exemptRow || lockedRow}
                                 onChange={(e) => updateRow(m.id, { checked: e.target.checked })}
                               />
                               <span className="truncate text-sm">{m.name}</span>
-                              {isExempt && (
+                              {exemptRow && (
                                 <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700">
                                   Miễn · {exempt.get(m.id)}
                                 </span>
                               )}
+                              {lockedRow && (
+                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+                                  <Lock className="size-3" />
+                                  {LOCK_LABEL[locked.get(m.id)!]}
+                                </span>
+                              )}
                             </label>
-                            {!isExempt && (
+                            {!exemptRow && (
                               <div className="flex items-center gap-1">
                                 <MoneyInput
                                   aria-label={`Số tiền của ${m.name}`}
                                   value={amountOf(m.id)}
                                   onChange={(v) => updateRow(m.id, { amount: v })}
-                                  disabled={!checked}
-                                  className={`h-7 w-32 ${custom ? "border-amber-400 bg-amber-50" : ""}`}
+                                  disabled={!checked || lockedRow}
+                                  className={`h-7 w-32 ${custom && !lockedRow ? "border-amber-400 bg-amber-50" : ""}`}
                                 />
                                 <button
                                   type="button"
                                   title="Về số tiền chung"
                                   onClick={() => updateRow(m.id, { amount: undefined })}
-                                  className={`p-1 text-gray-400 hover:text-goda-navy ${custom ? "" : "invisible"}`}
+                                  className={`p-1 text-gray-400 hover:text-goda-navy ${custom && !lockedRow ? "" : "invisible"}`}
                                 >
                                   <RotateCcw className="size-3.5" />
                                 </button>
@@ -300,8 +380,30 @@ export function CreateBillForm() {
             </div>
 
             <Button type="submit" disabled={loading || members === null} className="w-full bg-goda-navy hover:bg-goda-navy/90">
-              {loading ? "Đang tạo..." : `Tạo khoản thu · ${formatVnd(total)}`}
+              {loading ? "Đang lưu..." : editId ? `Lưu thay đổi · ${formatVnd(total)}` : `Tạo khoản thu · ${formatVnd(total)}`}
             </Button>
+            {editId && (
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                {onDone && (
+                  <button type="button" onClick={onDone} className="text-sm text-gray-600 underline">
+                    Huỷ, không sửa nữa
+                  </button>
+                )}
+                {locked.size === 0 ? (
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={loading}
+                    className="ml-auto inline-flex items-center gap-1 text-sm text-red-600 hover:underline"
+                  >
+                    <Trash2 className="size-4" />
+                    Xoá khoản thu này
+                  </button>
+                ) : (
+                  <span className="ml-auto text-xs text-gray-400">Đã có người đóng nên không xoá được</span>
+                )}
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>

@@ -25,6 +25,12 @@ export async function POST(
   if (!intent || intent.memberId !== session.memberId) {
     return NextResponse.json({ error: "Không tìm thấy mã thanh toán" }, { status: 404 });
   }
+  if (intent.status === "da_huy") {
+    return NextResponse.json(
+      { error: "Chủ tịch vừa sửa khoản cần đóng nên mã QR này đã huỷ — vui lòng quay lại trang Quỹ CLB và tạo mã QR mới" },
+      { status: 400 }
+    );
+  }
   if (intent.status !== "cho_bien_lai") {
     return NextResponse.json(
       { error: "Mã thanh toán này đã có ảnh bill hoặc không còn hợp lệ" },

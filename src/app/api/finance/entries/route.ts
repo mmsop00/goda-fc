@@ -7,8 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireChairman } from "@/lib/finance-auth";
-import { isValidCategory } from "@/lib/finance/categories";
-import { isValidPeriod } from "@/lib/finance/format";
+import { parseEntryInput } from "@/lib/finance/inputs";
 
 export const dynamic = "force-dynamic";
 
@@ -26,27 +25,9 @@ export async function POST(request: NextRequest) {
   if (error) return error;
 
   try {
-    const body = await request.json();
-    const direction = body.direction;
-    if (direction !== "thu" && direction !== "chi") return bad("Loại không hợp lệ");
-    const category = String(body.category ?? "");
-    if (!isValidCategory(direction, category)) return bad("Vui lòng chọn hạng mục");
-    const title = typeof body.title === "string" ? body.title.trim() : "";
-    if (!title) return bad("Vui lòng nhập nội dung");
-    if (title.length > 120) return bad("Nội dung quá dài");
-    const amount = body.amount;
-    if (typeof amount !== "number" || !Number.isInteger(amount) || amount <= 0 || amount > 1_000_000_000) {
-      return bad("Số tiền không hợp lệ");
-    }
-    const date = String(body.date ?? "");
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) return bad("Ngày không hợp lệ");
-    const period = body.period ? String(body.period) : date.slice(0, 7);
-    if (!isValidPeriod(period)) return bad("Tháng áp dụng không hợp lệ");
-    const note = typeof body.note === "string" && body.note.trim() ? body.note.trim().slice(0, 500) : null;
-
-    const entry = await prisma.fundEntry.create({
-      data: { direction, category, title, amount, date, period, note, createdByMemberId: session.memberId },
-    });
+    const parsed = parseEntryInput(await request.json());
+    if (!parsed.ok) return bad(parsed.error);
+    const entry = await prisma.fundEntry.create({ data: { ...parsed.value, createdByMemberId: session.memberId } });
     return NextResponse.json(entry, { status: 201 });
   } catch (e) {
     console.error("POST /api/finance/entries error:", e);
