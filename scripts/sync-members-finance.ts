@@ -10,10 +10,16 @@
 // Chạy 1 lần: npx tsx scripts/sync-members-finance.ts
 // ═══════════════════════════════════════
 
+import { readFileSync } from "fs";
+import { join } from "path";
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { MOCK_MEMBERS } from "../src/lib/mock-data";
-import phoneMapJson from "./name_phone_map.json";
+
+// Số điện thoại cá nhân — file chỉ nằm trên máy, KHÔNG commit (repo public).
+const phoneMapJson = JSON.parse(
+  readFileSync(join(__dirname, "name_phone_map.json"), "utf8")
+);
 
 const prisma = new PrismaClient();
 
