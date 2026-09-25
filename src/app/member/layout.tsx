@@ -1,61 +1,45 @@
-import Link from "next/link";
 import { auth } from "@/auth";
 import { MemberLogoutButton } from "./member-logout-button";
 import { MemberSessionProvider } from "./member-session-provider";
+import { MemberTabs, type TabItem } from "./member-tabs";
 
-export default async function MemberLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Các tính năng của khu thành viên — thêm tính năng mới thì thêm 1 tab ở đây.
+const TABS: TabItem[] = [
+  { label: "Quỹ CLB", href: "/member/quy" },
+  { label: "Tài khoản", href: "/member/doi-mat-khau" },
+];
+
+export default async function MemberLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
-  const user = session?.user;
-  const isChairman = user?.kind === "member" && user?.financeRole === "chairman";
+  const user = session?.user?.kind === "member" ? session.user : null;
+  const isChairman = user?.financeRole === "chairman";
 
   return (
     <MemberSessionProvider session={session}>
-    <div className="min-h-screen flex flex-col bg-goda-soft-gray">
-      <header className="bg-goda-navy text-white px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-4">
-          <Link href="/member" className="font-display font-bold text-lg whitespace-nowrap">
-            ⚽ Quỹ GODA FC
-          </Link>
-          {user?.kind === "member" && (
-            <nav className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-              <Link href="/member" className="hover:underline">
-                Tổng quan
-              </Link>
-              {isChairman && (
-                <>
-                  <Link href="/member/chu-tich" className="hover:underline">
-                    Chi tiết CLB
-                  </Link>
-                  <Link href="/member/chu-tich/duyet" className="hover:underline">
-                    Duyệt đóng tiền
-                  </Link>
-                  <Link href="/member/chu-tich/tao-khoan-thu" className="hover:underline">
-                    Tạo khoản thu
-                  </Link>
-                </>
-              )}
-              <Link href="/member/doi-mat-khau" className="hover:underline">
-                Đổi mật khẩu
-              </Link>
-            </nav>
-          )}
-        </div>
-        {user?.kind === "member" && (
-          <div className="flex items-center gap-3 text-sm">
-            <span className="whitespace-nowrap">
-              {user.name}
-              {isChairman && " (Chủ tịch)"}
-            </span>
-            <MemberLogoutButton />
-          </div>
+      <div className="min-h-screen flex flex-col bg-goda-soft-gray">
+        {user && (
+          <header className="bg-goda-navy text-white">
+            <div className="max-w-5xl mx-auto px-4 pt-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-white/60">Khu thành viên</p>
+                <p className="font-display font-bold text-lg">
+                  {user.name}
+                  {isChairman && (
+                    <span className="ml-2 rounded-full bg-goda-yellow px-2 py-0.5 text-xs font-semibold text-goda-navy align-middle">
+                      Chủ tịch
+                    </span>
+                  )}
+                </p>
+              </div>
+              <MemberLogoutButton />
+            </div>
+            <div className="max-w-5xl mx-auto px-2 mt-2">
+              {!user.mustChangePassword && <MemberTabs items={TABS} />}
+            </div>
+          </header>
         )}
-      </header>
-      <main className="flex-1">{children}</main>
-    </div>
+        <main className="flex-1">{children}</main>
+      </div>
     </MemberSessionProvider>
   );
 }

@@ -38,7 +38,7 @@ export default function CreateBillPage() {
         return;
       }
       setSuccess(true);
-      setTimeout(() => router.push("/member/chu-tich"), 1000);
+      setTimeout(() => router.push("/member/quy/chu-tich"), 1000);
     } catch {
       setError("Lỗi kết nối, vui lòng thử lại");
       setLoading(false);

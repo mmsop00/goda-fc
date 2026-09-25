@@ -32,8 +32,8 @@ export default auth((req) => {
     if (user.mustChangePassword && pathname !== "/member/doi-mat-khau") {
       return NextResponse.redirect(new URL("/member/doi-mat-khau", base));
     }
-    if (pathname.startsWith("/member/chu-tich") && user.financeRole !== "chairman") {
-      return NextResponse.redirect(new URL("/member", base));
+    if (pathname.startsWith("/member/quy/chu-tich") && user.financeRole !== "chairman") {
+      return NextResponse.redirect(new URL("/member/quy", base));
     }
   }
 });

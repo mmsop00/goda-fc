@@ -7,6 +7,7 @@
 import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,7 +48,7 @@ function LoginForm() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center pb-2">
           <CardTitle className="text-2xl font-display text-goda-navy">
-            ⚽ Cổng Thành viên GODA FC
+            ⚽ Đăng nhập GODA FC
           </CardTitle>
           <p className="text-sm text-gray-500 mt-1">
             Đăng nhập bằng số điện thoại — mật khẩu mặc định lần đầu: 123456
@@ -90,6 +91,12 @@ function LoginForm() {
               {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
           </form>
+          <p className="mt-4 text-center text-xs text-gray-500">
+            Quản trị nội dung website?{" "}
+            <Link href="/login" className="text-goda-navy underline">
+              Đăng nhập bằng email
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

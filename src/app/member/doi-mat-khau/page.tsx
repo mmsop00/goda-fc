@@ -121,7 +121,8 @@ export default function ChangePasswordPage() {
                   className="w-full"
                   onClick={async () => {
                     await signOut({ redirect: false });
-                    window.location.href = "/member/login";
+                    router.push("/member/login");
+                    router.refresh();
                   }}
                 >
                   Đăng xuất

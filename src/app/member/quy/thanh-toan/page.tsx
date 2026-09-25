@@ -27,7 +27,7 @@ function PaymentContent() {
         <Alert variant="destructive">
           <AlertDescription>Thiếu thông tin mã thanh toán. Vui lòng quay lại trang tổng quan.</AlertDescription>
         </Alert>
-        <Button className="mt-4" onClick={() => router.push("/member")}>
+        <Button className="mt-4" onClick={() => router.push("/member/quy")}>
           Quay lại
         </Button>
       </div>
@@ -79,7 +79,7 @@ function PaymentContent() {
                 </AlertDescription>
               </Alert>
             )}
-            <Button onClick={() => router.push("/member")} className="w-full bg-goda-navy hover:bg-goda-navy/90">
+            <Button onClick={() => router.push("/member/quy")} className="w-full bg-goda-navy hover:bg-goda-navy/90">
               Về trang tổng quan
             </Button>
           </CardContent>
