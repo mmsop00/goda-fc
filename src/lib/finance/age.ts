@@ -27,8 +27,18 @@ export function ageAtEndOfMonth(birthday: string | null | undefined, year: numbe
   return age;
 }
 
-/** Từ 70 tuổi trở lên (tính tới cuối tháng thu) được miễn quỹ tháng. */
-export function isMonthlyFundExempt(birthday: string | null | undefined, year: number, month: number): boolean {
-  const age = ageAtEndOfMonth(birthday, year, month);
-  return age !== null && age >= MONTHLY_FUND_EXEMPT_AGE;
+/** Được CLB miễn quỹ tháng dù chưa đủ 70 tuổi (theo quyết định của CLB). */
+const MONTHLY_FUND_EXEMPT_NAMES = new Set(["Nguyễn Tiến Dũng"]);
+
+/** Lý do được miễn quỹ tháng ("71 tuổi" / "CLB miễn"), hoặc null nếu phải đóng.
+ * Từ 70 tuổi trở lên (tính tới cuối tháng thu) được miễn. */
+export function monthlyFundExemption(
+  member: { name: string; birthday: string | null | undefined },
+  year: number,
+  month: number
+): string | null {
+  const age = ageAtEndOfMonth(member.birthday, year, month);
+  if (age !== null && age >= MONTHLY_FUND_EXEMPT_AGE) return `${age} tuổi`;
+  if (MONTHLY_FUND_EXEMPT_NAMES.has(member.name)) return "CLB miễn";
+  return null;
 }

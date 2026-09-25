@@ -11,7 +11,7 @@ import { prisma } from "@/lib/prisma";
 import { requireChairman } from "@/lib/finance-auth";
 import { createBill } from "@/lib/finance/status";
 import { getFinanceMembers } from "@/lib/finance/members";
-import { isMonthlyFundExempt } from "@/lib/finance/age";
+import { monthlyFundExemption } from "@/lib/finance/age";
 
 export const dynamic = "force-dynamic";
 
@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
       const member = members.get(it?.memberId);
       if (!member || seen.has(member.id)) return bad("Danh sách thành viên không hợp lệ");
       if (!isValidAmount(it.amount)) return bad(`Số tiền của ${member.name} không hợp lệ`);
-      if (kind === "quy_thang" && isMonthlyFundExempt(member.birthday, year, month)) {
-        return bad(`${member.name} từ 70 tuổi trở lên, được miễn quỹ tháng`);
+      if (kind === "quy_thang" && monthlyFundExemption(member, year, month)) {
+        return bad(`${member.name} được miễn quỹ tháng`);
       }
       seen.add(member.id);
       items.push({ memberId: member.id, amount: it.amount });

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { formatThousands, formatVnd, onlyDigits } from "@/lib/finance/format";
-import { ageAtEndOfMonth, isMonthlyFundExempt, MONTHLY_FUND_EXEMPT_AGE } from "@/lib/finance/age";
+import { monthlyFundExemption } from "@/lib/finance/age";
 
 type Kind = "quy_thang" | "khac";
 
@@ -72,12 +72,16 @@ export default function CreateBillPage() {
       });
   }, []);
 
+  // id → lý do được miễn (chỉ áp dụng cho quỹ tháng)
   const exempt = useMemo(() => {
-    const set = new Set<string>();
+    const map = new Map<string, string>();
     if (kind === "quy_thang") {
-      for (const m of members ?? []) if (isMonthlyFundExempt(m.birthday, year, month)) set.add(m.id);
+      for (const m of members ?? []) {
+        const reason = monthlyFundExemption(m, year, month);
+        if (reason) map.set(m.id, reason);
+      }
     }
-    return set;
+    return map;
   }, [kind, members, year, month]);
 
   const isChecked = (id: string) => !exempt.has(id) && (rows[id]?.checked ?? false);
@@ -232,7 +236,7 @@ export default function CreateBillPage() {
                   </p>
                   <p className="text-xs text-gray-500">
                     Tổng dự kiến: <strong>{formatVnd(total)}</strong>
-                    {exempt.size > 0 && ` · ${exempt.size} người miễn (từ ${MONTHLY_FUND_EXEMPT_AGE} tuổi)`}
+                    {exempt.size > 0 && ` · ${exempt.size} người được miễn quỹ tháng`}
                   </p>
                 </div>
                 <span className="flex items-center gap-1 text-xs font-medium text-goda-navy whitespace-nowrap">
@@ -279,7 +283,7 @@ export default function CreateBillPage() {
                               <span className="truncate text-sm">{m.name}</span>
                               {isExempt && (
                                 <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700">
-                                  Miễn · {ageAtEndOfMonth(m.birthday, year, month)} tuổi
+                                  Miễn · {exempt.get(m.id)}
                                 </span>
                               )}
                             </label>
