@@ -2,7 +2,7 @@
 // GODA FC — Khoản thu (Bill)
 // GET  /api/finance/bills  → chủ tịch: danh sách khoản thu đã tạo
 // POST /api/finance/bills  → chủ tịch: tạo khoản thu cho các thành viên được chọn
-//   { kind: "quy_thang", month, year } | { kind: "khac", title }
+//   { kind: "quy_thang", month, year } | { kind: "khac", title, period: YYYY-MM }
 //   + amountPerMember, dueDate? (DD/MM/YYYY), items: [{ memberId, amount }]
 // ═══════════════════════════════════════
 
@@ -12,6 +12,7 @@ import { requireChairman } from "@/lib/finance-auth";
 import { createBill } from "@/lib/finance/status";
 import { getFinanceMembers } from "@/lib/finance/members";
 import { monthlyFundExemption } from "@/lib/finance/age";
+import { isValidPeriod } from "@/lib/finance/format";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +62,8 @@ export async function POST(request: NextRequest) {
       title = typeof body.title === "string" ? body.title.trim() : "";
       if (!title) return bad("Vui lòng nhập tên khoản thu");
       if (title.length > 120) return bad("Tên khoản thu quá dài");
+      period = String(body.period ?? "");
+      if (!isValidPeriod(period)) return bad("Vui lòng chọn tháng áp dụng");
     }
 
     const amountPerMember = body.amountPerMember;

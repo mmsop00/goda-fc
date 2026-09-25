@@ -110,7 +110,7 @@ model Bill {
   id                String   @id @default(cuid())
   title             String
   kind              String   @default("khac") // quy_thang | khac
-  period            String?  // YYYY-MM — chỉ với quỹ tháng, chặn tạo trùng tháng
+  period            String?  // YYYY-MM — tháng áp dụng (báo cáo theo kỳ); quỹ tháng dùng để chặn tạo trùng
   amountPerMember   Int      // số tiền mặc định; từng người có thể khác (PaymentItem.amount)
   dueDate           String?  // DD/MM/YYYY
   createdByMemberId String
@@ -128,7 +128,8 @@ model FundEntry {
   category          String   // xem src/lib/finance/categories.ts
   title             String
   amount            Int
-  date              String   // YYYY-MM-DD — ngày phát sinh (giờ VN)
+  date              String   // YYYY-MM-DD — ngày tiền thực vào/ra (báo cáo theo dòng tiền)
+  period            String?  // YYYY-MM — tháng áp dụng (báo cáo theo kỳ); trống = tháng của `date`
   note              String?
   createdByMemberId String
   createdAt         DateTime @default(now())

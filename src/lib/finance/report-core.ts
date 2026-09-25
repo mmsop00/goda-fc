@@ -9,6 +9,8 @@ export interface RawBill {
   id: string;
   title: string;
   kind: string; // quy_thang | khac
+  /** YYYY-MM tháng áp dụng; null (dữ liệu cũ) = tháng tạo */
+  period: string | null;
   dueDate: string | null;
   createdAt: string; // YYYY-MM-DD giờ VN
   items: { memberId: string; amount: number; status: string; paidDate: string | null }[];
@@ -21,12 +23,17 @@ export interface RawEntry {
   title: string;
   amount: number;
   date: string; // YYYY-MM-DD
+  /** YYYY-MM tháng áp dụng; null = tháng của `date` */
+  period: string | null;
   note: string | null;
 }
 
 export interface LedgerRow {
   id: string;
-  date: string; // YYYY-MM-DD giờ VN
+  /** YYYY-MM-DD — ngày tiền thực vào/ra (báo cáo theo dòng tiền) */
+  date: string;
+  /** YYYY-MM — tháng khoản này thuộc về (báo cáo theo kỳ áp dụng) */
+  period: string;
   direction: Direction;
   /** "dong_quy" = thành viên đóng qua cổng; "so_quy" = chủ tịch ghi tay (xoá được) */
   source: "dong_quy" | "so_quy";
@@ -51,6 +58,7 @@ export interface BillMemberItem {
 export interface BillProgress {
   id: string;
   title: string;
+  period: string;
   dueDate: string | null;
   createdAt: string;
   expected: number;
@@ -92,6 +100,7 @@ export function buildReport(members: { id: string; name: string }[], bills: RawB
     const p: BillProgress = {
       id: bill.id,
       title: bill.title,
+      period: bill.period ?? bill.createdAt.slice(0, 7),
       dueDate: bill.dueDate,
       createdAt: bill.createdAt,
       expected: 0,
@@ -115,6 +124,7 @@ export function buildReport(members: { id: string; name: string }[], bills: RawB
         ledger.push({
           id: `${bill.id}:${item.memberId}`,
           date: item.paidDate ?? bill.createdAt,
+          period: p.period,
           direction: "thu",
           source: "dong_quy",
           billId: bill.id,
@@ -143,6 +153,7 @@ export function buildReport(members: { id: string; name: string }[], bills: RawB
     ledger.push({
       id: e.id,
       date: e.date,
+      period: e.period ?? e.date.slice(0, 7),
       direction,
       source: "so_quy",
       billId: null,

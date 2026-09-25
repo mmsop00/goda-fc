@@ -103,6 +103,7 @@ export function CreateBillForm() {
           month,
           year,
           title,
+          period: `${year}-${String(month).padStart(2, "0")}`,
           amountPerMember: Number(amount),
           dueDate: dueDate ? dueDate.split("-").reverse().join("/") : undefined,
           items: selected.map((m) => ({ memberId: m.id, amount: Number(amountOf(m.id)) })),
@@ -160,30 +161,7 @@ export function CreateBillForm() {
               </div>
             </div>
 
-            {kind === "quy_thang" ? (
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="month">Tháng</Label>
-                  <select id="month" value={month} onChange={(e) => setMonth(Number(e.target.value))} className={selectClass}>
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                      <option key={m} value={m}>
-                        Tháng {m}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="year">Năm</Label>
-                  <select id="year" value={year} onChange={(e) => setYear(Number(e.target.value))} className={selectClass}>
-                    {YEARS.map((y) => (
-                      <option key={y} value={y}>
-                        {y}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            ) : (
+            {kind === "khac" && (
               <div className="space-y-2">
                 <Label htmlFor="title">Tên khoản thu</Label>
                 <Input
@@ -194,6 +172,30 @@ export function CreateBillForm() {
                 />
               </div>
             )}
+
+            {/* Tháng áp dụng: báo cáo "theo kỳ" tính khoản này vào tháng này dù đóng lúc nào */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="month">{kind === "quy_thang" ? "Quỹ của tháng" : "Tháng áp dụng"}</Label>
+                <select id="month" value={month} onChange={(e) => setMonth(Number(e.target.value))} className={selectClass}>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                    <option key={m} value={m}>
+                      Tháng {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="year">Năm</Label>
+                <select id="year" value={year} onChange={(e) => setYear(Number(e.target.value))} className={selectClass}>
+                  {YEARS.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-2">

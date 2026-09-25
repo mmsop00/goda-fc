@@ -13,6 +13,18 @@ export function formatCompactVnd(n: number): string {
   return `${sign}${abs}`;
 }
 
+/** Tháng áp dụng dạng "YYYY-MM" */
+export function isValidPeriod(p: string): boolean {
+  const m = /^(\d{4})-(\d{2})$/.exec(p);
+  return !!m && +m[1] >= 2020 && +m[1] <= 2100 && +m[2] >= 1 && +m[2] <= 12;
+}
+
+/** "2026-10" → "10/2026" */
+export function formatPeriod(p: string): string {
+  const [y, m] = p.split("-");
+  return `${m}/${y}`;
+}
+
 /** "2026-10-05" → "05/10/2026" */
 export function formatIsoDate(iso: string): string {
   const [y, m, d] = iso.split("-");

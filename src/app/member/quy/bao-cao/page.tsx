@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { FlaskConical } from "lucide-react";
-import { DetailSheet, Ledger, Members, Overview, Segmented, type Detail } from "@/components/finance/report-views";
+import { DetailSheet, Ledger, Members, Overview, Segmented, type Basis, type Detail } from "@/components/finance/report-views";
 import { buildSampleReport } from "@/lib/finance/sample-report";
 import { formatVnd } from "@/lib/finance/format";
 import type { FinanceReport, LedgerRow } from "@/lib/finance/report-core";
@@ -17,6 +17,7 @@ export default function FinanceReportPage() {
   const [reloading, setReloading] = useState(false);
   const [view, setView] = useState<View>("tong-quan");
   const [sample, setSample] = useState(false);
+  const [basis, setBasis] = useState<Basis>("cash");
   const [stack, setStack] = useState<Detail[]>([]);
   const sampleReport = useMemo(() => (sample ? buildSampleReport() : null), [sample]);
 
@@ -96,10 +97,33 @@ export default function FinanceReportPage() {
         )}
       </div>
 
-      {/* key: đổi thật ↔ mẫu thì bộ lọc về mặc định */}
-      <div key={sample ? "mau" : "that"}>
-        {view === "tong-quan" && <Overview report={data} onOpen={open} />}
-        {view === "so-thu-chi" && <Ledger report={data} onOpen={open} onDelete={isChairman && !sample ? remove : undefined} />}
+      {view !== "thanh-vien" && (
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-gray-600">Cách tính</span>
+            <Segmented<Basis>
+              value={basis}
+              onChange={setBasis}
+              options={[
+                ["cash", "Theo dòng tiền"],
+                ["accrual", "Theo kỳ áp dụng (chuẩn)"],
+              ]}
+            />
+          </div>
+          <p className="text-xs text-gray-500">
+            {basis === "cash"
+              ? "Tính vào tháng tiền thực sự vào/ra quỹ (ngày đóng, ngày chi)."
+              : "Tính vào tháng mà khoản đó thuộc về — vd Quỹ tháng 10 đóng muộn tháng 11 vẫn tính cho tháng 10; tiền sân tháng 9 trả đầu tháng 10 vẫn tính cho tháng 9."}
+          </p>
+        </div>
+      )}
+
+      {/* key: đổi thật ↔ mẫu hoặc đổi cách tính thì bộ lọc về mặc định */}
+      <div key={`${sample ? "mau" : "that"}-${basis}`}>
+        {view === "tong-quan" && <Overview report={data} onOpen={open} basis={basis} />}
+        {view === "so-thu-chi" && (
+          <Ledger report={data} onOpen={open} basis={basis} onDelete={isChairman && !sample ? remove : undefined} />
+        )}
         {view === "thanh-vien" && <Members report={data} onOpen={open} />}
       </div>
 

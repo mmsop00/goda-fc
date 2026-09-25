@@ -33,6 +33,7 @@ export async function getFinanceReport(): Promise<FinanceReport> {
       id: b.id,
       title: b.title,
       kind: b.kind,
+      period: b.period,
       dueDate: b.dueDate,
       createdAt: toVnDate(b.createdAt),
       items: b.items.map((it) => ({

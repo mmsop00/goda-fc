@@ -1,13 +1,14 @@
 // ═══════════════════════════════════════
 // GODA FC — Sổ quỹ ghi tay (chủ tịch)
 // GET  /api/finance/entries → 20 dòng ghi gần nhất
-// POST /api/finance/entries → { direction, category, title, amount, date: YYYY-MM-DD, note? }
+// POST /api/finance/entries → { direction, category, title, amount, date: YYYY-MM-DD, period?: YYYY-MM, note? }
 // ═══════════════════════════════════════
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireChairman } from "@/lib/finance-auth";
 import { isValidCategory } from "@/lib/finance/categories";
+import { isValidPeriod } from "@/lib/finance/format";
 
 export const dynamic = "force-dynamic";
 
@@ -39,10 +40,12 @@ export async function POST(request: NextRequest) {
     }
     const date = String(body.date ?? "");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(date))) return bad("Ngày không hợp lệ");
+    const period = body.period ? String(body.period) : date.slice(0, 7);
+    if (!isValidPeriod(period)) return bad("Tháng áp dụng không hợp lệ");
     const note = typeof body.note === "string" && body.note.trim() ? body.note.trim().slice(0, 500) : null;
 
     const entry = await prisma.fundEntry.create({
-      data: { direction, category, title, amount, date, note, createdByMemberId: session.memberId },
+      data: { direction, category, title, amount, date, period, note, createdByMemberId: session.memberId },
     });
     return NextResponse.json(entry, { status: 201 });
   } catch (e) {

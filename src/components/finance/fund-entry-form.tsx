@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MoneyInput } from "@/components/finance/money-input";
-import { formatIsoDate, formatVnd } from "@/lib/finance/format";
+import { formatIsoDate, formatPeriod, formatVnd } from "@/lib/finance/format";
 import { categoryLabel, EXPENSE_CATEGORIES, INCOME_CATEGORIES, type Direction } from "@/lib/finance/categories";
 
 interface Entry {
@@ -18,8 +18,15 @@ interface Entry {
   title: string;
   amount: number;
   date: string;
+  period: string | null;
   note: string | null;
 }
+
+const monthOf = (isoDate: string) => isoDate.slice(0, 7);
+const prevMonth = (p: string) => {
+  const [y, m] = p.split("-").map(Number);
+  return m === 1 ? `${y - 1}-12` : `${y}-${String(m - 1).padStart(2, "0")}`;
+};
 
 const todayIso = () => {
   const d = new Date();
@@ -32,6 +39,9 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(todayIso);
+  /** null = theo tháng của ngày nhập, cho tới khi người dùng tự chọn */
+  const [period, setPeriod] = useState<string | null>(null);
+  const effectivePeriod = period ?? monthOf(date);
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [saved, setSaved] = useState("");
@@ -61,7 +71,7 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
       const res = await fetch("/api/finance/entries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ direction, category, title, amount: Number(amount), date, note }),
+        body: JSON.stringify({ direction, category, title, amount: Number(amount), date, period: effectivePeriod, note }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -147,9 +157,41 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
                 <MoneyInput id="amount" placeholder="500.000" value={amount} onChange={setAmount} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="date">Ngày</Label>
+                <Label htmlFor="date">{direction === "chi" ? "Ngày chi tiền" : "Ngày nhận tiền"}</Label>
                 <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="period">Tháng áp dụng</Label>
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  id="period"
+                  type="month"
+                  value={effectivePeriod}
+                  onChange={(e) => setPeriod(e.target.value || null)}
+                  className="w-44"
+                  required
+                />
+                {[
+                  ["Tháng này", monthOf(todayIso())],
+                  ["Tháng trước", prevMonth(monthOf(todayIso()))],
+                ].map(([label, p]) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => setPeriod(p)}
+                    className={`rounded-full px-3 py-1 text-xs ring-1 ${
+                      effectivePeriod === p ? "bg-goda-navy text-white ring-goda-navy" : "bg-white text-gray-700 ring-black/10"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">
+                Khoản này thuộc về tháng nào (báo cáo chuẩn tính theo tháng này). Vd: tiền sân tháng 9 trả ngày 02/10 → chọn tháng 9.
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -176,7 +218,7 @@ export function FundEntryForm({ direction }: { direction: Direction }) {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900">{e.title}</p>
                     <p className="text-xs text-gray-500">
-                      {formatIsoDate(e.date)} · {categoryLabel(e.direction, e.category)}
+                      {formatIsoDate(e.date)} · Kỳ {formatPeriod(e.period ?? monthOf(e.date))} · {categoryLabel(e.direction, e.category)}
                     </p>
                   </div>
                   <span

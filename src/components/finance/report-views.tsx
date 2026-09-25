@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatIsoDate, formatVnd } from "@/lib/finance/format";
+import { formatIsoDate, formatPeriod, formatVnd } from "@/lib/finance/format";
 import {
   BalanceChart,
   CategoryBars,
@@ -34,6 +34,11 @@ export type Detail =
 
 type OpenDetail = (d: Detail) => void;
 
+/** cash = theo dòng tiền (ngày tiền thực vào/ra); accrual = theo kỳ áp dụng (tháng khoản đó thuộc về) */
+export type Basis = "cash" | "accrual";
+
+const monthKey = (r: LedgerRow, basis: Basis) => (basis === "cash" ? r.date.slice(0, 7) : r.period);
+
 const selectClass =
   "h-8 rounded-lg border border-input bg-white px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
@@ -48,12 +53,12 @@ function nextMonth(key: string) {
 }
 
 /** Các tháng của kỳ đang xem, kèm thu/chi trong tháng và số dư cuối tháng (tính từ đầu). */
-function buildMonths(ledger: LedgerRow[], year: string): MonthPoint[] {
+function buildMonths(ledger: LedgerRow[], year: string, basis: Basis): MonthPoint[] {
   const nowKey = currentMonthKey();
   let from: string;
   let to: string;
   if (year === "all") {
-    from = ledger.reduce((min, r) => (r.date.slice(0, 7) < min ? r.date.slice(0, 7) : min), nowKey);
+    from = ledger.reduce((min, r) => (monthKey(r, basis) < min ? monthKey(r, basis) : min), nowKey);
     to = nowKey;
   } else {
     from = `${year}-01`;
@@ -61,7 +66,7 @@ function buildMonths(ledger: LedgerRow[], year: string): MonthPoint[] {
   }
   const byMonth = new Map<string, { thu: number; chi: number }>();
   for (const r of ledger) {
-    const k = r.date.slice(0, 7);
+    const k = monthKey(r, basis);
     const m = byMonth.get(k) ?? { thu: 0, chi: 0 };
     m[r.direction] += r.amount;
     byMonth.set(k, m);
@@ -205,7 +210,8 @@ function LedgerItem({
         </span>
         <p className="col-span-2 text-xs text-gray-500">
           {grouped && row.billId ? "Gần nhất " : ""}
-          {formatIsoDate(row.date)} · {row.categoryLabel}
+          {formatIsoDate(row.date)}
+          {row.period !== row.date.slice(0, 7) && ` · Kỳ ${formatPeriod(row.period)}`} · {row.categoryLabel}
           {row.note && ` · ${row.note}`}
         </p>
       </Clickable>
@@ -422,29 +428,31 @@ function BillDetail({ bill, onOpen }: { bill: BillProgress; onOpen: OpenDetail }
 }
 
 // ─── Tổng quan ─────────────────────────────────────────
-export function Overview({ report, onOpen }: { report: FinanceReport; onOpen: OpenDetail }) {
+export function Overview({ report, onOpen, basis }: { report: FinanceReport; onOpen: OpenDetail; basis: Basis }) {
   const years = useMemo(() => {
     const set = new Set([currentMonthKey().slice(0, 4)]);
-    for (const r of report.ledger) set.add(r.date.slice(0, 4));
-    for (const b of report.bills) set.add(b.createdAt.slice(0, 4));
+    for (const r of report.ledger) set.add(monthKey(r, basis).slice(0, 4));
+    for (const b of report.bills) set.add((basis === "cash" ? b.createdAt : b.period).slice(0, 4));
     return [...set].sort().reverse();
-  }, [report]);
+  }, [report, basis]);
   const [year, setYear] = useState(years[0]);
   const [showTable, setShowTable] = useState(false);
   const [showAllBills, setShowAllBills] = useState(false);
 
-  const inPeriod = (date: string) => year === "all" || date.startsWith(year);
-  const rows = report.ledger.filter((r) => inPeriod(r.date));
+  const inPeriod = (key: string) => year === "all" || key.startsWith(year);
+  const rows = report.ledger.filter((r) => inPeriod(monthKey(r, basis)));
   const thu = rows.filter((r) => r.direction === "thu");
   const chi = rows.filter((r) => r.direction === "chi");
   const totalThu = sumOf(rows, "thu");
   const totalChi = sumOf(rows, "chi");
-  const months = buildMonths(report.ledger, year);
-  const bills = report.bills.filter((b) => inPeriod(b.createdAt));
+  const months = buildMonths(report.ledger, year, basis);
+  const bills = report.bills.filter((b) => inPeriod(basis === "cash" ? b.createdAt : b.period));
+  // Theo kỳ: tiền thành viên còn nợ của các khoản thu thuộc kỳ (phải thu)
+  const receivable = bills.reduce((s, b) => s + b.expected - b.collected, 0);
   const periodLabel = year === "all" ? "từ trước tới nay" : `năm ${year}`;
 
   const openMonth = (i: number) =>
-    onOpen({ kind: "rows", title: `Thu chi ${months[i].title.toLowerCase()}`, rows: report.ledger.filter((r) => r.date.startsWith(months[i].key)) });
+    onOpen({ kind: "rows", title: `Thu chi ${months[i].title.toLowerCase()}`, rows: report.ledger.filter((r) => monthKey(r, basis) === months[i].key) });
 
   return (
     <div className="space-y-4">
@@ -485,7 +493,7 @@ export function Overview({ report, onOpen }: { report: FinanceReport; onOpen: Op
         <StatTile
           label={`Tổng thu ${periodLabel}`}
           value={formatVnd(totalThu)}
-          hint={`${thu.length} lượt thu`}
+          hint={basis === "accrual" && receivable > 0 ? `${thu.length} lượt thu · còn phải thu ${formatVnd(receivable)}` : `${thu.length} lượt thu`}
           onClick={() => onOpen({ kind: "rows", title: `Các khoản thu ${periodLabel}`, rows: thu })}
         />
         <StatTile
@@ -524,7 +532,7 @@ export function Overview({ report, onOpen }: { report: FinanceReport; onOpen: Op
                     <th className="py-1.5 pr-2 font-medium">Tháng</th>
                     <th className="py-1.5 px-2 text-right font-medium">Thu</th>
                     <th className="py-1.5 px-2 text-right font-medium">Chi</th>
-                    <th className="py-1.5 pl-2 text-right font-medium">Số dư cuối tháng</th>
+                    <th className="py-1.5 pl-2 text-right font-medium">{basis === "cash" ? "Số dư cuối tháng" : "Lũy kế"}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -545,7 +553,7 @@ export function Overview({ report, onOpen }: { report: FinanceReport; onOpen: Op
 
       <Card>
         <CardHeader>
-          <CardTitle>Số dư quỹ cuối mỗi tháng</CardTitle>
+          <CardTitle>{basis === "cash" ? "Số dư quỹ cuối mỗi tháng" : "Lũy kế thu − chi theo kỳ"}</CardTitle>
         </CardHeader>
         <CardContent>
           <BalanceChart data={months} onSelect={openMonth} />
@@ -628,9 +636,11 @@ export function Ledger({
   report,
   onOpen,
   onDelete,
+  basis,
 }: {
   report: FinanceReport;
   onOpen: OpenDetail;
+  basis: Basis;
   /** Chỉ truyền khi là chủ tịch và đang xem dữ liệu thật */
   onDelete?: (r: LedgerRow) => void;
 }) {
@@ -641,7 +651,7 @@ export function Ledger({
   const [grouped, setGrouped] = useState(true);
   const [limit, setLimit] = useState(40);
 
-  const months = useMemo(() => [...new Set(report.ledger.map((r) => r.date.slice(0, 7)))].sort().reverse(), [report]);
+  const months = useMemo(() => [...new Set(report.ledger.map((r) => monthKey(r, basis)))].sort().reverse(), [report, basis]);
   const categories = useMemo(
     () =>
       [...new Set(report.ledger.filter((r) => direction === "all" || r.direction === direction).map((r) => r.categoryLabel))].sort(),
@@ -653,7 +663,7 @@ export function Ledger({
     (r) =>
       (direction === "all" || r.direction === direction) &&
       (category === "all" || r.categoryLabel === category) &&
-      (month === "all" || r.date.startsWith(month)) &&
+      (month === "all" || monthKey(r, basis) === month) &&
       (!needle || [r.title, r.memberName, r.note, r.categoryLabel].some((s) => s?.toLowerCase().includes(needle)))
   );
   // Đang tìm theo tên thì bỏ gộp để thấy được từng người.
@@ -695,10 +705,10 @@ export function Ledger({
           ))}
         </select>
         <select aria-label="Tháng" value={month} onChange={(e) => setMonth(e.target.value)} className={selectClass}>
-          <option value="all">Mọi tháng</option>
+          <option value="all">{basis === "cash" ? "Mọi tháng" : "Mọi kỳ"}</option>
           {months.map((m) => (
             <option key={m} value={m}>
-              Tháng {Number(m.slice(5))}/{m.slice(0, 4)}
+              {basis === "cash" ? "Tháng" : "Kỳ"} {Number(m.slice(5))}/{m.slice(0, 4)}
             </option>
           ))}
         </select>
