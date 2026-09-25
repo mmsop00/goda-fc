@@ -1,13 +1,13 @@
-// GET /api/finance/summary → số dư quỹ CLB hiện tại (đã trừ các khoản chi)
+// GET /api/finance/report → mọi thành viên: báo cáo thu chi, tiến độ thu, tình hình đóng quỹ
 
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/finance-auth";
-import { getFundBalance } from "@/lib/finance/report";
+import { getFinanceReport } from "@/lib/finance/report";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const { error } = await requireMember();
   if (error) return error;
-  return NextResponse.json({ totalFund: await getFundBalance() });
+  return NextResponse.json(await getFinanceReport());
 }

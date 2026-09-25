@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { formatThousands, formatVnd, reformatMoney } from "@/lib/finance/format";
+import { formatVnd } from "@/lib/finance/format";
+import { MoneyInput } from "@/components/finance/money-input";
 import { monthlyFundExemption } from "@/lib/finance/age";
 
 type Kind = "quy_thang" | "khac";
@@ -24,61 +24,6 @@ interface RowState {
   checked: boolean;
   /** Số tiền riêng (chữ số) — undefined = dùng số tiền chung. */
   amount?: string;
-}
-
-/** Ô nhập tiền tự thêm dấu chấm. Mỗi lần định dạng lại, trình duyệt đẩy con
- * trỏ về cuối ô — nên tự đặt lại con trỏ ngay sau đúng chữ số người dùng vừa gõ. */
-function MoneyInput({
-  value,
-  onChange,
-  className,
-  ...props
-}: { value: string; onChange: (digits: string) => void } & Omit<React.ComponentProps<"input">, "value" | "onChange">) {
-  const ref = useRef<HTMLInputElement>(null);
-
-  function commit(raw: string, caret: number) {
-    const next = reformatMoney(raw, caret);
-    onChange(next.digits);
-    // Chờ React vẽ lại giá trị mới rồi mới đặt con trỏ.
-    requestAnimationFrame(() => {
-      const el = ref.current;
-      if (el && document.activeElement === el) el.setSelectionRange(next.caret, next.caret);
-    });
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    const el = e.currentTarget;
-    const start = el.selectionStart;
-    if (start === null || start !== el.selectionEnd) return;
-    // Xoá ngay cạnh dấu chấm: xoá luôn chữ số bên kia dấu chấm, nếu không bấm xoá như không có tác dụng.
-    if (e.key === "Backspace" && el.value[start - 1] === ".") {
-      e.preventDefault();
-      commit(el.value.slice(0, start - 2) + el.value.slice(start), start - 2);
-    } else if (e.key === "Delete" && el.value[start] === ".") {
-      e.preventDefault();
-      commit(el.value.slice(0, start) + el.value.slice(start + 2), start);
-    }
-  }
-
-  return (
-    <div className="relative">
-      <input
-        {...props}
-        ref={ref}
-        type="text"
-        inputMode="numeric"
-        autoComplete="off"
-        value={formatThousands(value)}
-        onChange={(e) => commit(e.target.value, e.target.selectionStart ?? e.target.value.length)}
-        onKeyDown={handleKeyDown}
-        className={cn(
-          "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 pr-7 text-right text-base tabular-nums outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className
-        )}
-      />
-      <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-gray-400">đ</span>
-    </div>
-  );
 }
 
 const now = new Date();
@@ -169,7 +114,7 @@ export default function CreateBillPage() {
         setLoading(false);
         return;
       }
-      router.push("/member/quy/chu-tich");
+      router.push("/member/quy/bao-cao");
     } catch {
       setError("Lỗi kết nối, vui lòng thử lại");
       setLoading(false);

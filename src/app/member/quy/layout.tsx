@@ -1,11 +1,16 @@
 import { auth } from "@/auth";
 import { MemberTabs } from "../member-tabs";
 
-const CHAIRMAN_TABS = [
+const MEMBER_TABS = [
   { label: "Khoản của tôi", href: "/member/quy" },
-  { label: "Chi tiết CLB", href: "/member/quy/chu-tich" },
+  { label: "Báo cáo tài chính", href: "/member/quy/bao-cao" },
+];
+
+const CHAIRMAN_TABS = [
+  ...MEMBER_TABS,
   { label: "Duyệt đóng tiền", href: "/member/quy/chu-tich/duyet" },
   { label: "Tạo khoản thu", href: "/member/quy/chu-tich/tao-khoan-thu" },
+  { label: "Ghi thu chi", href: "/member/quy/chu-tich/ghi-thu-chi" },
 ];
 
 export default async function FundLayout({ children }: { children: React.ReactNode }) {
@@ -14,11 +19,9 @@ export default async function FundLayout({ children }: { children: React.ReactNo
 
   return (
     <>
-      {isChairman && (
-        <div className="max-w-5xl mx-auto px-4 pt-4">
-          <MemberTabs items={CHAIRMAN_TABS} variant="sub" />
-        </div>
-      )}
+      <div className="max-w-5xl mx-auto px-4 pt-4">
+        <MemberTabs items={isChairman ? CHAIRMAN_TABS : MEMBER_TABS} variant="sub" />
+      </div>
       {children}
     </>
   );

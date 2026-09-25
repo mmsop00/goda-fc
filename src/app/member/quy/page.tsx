@@ -98,7 +98,7 @@ export default function MemberDashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Card>
           <CardHeader className="pb-1">
-            <CardTitle className="text-xs text-gray-500">Tổng quỹ CLB</CardTitle>
+            <CardTitle className="text-xs text-gray-500">Số dư quỹ CLB</CardTitle>
           </CardHeader>
           <CardContent className="text-lg font-bold text-goda-navy">
             {formatVnd(totalFund)}

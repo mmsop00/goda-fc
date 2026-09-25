@@ -97,6 +97,7 @@ model Member {
   financeRole        String    @default("member") // member | chairman
 
   billsCreated   Bill[]          @relation("BillsCreated")
+  fundEntries    FundEntry[]     @relation("FundEntriesCreated")
   paymentItems   PaymentItem[]   @relation("MemberPaymentItems")
   paymentIntents PaymentIntent[] @relation("MemberPaymentIntents")
 }
@@ -117,6 +118,22 @@ model Bill {
 
   createdBy Member        @relation("BillsCreated", fields: [createdByMemberId], references: [id])
   items     PaymentItem[]
+}
+
+/// Sổ quỹ ghi tay của chủ tịch: khoản chi, và khoản thu không qua đóng quỹ
+/// thành viên (tài trợ, số dư chuyển sang...). Tiền thành viên đóng quỹ nằm ở PaymentItem.
+model FundEntry {
+  id                String   @id @default(cuid())
+  direction         String   // chi | thu
+  category          String   // xem src/lib/finance/categories.ts
+  title             String
+  amount            Int
+  date              String   // YYYY-MM-DD — ngày phát sinh (giờ VN)
+  note              String?
+  createdByMemberId String
+  createdAt         DateTime @default(now())
+
+  createdBy Member @relation("FundEntriesCreated", fields: [createdByMemberId], references: [id])
 }
 
 model PaymentItem {
