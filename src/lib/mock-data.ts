@@ -359,6 +359,15 @@ export const MOCK_EVENTS: UpcomingEvent[] = [
     description: "Tổ chức trao quà chúc mừng sinh nhật các thành viên có ngày sinh trong quý 3 (tháng 7, 8, 9) năm 2026.",
     level: "NORMAL",
   },
+  {
+    id: "evt-008",
+    type: "club_event",
+    title: "Chia buồn cùng gia đình anh Huy",
+    date: "27/09/2026",
+    time: "10:00",
+    description: "Bố vợ chú/anh Huy đã từ trần. Anh em tập trung đúng 10h Chủ nhật 27/09 tại Nhà tang lễ Bệnh viện Quân y 354. Anh em thu xếp thời gian đến chia buồn cùng gia đình anh Huy.",
+    level: "MAJOR",
+  },
 ];
 
 export const MOCK_DONORS: TopDonor[] = [
@@ -480,6 +489,18 @@ export const MOCK_NEWS: NewsItem[] = [
     category: "Sinh nhật",
     author: "Ban truyền thông GODA FC",
     thumbnailUrl: "/photos/hoat-dong/trao-qua-sinh-nhat-quy3-2026.jpg",
+  },
+  {
+    id: "news-006",
+    slug: "ra-mat-quy-clb-ho-so-cau-thu-ung-ho-tren-clbgoda-vn",
+    title: "Ra mắt Quỹ CLB, Hồ sơ cầu thủ và Ủng hộ trực tuyến trên clbgoda.vn",
+    summary: "Từ nay thành viên GODA FC đóng quỹ bằng mã QR, xem báo cáo thu chi minh bạch và tự cập nhật hồ sơ cầu thủ; người hâm mộ có thể ủng hộ CLB ngay trên trang chủ. Xem video giới thiệu và video hướng dẫn sử dụng.",
+    content:
+      "<p>Từ hôm nay, website <strong>clbgoda.vn</strong> chính thức có thêm các tính năng mới dành cho thành viên và người hâm mộ GODA FC: <strong>Quỹ CLB</strong> (đóng quỹ bằng mã QR, báo cáo thu chi minh bạch), <strong>Hồ sơ cầu thủ</strong> tự cập nhật và <strong>Ủng hộ CLB</strong> trực tuyến ngay trên trang chủ. Mời mọi người xem nhanh video giới thiệu dưới đây.</p><h2>Video giới thiệu</h2><div style='max-width:360px;margin:20px auto;aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:#0B1E3A'><iframe src='https://www.youtube-nocookie.com/embed/szEMWG-1sIA' title='GODA FC — Giới thiệu Quỹ CLB' style='width:100%;height:100%;border:0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen loading='lazy'></iframe></div><p style='text-align:center;font-size:14px;margin-top:-8px'>Xem trên YouTube: <a href='https://youtu.be/szEMWG-1sIA' target='_blank' rel='noopener'>youtu.be/szEMWG-1sIA</a></p><h2>Có gì mới?</h2><h3>1. Quỹ CLB</h3><ul><li>Mỗi thành viên đăng nhập bằng <strong>số điện thoại</strong> để xem số dư quỹ CLB, các khoản của mình: chưa đóng, chờ duyệt, đã đóng.</li><li>Đóng quỹ bằng <strong>mã QR riêng</strong>: quét bằng app ngân hàng là tự điền đúng số tiền và nội dung, chuyển xong tải ảnh bill lên và bấm <strong>Hoàn tất</strong>.</li><li>Chủ tịch đối chiếu tài khoản ngân hàng rồi xác nhận. Nộp thừa hoặc nộp thiếu thì phần chênh được giữ trong <strong>số dư</strong> của mỗi người để trừ vào khoản sau.</li><li><strong>Báo cáo tài chính</strong> công khai cho mọi thành viên: biểu đồ thu chi theo tháng, số dư quỹ, chi theo hạng mục, ai đã đóng, ai còn nợ. Bấm vào từng mục để xem chi tiết.</li><li>Quỹ tháng được <strong>tự động tạo lúc 00:00 ngày 1</strong> hằng tháng, tự miễn cho các thành viên từ 70 tuổi.</li></ul><h3>2. Hồ sơ cầu thủ</h3><ul><li>Mỗi người tự cập nhật biệt danh, vị trí, <strong>chân thuận</strong>, ngày sinh, ngày gia nhập đội, quê quán.</li><li>Thẻ cầu thủ trên trang <a href='/thanh-vien'>Thành viên</a> cập nhật ngay sau khi lưu.</li></ul><h3>3. Ủng hộ CLB</h3><ul><li>Người hâm mộ, đội bạn, khách mời có thể ủng hộ GODA FC tại trang <a href='/ung-ho'>Ủng hộ</a> mà <strong>không cần đăng nhập</strong>: nhập tên (hoặc ẩn danh), số tiền, quét mã QR và gửi ảnh bill.</li><li>Sau khi CLB xác nhận, lời cảm ơn hiện trên bảng tin chạy và mục <strong>Tài trợ gần đây</strong> ở trang chủ, số tiền được cộng vào quỹ đội.</li></ul><h2>Video hướng dẫn sử dụng</h2><p>Video hướng dẫn chi tiết từng bước, chia 3 phần: <strong>Thành viên</strong> (đăng nhập, đổi mật khẩu, đóng quỹ, số dư, báo cáo, hồ sơ cầu thủ), <strong>Chủ tịch</strong> (duyệt đóng tiền, duyệt ủng hộ, tạo khoản thu, ghi khoản chi, điều chỉnh số dư) và <strong>Người ủng hộ</strong>.</p><div style='max-width:100%;margin:20px auto;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#0B1E3A'><iframe src='https://www.youtube-nocookie.com/embed/wM1Wyx1Yx1I' title='GODA FC — Hướng dẫn sử dụng Quỹ CLB' style='width:100%;height:100%;border:0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen loading='lazy'></iframe></div><p style='text-align:center;font-size:14px;margin-top:-8px'>Xem trên YouTube: <a href='https://youtu.be/wM1Wyx1Yx1I' target='_blank' rel='noopener'>youtu.be/wM1Wyx1Yx1I</a></p><h2>Bắt đầu thế nào?</h2><ol><li>Vào <strong>clbgoda.vn</strong>, bấm <strong>Đăng nhập</strong> trên menu.</li><li>Nhập <strong>số điện thoại</strong> của bạn, mật khẩu lần đầu là <strong>123456</strong>.</li><li>Vào mục <strong>Tài khoản</strong> để đổi sang mật khẩu của riêng bạn.</li><li>Mở <strong>Quỹ CLB</strong> để xem và đóng các khoản; mở <strong>Hồ sơ cầu thủ</strong> để cập nhật thông tin của mình.</li></ol><p>Có thắc mắc hoặc không đăng nhập được, anh em vui lòng liên hệ chủ tịch <strong>Lê Thanh Hà</strong> hoặc Ban truyền thông GODA FC. Rất mong mọi người dùng thử và góp ý để website ngày càng tiện hơn!</p>",
+    date: "26/09/2026",
+    category: "Tin CLB",
+    author: "Ban truyền thông GODA FC",
+    thumbnailUrl: "/photos/hoat-dong/ra-mat-quy-clb.jpg",
   },
 ];
 
