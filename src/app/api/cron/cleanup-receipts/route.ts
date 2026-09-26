@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════
 // GODA FC — Vercel Cron: dọn ảnh bill quá hạn lưu (90 ngày)
 // GET /api/cron/cleanup-receipts   (header Authorization: Bearer CRON_SECRET)
-// Chỉ xoá PaymentReceipt hết hạn — không đụng PaymentIntent/PaymentItem/Bill.
+// Chỉ xoá ảnh bill hết hạn (thành viên & ủng hộ) và lượt ủng hộ bỏ dở — không đụng lịch sử thanh toán.
 // ═══════════════════════════════════════
 
 import { NextRequest, NextResponse } from "next/server";
@@ -13,9 +13,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const result = await prisma.paymentReceipt.deleteMany({
-    where: { expiresAt: { lt: new Date() } },
-  });
+  const now = new Date();
+  const [result, donationReceipts, staleDonations] = await Promise.all([
+    prisma.paymentReceipt.deleteMany({ where: { expiresAt: { lt: now } } }),
+    prisma.donationReceipt.deleteMany({ where: { expiresAt: { lt: now } } }),
+    // Tạo mã QR ủng hộ rồi bỏ dở, không gửi bill sau 3 ngày
+    prisma.donation.deleteMany({ where: { status: "cho_bien_lai", createdAt: { lt: new Date(now.getTime() - 3 * 86400_000) } } }),
+  ]);
 
-  return NextResponse.json({ deleted: result.count });
+  return NextResponse.json({ deleted: result.count, donationReceipts: donationReceipts.count, staleDonations: staleDonations.count });
 }

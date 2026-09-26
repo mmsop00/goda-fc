@@ -20,17 +20,16 @@ import {
   MOCK_MATCH_RESULTS,
   MOCK_HISTORY,
   MOCK_EVENTS,
-  MOCK_DONORS,
-  MOCK_RECENT_DONATIONS,
   MOCK_NEWS,
   MOCK_ALBUM,
   sortNewsByDateDesc,
   isUpcomingEvent,
 } from "@/lib/mock-data";
 import type { MemberPublic } from "@/lib/mock-data";
+import type { PublicDonationBoard } from "@/lib/finance/donations";
 
 /** Trang chủ — `members` đã ghép hồ sơ thành viên tự sửa (server truyền vào). */
-export function HomeView({ members }: { members: MemberPublic[] }) {
+export function HomeView({ members, donations }: { members: MemberPublic[]; donations: PublicDonationBoard }) {
   // Ticks every second so an event whose countdown hits 0 (or that crosses
   // midnight) automatically flips from "sắp tới" to "đã diễn ra" while the
   // page is open, no refresh needed.
@@ -104,7 +103,7 @@ export function HomeView({ members }: { members: MemberPublic[] }) {
 
       {/* Birthday & Event ticker — chỉ sự kiện sắp tới + sinh nhật trong 7
           ngày tới; sự kiện đã diễn ra chỉ hiện ở mục "Sự kiện & Đóng góp". */}
-      <BirthdayBanner members={members} events={sortedEvents} recentDonations={MOCK_RECENT_DONATIONS} />
+      <BirthdayBanner members={members} events={sortedEvents} recentDonations={donations.recent} />
 
       {/* Section 2: Match Results — synced from /tran-dau */}
       <section className="py-16 md:py-20 bg-goda-warm-white">
@@ -152,7 +151,7 @@ export function HomeView({ members }: { members: MemberPublic[] }) {
       <HistoryTeaser milestones={MOCK_HISTORY} />
 
       {/* Section 6: Events + Top Donate */}
-      <EventsDonateSection events={sortedEvents} pastEvents={pastEvents} donors={MOCK_DONORS} recentDonations={MOCK_RECENT_DONATIONS} members={members} />
+      <EventsDonateSection events={sortedEvents} pastEvents={pastEvents} donors={donations.top.map((d) => ({ ...d, month: donations.monthLabel }))} donorMonth={donations.monthLabel} recentDonations={donations.recent} members={members} />
 
       {/* Section 7: News */}
       <NewsSection news={sortNewsByDateDesc(MOCK_NEWS)} />

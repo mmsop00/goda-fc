@@ -4,9 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Calendar, PartyPopper, Heart } from "lucide-react";
 import { type MemberPublic, type UpcomingEvent, type RecentDonation } from "@/lib/mock-data";
 
-// Tạm ẩn mục "5 nhà tài trợ gần đây nhất" khỏi bảng tin chạy — bật lại bằng
-// cách đổi giá trị này thành true khi cần.
-const SHOW_DONORS = false;
+// Hiện 5 lượt ủng hộ gần nhất (đã được chủ tịch xác nhận) trên bảng tin chạy.
+const SHOW_DONORS = true;
 
 interface BirthdayBannerProps {
   members: MemberPublic[];
@@ -101,9 +100,14 @@ export function BirthdayBanner({ members, events, recentDonations = [] }: Birthd
     if (SHOW_DONORS && recentDonations.length > 0) {
       const top5 = recentDonations.slice(0, 5);
       result.push({
-        title: "5 nhà tài trợ gần đây nhất",
+        title: "Cảm ơn nhà hảo tâm",
         icon: <Heart className="size-3.5" />,
-        items: top5.map((d) => ({ key: d.id, section: "donor", label: d.name, date: d.date })),
+        items: top5.map((d) => ({
+          key: d.id,
+          section: "donor",
+          label: d.amount ? `${d.name} · ${d.amount.toLocaleString("vi-VN")}đ` : d.name,
+          date: d.date,
+        })),
       });
     }
 

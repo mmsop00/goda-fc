@@ -25,6 +25,7 @@ export const MEMBER_PAYMENT_CATEGORIES = {
   quy_thang: "Quỹ tháng",
   dong_gop: "Đóng góp khác",
   nop_tien: "Thành viên nộp tiền",
+  ung_ho: "Ủng hộ qua website",
 } as const;
 
 export function categoryLabel(direction: Direction, category: string): string {

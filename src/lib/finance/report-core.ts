@@ -16,6 +16,15 @@ export interface RawBill {
   items: { id: string; memberId: string; amount: number; status: string; paidDate: string | null }[];
 }
 
+/** 1 lượt ủng hộ công khai đã được chủ tịch xác nhận */
+export interface RawDonation {
+  id: string;
+  name: string;
+  amount: number; // số thực nhận
+  date: string; // YYYY-MM-DD giờ VN
+  message: string | null;
+}
+
 /** 1 dòng sổ số dư thành viên (nộp thừa/thiếu) */
 export interface RawCredit {
   id: string;
@@ -49,7 +58,7 @@ export interface LedgerRow {
   direction: Direction;
   /** "dong_quy" = 1 khoản thành viên đã đóng; "nop_tien" = 1 lần thành viên chuyển tiền
    * (thực nhận); "so_quy" = chủ tịch ghi tay (sửa/xoá được) */
-  source: "dong_quy" | "nop_tien" | "so_quy";
+  source: "dong_quy" | "nop_tien" | "so_quy" | "ung_ho";
   /** Tính vào cách xem nào: tiền thực nhận chỉ "cash", khoản đã đóng qua sổ số dư chỉ
    * "accrual" (tránh đếm 2 lần); dữ liệu cũ & sổ quỹ tính cả hai. */
   basis: "both" | "cash" | "accrual";
@@ -121,7 +130,8 @@ export function buildReport(
   members: { id: string; name: string }[],
   bills: RawBill[],
   entries: RawEntry[],
-  credits: RawCredit[] = []
+  credits: RawCredit[] = [],
+  donations: RawDonation[] = []
 ): FinanceReport {
   const nameOf = new Map(members.map((m) => [m.id, m.name]));
   const standing = new Map(
@@ -236,6 +246,25 @@ export function buildReport(
     });
   }
   for (const st of standing.values()) outstanding.creditHeld += st.soDu;
+
+  // Ủng hộ qua trang chủ — tiền thực nhận, tính vào quỹ ở cả 2 cách xem
+  for (const d of donations) {
+    ledger.push({
+      id: d.id,
+      date: d.date,
+      period: d.date.slice(0, 7),
+      direction: "thu",
+      source: "ung_ho",
+      basis: "both",
+      billId: null,
+      category: "ung_ho",
+      categoryLabel: categoryLabel("thu", "ung_ho"),
+      title: `Ủng hộ — ${d.name}`,
+      memberName: null,
+      note: d.message,
+      amount: d.amount,
+    });
+  }
 
   ledger.sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
   const balance = ledger

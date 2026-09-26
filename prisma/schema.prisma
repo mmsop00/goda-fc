@@ -322,3 +322,44 @@ model GalleryPhoto {
   fullUrl      String
   createdAt    DateTime @default(now())
 }
+
+// ═══════════════════════════════════════
+// Ủng hộ công khai từ trang chủ (không cần đăng nhập)
+// ═══════════════════════════════════════
+
+/// 1 lượt ủng hộ: người ủng hộ tự khai số tiền → QR → ảnh bill → chủ tịch xác nhận
+/// số tiền thực nhận → hiện trên trang chủ và cộng vào quỹ đội.
+model Donation {
+  id                  String    @id @default(cuid())
+  code                String    @unique // nội dung chuyển khoản, vd "GODA7K3PQ2"
+  tokenHash           String    // sha256 của mã bí mật trả cho trình duyệt người ủng hộ — chỉ họ mới gửi được ảnh bill
+  donorName           String
+  anonymous           Boolean   @default(false)
+  showAmount          Boolean   @default(true) // cho phép hiện số tiền trên trang chủ
+  message             String?
+  amount              Int       // số tiền người ủng hộ khai
+  receivedAmount      Int?      // số chủ tịch thực nhận — số được cộng vào quỹ
+  status              String    @default("cho_bien_lai") // cho_bien_lai | cho_duyet | da_xac_nhan | tu_choi
+  ocrHint             String?
+  ocrRawText          String?
+  ipHash              String?   // chống spam: giới hạn số lượt tạo theo địa chỉ mạng
+  confirmedAt         DateTime?
+  confirmedByMemberId String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  receipts DonationReceipt[]
+
+  @@index([status])
+}
+
+model DonationReceipt {
+  id         String   @id @default(cuid())
+  donationId String
+  imageData  Bytes
+  mimeType   String   @default("image/jpeg")
+  uploadedAt DateTime @default(now())
+  expiresAt  DateTime // uploadedAt + 90 ngày
+
+  donation Donation @relation(fields: [donationId], references: [id], onDelete: Cascade)
+}

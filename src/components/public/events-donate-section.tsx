@@ -2,7 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Trophy, Beer, Cake, Users, Star, Clock, Gift, History } from "lucide-react";
+import Link from "next/link";
+import { Calendar, Trophy, Beer, Cake, Users, Star, Clock, Gift, History, Heart } from "lucide-react";
 import { CountdownTimer } from "./countdown-timer";
 import type { UpcomingEvent, TopDonor, RecentDonation, MemberPublic } from "@/lib/mock-data";
 
@@ -10,6 +11,8 @@ interface EventsDonateSectionProps {
   events: UpcomingEvent[];
   pastEvents?: UpcomingEvent[];
   donors: TopDonor[];
+  /** MM/YYYY của bảng xếp hạng */
+  donorMonth?: string;
   recentDonations?: RecentDonation[];
   members?: MemberPublic[];
   isLoading?: boolean;
@@ -52,15 +55,15 @@ function sortMembersByUpcomingBirthday(members: MemberPublic[]): MemberPublic[] 
     });
 }
 
-function formatVND(index: number): string {
-  const amounts = ["xxx.xxx.xxx ₫", "xxx.xxx.xxx ₫", "xx.xxx.xxx ₫", "xx.xxx.xxx ₫", "x.xxx.xxx ₫"];
-  return amounts[Math.min(index, amounts.length - 1)];
+function formatVND(amount: number | null): string {
+  return amount ? `${amount.toLocaleString("vi-VN")} ₫` : "Ẩn số tiền";
 }
 
 export function EventsDonateSection({
   events,
   pastEvents = [],
   donors,
+  donorMonth,
   recentDonations = [],
   members = [],
   isLoading,
@@ -246,6 +249,21 @@ export function EventsDonateSection({
 
             {/* Right Column: Tài trợ */}
             <div className="lg:w-1/3 space-y-6">
+              {/* Nút ủng hộ — mở trang /ung-ho (QR, gửi bill, chủ tịch xác nhận) */}
+              <Card className="overflow-hidden bg-goda-navy text-white">
+                <CardContent className="space-y-3 py-5 text-center">
+                  <Heart className="mx-auto size-8 text-goda-yellow" aria-hidden="true" />
+                  <p className="font-display text-xl font-bold">Ủng hộ GODA FC</p>
+                  <p className="text-sm text-gray-300">Quét mã QR, gửi ảnh bill — tên bạn sẽ hiện ở đây sau khi CLB xác nhận.</p>
+                  <Link
+                    href="/ung-ho"
+                    className="inline-block rounded-full bg-goda-yellow px-5 py-2 text-sm font-bold text-goda-navy hover:brightness-105"
+                  >
+                    Ủng hộ ngay
+                  </Link>
+                </CardContent>
+              </Card>
+
               {/* Top tài trợ */}
               <div>
                 <h3 className="font-display font-semibold text-xl text-goda-navy mb-4 flex items-center gap-2">
@@ -255,13 +273,13 @@ export function EventsDonateSection({
                 <Card className="p-0 overflow-hidden">
                   <CardHeader className="bg-goda-navy text-white pb-3">
                     <CardTitle className="text-sm font-medium text-center">
-                      Bảng xếp hạng tháng 08/2026
+                      Bảng xếp hạng tháng {donorMonth ?? ""}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-0 max-h-80 overflow-y-auto">
                     {donors.length === 0 ? (
                       <div className="py-12 text-center text-gray-400 text-sm">
-                        Chưa có nhà tài trợ nào.
+                        Chưa có ai ủng hộ tháng này — hãy là người đầu tiên!
                       </div>
                     ) : (
                       <div>
@@ -279,7 +297,7 @@ export function EventsDonateSection({
                                 </span>
                               </div>
                               <span className={`text-xs whitespace-nowrap shrink-0 ${index === 0 ? "text-goda-yellow font-semibold" : "text-goda-green"}`}>
-                                {formatVND(index)}
+                                {formatVND(donor.amount)}
                               </span>
                             </div>
                             {index < donors.length - 1 && <Separator />}
@@ -301,7 +319,7 @@ export function EventsDonateSection({
                   <CardContent className="p-0 max-h-80 overflow-y-auto">
                     {recentDonations.length === 0 ? (
                       <div className="py-12 text-center text-gray-400 text-sm">
-                        Chưa có giao dịch nào.
+                        Chưa có lượt ủng hộ nào.
                       </div>
                     ) : (
                       <div>
@@ -323,7 +341,7 @@ export function EventsDonateSection({
                               </div>
                               <div className="text-right shrink-0">
                                 <span className="text-xs text-goda-green block">
-                                  {formatVND(index)}
+                                  {formatVND(tx.amount)}
                                 </span>
                                 <span className="text-[10px] text-gray-400">
                                   {tx.date}

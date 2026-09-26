@@ -88,7 +88,8 @@ export function getWeekdayLabel(dateStr: string): string | null {
 export interface TopDonor {
   id: string;
   name: string;
-  amount: number;
+  /** null = người ủng hộ không công khai số tiền */
+  amount: number | null;
   month?: string;
   anonymous: boolean;
 }
@@ -392,7 +393,8 @@ export const MOCK_DONORS: TopDonor[] = [
 export interface RecentDonation {
   id: string;
   name: string;
-  amount: number;
+  /** null = người ủng hộ không công khai số tiền */
+  amount: number | null;
   date: string;
   message?: string;
 }

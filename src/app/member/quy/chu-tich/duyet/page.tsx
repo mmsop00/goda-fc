@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatVnd } from "@/lib/finance/format";
 import { MoneyInput } from "@/components/finance/money-input";
+import { DonationQueue } from "@/components/finance/donation-queue";
 
 interface QueueItem {
   id: string;
@@ -211,6 +212,7 @@ export default function ApprovalQueuePage() {
           </Card>
         ))
       )}
+      {!sample && <DonationQueue />}
     </div>
   );
 }

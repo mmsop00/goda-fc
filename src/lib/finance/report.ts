@@ -15,13 +15,17 @@ export async function getFundBalance(): Promise<number> {
 }
 
 export async function getFinanceReport(): Promise<FinanceReport> {
-  const [members, bills, entries, credits] = await Promise.all([
+  const [members, bills, entries, credits, donations] = await Promise.all([
     getFinanceMembers(),
     prisma.bill.findMany({
       include: { items: { select: { id: true, memberId: true, amount: true, status: true, confirmedAt: true } } },
     }),
     prisma.fundEntry.findMany(),
     prisma.creditEntry.findMany(),
+    prisma.donation.findMany({
+      where: { status: "da_xac_nhan" },
+      select: { id: true, donorName: true, anonymous: true, receivedAmount: true, confirmedAt: true, message: true },
+    }),
   ]);
   return buildReport(
     members,
@@ -50,6 +54,13 @@ export async function getFinanceReport(): Promise<FinanceReport> {
       paymentIntentId: c.paymentIntentId,
       paymentItemId: c.paymentItemId,
       note: c.note,
+    })),
+    donations.map((d) => ({
+      id: d.id,
+      name: d.anonymous ? "Ẩn danh" : d.donorName,
+      amount: d.receivedAmount ?? 0,
+      date: toVnDate(d.confirmedAt ?? new Date()),
+      message: d.message,
     }))
   );
 }
