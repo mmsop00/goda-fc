@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { MemberPublic } from "@/lib/mock-data";
+import { FOOT_LABEL } from "@/lib/member-profile";
 
 interface MemberCardProps {
   member?: MemberPublic;
@@ -284,6 +285,8 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
                   ? member.joinYear
                   : "—"}
             </span>
+            {member.preferredFoot && <span>🦶 {FOOT_LABEL[member.preferredFoot]}</span>}
+            {member.hometown && <span>📍 {member.hometown}</span>}
           </div>
         </div>
       </div>

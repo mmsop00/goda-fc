@@ -4,28 +4,24 @@ import { prisma } from "@/lib/prisma";
 import { getFinanceMembers } from "./members";
 import { buildReport, type FinanceReport } from "./report-core";
 
-export type { FinanceReport, LedgerRow, BillProgress, MemberStanding } from "./report-core";
+export type { FinanceReport, LedgerRow, BillProgress, MemberStanding, CreditRow } from "./report-core";
 
 const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
 const toVnDate = (d: Date) => new Date(d.getTime() + VN_OFFSET_MS).toISOString().slice(0, 10);
 
-/** Số dư quỹ = tiền thành viên đã đóng (đã xác nhận) + thu ngoài − chi. */
+/** Số dư quỹ = tiền thực có: thành viên thực nộp + thu ngoài − chi (tính giống báo cáo). */
 export async function getFundBalance(): Promise<number> {
-  const [paid, entries] = await Promise.all([
-    prisma.paymentItem.aggregate({ where: { status: "da_dong" }, _sum: { amount: true } }),
-    prisma.fundEntry.groupBy({ by: ["direction"], _sum: { amount: true } }),
-  ]);
-  const sum = (dir: string) => entries.find((e) => e.direction === dir)?._sum.amount ?? 0;
-  return (paid._sum.amount ?? 0) + sum("thu") - sum("chi");
+  return (await getFinanceReport()).balance;
 }
 
 export async function getFinanceReport(): Promise<FinanceReport> {
-  const [members, bills, entries] = await Promise.all([
+  const [members, bills, entries, credits] = await Promise.all([
     getFinanceMembers(),
     prisma.bill.findMany({
-      include: { items: { select: { memberId: true, amount: true, status: true, confirmedAt: true } } },
+      include: { items: { select: { id: true, memberId: true, amount: true, status: true, confirmedAt: true } } },
     }),
     prisma.fundEntry.findMany(),
+    prisma.creditEntry.findMany(),
   ]);
   return buildReport(
     members,
@@ -37,12 +33,23 @@ export async function getFinanceReport(): Promise<FinanceReport> {
       dueDate: b.dueDate,
       createdAt: toVnDate(b.createdAt),
       items: b.items.map((it) => ({
+        id: it.id,
         memberId: it.memberId,
         amount: it.amount,
         status: it.status,
         paidDate: it.confirmedAt ? toVnDate(it.confirmedAt) : null,
       })),
     })),
-    entries
+    entries,
+    credits.map((c) => ({
+      id: c.id,
+      memberId: c.memberId,
+      kind: c.kind,
+      amount: c.amount,
+      date: toVnDate(c.createdAt),
+      paymentIntentId: c.paymentIntentId,
+      paymentItemId: c.paymentItemId,
+      note: c.note,
+    }))
   );
 }

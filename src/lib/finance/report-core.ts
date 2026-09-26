@@ -13,7 +13,19 @@ export interface RawBill {
   period: string | null;
   dueDate: string | null;
   createdAt: string; // YYYY-MM-DD giờ VN
-  items: { memberId: string; amount: number; status: string; paidDate: string | null }[];
+  items: { id: string; memberId: string; amount: number; status: string; paidDate: string | null }[];
+}
+
+/** 1 dòng sổ số dư thành viên (nộp thừa/thiếu) */
+export interface RawCredit {
+  id: string;
+  memberId: string;
+  kind: string; // nop | tru | dieu_chinh
+  amount: number; // + tăng, − giảm số dư
+  date: string; // YYYY-MM-DD giờ VN
+  paymentIntentId: string | null;
+  paymentItemId: string | null;
+  note: string | null;
 }
 
 export interface RawEntry {
@@ -35,8 +47,12 @@ export interface LedgerRow {
   /** YYYY-MM — tháng khoản này thuộc về (báo cáo theo kỳ áp dụng) */
   period: string;
   direction: Direction;
-  /** "dong_quy" = thành viên đóng qua cổng; "so_quy" = chủ tịch ghi tay (xoá được) */
-  source: "dong_quy" | "so_quy";
+  /** "dong_quy" = 1 khoản thành viên đã đóng; "nop_tien" = 1 lần thành viên chuyển tiền
+   * (thực nhận); "so_quy" = chủ tịch ghi tay (sửa/xoá được) */
+  source: "dong_quy" | "nop_tien" | "so_quy";
+  /** Tính vào cách xem nào: tiền thực nhận chỉ "cash", khoản đã đóng qua sổ số dư chỉ
+   * "accrual" (tránh đếm 2 lần); dữ liệu cũ & sổ quỹ tính cả hai. */
+  basis: "both" | "cash" | "accrual";
   /** Khoản thu (Bill) của lượt đóng quỹ; null với dòng sổ quỹ ghi tay */
   billId: string | null;
   category: string;
@@ -75,26 +91,50 @@ export interface MemberStanding {
   daDong: number;
   choDuyet: number;
   chuaDong: number;
+  /** Số dư nộp thừa/thiếu đang giữ */
+  soDu: number;
+}
+
+export interface CreditRow {
+  id: string;
+  memberId: string;
+  kind: string;
+  amount: number;
+  date: string;
+  note: string | null;
 }
 
 export interface FinanceReport {
+  /** Số dư quỹ = tiền thực có (theo dòng tiền) */
   balance: number;
-  outstanding: { chuaDong: number; choDuyet: number };
+  /** creditHeld: tổng số dư thành viên đang giữ (nộp thừa/thiếu chưa trừ vào khoản nào) */
+  outstanding: { chuaDong: number; choDuyet: number; creditHeld: number };
   ledger: LedgerRow[];
   bills: BillProgress[];
   members: MemberStanding[];
+  credits: CreditRow[];
 }
 
 const asStatus = (s: string): ItemStatus => (s === "da_dong" || s === "cho_duyet" ? s : "chua_dong");
 
-export function buildReport(members: { id: string; name: string }[], bills: RawBill[], entries: RawEntry[]): FinanceReport {
+export function buildReport(
+  members: { id: string; name: string }[],
+  bills: RawBill[],
+  entries: RawEntry[],
+  credits: RawCredit[] = []
+): FinanceReport {
   const nameOf = new Map(members.map((m) => [m.id, m.name]));
-  const standing = new Map(members.map((m) => [m.id, { memberId: m.id, name: m.name, daDong: 0, choDuyet: 0, chuaDong: 0 }]));
+  const standing = new Map(
+    members.map((m) => [m.id, { memberId: m.id, name: m.name, daDong: 0, choDuyet: 0, chuaDong: 0, soDu: 0 }])
+  );
+  // Khoản được trừ qua sổ số dư → tiền mặt đã tính ở dòng "nộp tiền", không tính lại
+  const viaCredit = new Set(credits.filter((c) => c.kind === "tru" && c.paymentItemId).map((c) => c.paymentItemId!));
+  const billTitleOfItem = new Map(bills.flatMap((b) => b.items.map((it) => [it.id, b.title] as const)));
   const order = new Map(members.map((m, i) => [m.id, i]));
 
   const ledger: LedgerRow[] = [];
   const billProgress: BillProgress[] = [];
-  const outstanding = { chuaDong: 0, choDuyet: 0 };
+  const outstanding = { chuaDong: 0, choDuyet: 0, creditHeld: 0 };
 
   for (const bill of [...bills].sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
     const p: BillProgress = {
@@ -127,6 +167,7 @@ export function buildReport(members: { id: string; name: string }[], bills: RawB
           period: p.period,
           direction: "thu",
           source: "dong_quy",
+          basis: viaCredit.has(item.id) ? "accrual" : "both",
           billId: bill.id,
           category,
           categoryLabel: categoryLabel("thu", category),
@@ -156,6 +197,7 @@ export function buildReport(members: { id: string; name: string }[], bills: RawB
       period: e.period ?? e.date.slice(0, 7),
       direction,
       source: "so_quy",
+      basis: "both",
       billId: null,
       category: e.category,
       categoryLabel: categoryLabel(direction, e.category),
@@ -166,8 +208,48 @@ export function buildReport(members: { id: string; name: string }[], bills: RawB
     });
   }
 
-  ledger.sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
-  const balance = ledger.reduce((s, r) => s + (r.direction === "thu" ? r.amount : -r.amount), 0);
+  // Mỗi lần thành viên chuyển tiền = 1 dòng thu theo dòng tiền (số thực nhận)
+  for (const c of credits) {
+    const st = standing.get(c.memberId);
+    if (st) st.soDu += c.amount;
+    if (c.kind !== "nop") continue;
+    const used = credits.filter((x) => x.kind === "tru" && x.paymentIntentId && x.paymentIntentId === c.paymentIntentId);
+    const titles = used.map((x) => billTitleOfItem.get(x.paymentItemId ?? "")).filter(Boolean);
+    const extra = c.amount + used.reduce((t, x) => t + x.amount, 0);
+    const parts = [titles.length ? `Cho: ${titles.join(", ")}` : "Chưa đủ trọn khoản nào"];
+    if (extra > 0) parts.push(`${extra.toLocaleString("vi-VN")}đ vào số dư`);
+    if (extra < 0) parts.push(`dùng thêm ${(-extra).toLocaleString("vi-VN")}đ số dư`);
+    ledger.push({
+      id: c.id,
+      date: c.date,
+      period: c.date.slice(0, 7),
+      direction: "thu",
+      source: "nop_tien",
+      basis: "cash",
+      billId: null,
+      category: "nop_tien",
+      categoryLabel: categoryLabel("thu", "nop_tien"),
+      title: "Nộp tiền quỹ",
+      memberName: nameOf.get(c.memberId) ?? null,
+      note: parts.join(" · "),
+      amount: c.amount,
+    });
+  }
+  for (const st of standing.values()) outstanding.creditHeld += st.soDu;
 
-  return { balance, outstanding, ledger, bills: billProgress, members: [...standing.values()] };
+  ledger.sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
+  const balance = ledger
+    .filter((r) => r.basis !== "accrual")
+    .reduce((t, r) => t + (r.direction === "thu" ? r.amount : -r.amount), 0);
+
+  return {
+    balance,
+    outstanding,
+    ledger,
+    bills: billProgress,
+    members: [...standing.values()],
+    credits: credits
+      .map((c) => ({ id: c.id, memberId: c.memberId, kind: c.kind, amount: c.amount, date: c.date, note: c.note }))
+      .sort((a, b) => b.date.localeCompare(a.date)),
+  };
 }

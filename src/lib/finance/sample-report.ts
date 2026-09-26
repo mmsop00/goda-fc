@@ -1,7 +1,9 @@
 // DỮ LIỆU MẪU cho trang báo cáo — chỉ dựng trên trình duyệt để xem thử giao
 // diện, KHÔNG ghi vào DB. Cố định (seed) để lần nào mở cũng giống nhau.
 
-import { buildReport, type FinanceReport, type RawBill, type RawEntry } from "./report-core";
+import { buildReport, type FinanceReport, type RawBill, type RawCredit, type RawEntry } from "./report-core";
+
+type SampleBill = Omit<RawBill, "items"> & { items: Omit<RawBill["items"][number], "id">[] };
 
 const NAMES = [
   "Lê Thanh Hà", "Trần Đình Thanh", "Huy Quang", "Hoàng Trọng Nội", "Nguyễn Văn Bình", "Chu Triệu Thành",
@@ -26,7 +28,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 export function buildSampleReport(now = new Date()): FinanceReport {
   const rand = rng(32);
   const members = NAMES.map((name, i) => ({ id: `mau-${i}`, name }));
-  const bills: RawBill[] = [];
+  const bills: SampleBill[] = [];
   const entries: RawEntry[] = [];
 
   // 9 tháng gần nhất, tính cả tháng hiện tại
@@ -108,5 +110,24 @@ export function buildSampleReport(now = new Date()): FinanceReport {
   entries.push({ id: "mau-tai-tro", direction: "thu", category: "tai_tro", title: "Tài trợ giải sinh nhật 32 năm", amount: 31_500_000, date: at(sn, 20), period: null, note: "Khách mời và các đội bạn" });
   entries.push({ id: "mau-su-kien", direction: "chi", category: "su_kien", title: "Tổ chức sinh nhật 32 năm", amount: 42_340_000, date: at(sn, 28), period: null, note: "Sân, trọng tài, cúp, tiệc" });
 
-  return buildReport(members, bills, entries);
+  const withIds: RawBill[] = bills.map((b) => ({ ...b, items: b.items.map((it) => ({ ...it, id: `${b.id}:${it.memberId}` })) }));
+
+  // Vài trường hợp nộp thừa / nộp thiếu để xem phần số dư
+  const credits: RawCredit[] = [];
+  const cur = withIds.find((b) => b.id === `mau-quy-${months[months.length - 1].y}-${months[months.length - 1].m}`)!;
+  cur.items
+    .filter((it) => it.status === "da_dong")
+    .slice(0, 2)
+    .forEach((it, i) => {
+      const intent = `mau-ck-thua-${i}`;
+      credits.push({ id: `${intent}-nop`, memberId: it.memberId, kind: "nop", amount: it.amount + 100_000, date: it.paidDate!, paymentIntentId: intent, paymentItemId: null, note: "Chuyển khoản GODA" });
+      credits.push({ id: `${intent}-tru`, memberId: it.memberId, kind: "tru", amount: -it.amount, date: it.paidDate!, paymentIntentId: intent, paymentItemId: it.id, note: `Trừ cho ${cur.title}` });
+    });
+  const short = cur.items.find((it) => it.status === "chua_dong");
+  if (short) {
+    const d = day(months[months.length - 1].y, months[months.length - 1].m, Math.max(1, today - 1));
+    credits.push({ id: "mau-ck-thieu-nop", memberId: short.memberId, kind: "nop", amount: 150_000, date: d, paymentIntentId: "mau-ck-thieu", paymentItemId: null, note: "Chuyển khoản GODA" });
+  }
+
+  return buildReport(members, withIds, entries, credits);
 }

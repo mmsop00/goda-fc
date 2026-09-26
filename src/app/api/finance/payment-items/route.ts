@@ -6,6 +6,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireMember } from "@/lib/finance-auth";
+import { getCreditBalance } from "@/lib/finance/status";
 
 export const dynamic = "force-dynamic";
 
@@ -26,5 +27,6 @@ export async function GET() {
     else if (item.status === "da_dong") summary.daDong += item.amount;
   }
 
-  return NextResponse.json({ items, summary });
+  const credit = await getCreditBalance(session.memberId);
+  return NextResponse.json({ items, summary, credit });
 }

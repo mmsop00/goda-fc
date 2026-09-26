@@ -1504,6 +1504,9 @@ export interface MemberPublic {
   joinYear?: number;
   joinDate?: string;
   status?: string;
+  /** Chân thuận — thành viên tự điền trong Hồ sơ cầu thủ */
+  preferredFoot?: "phai" | "trai" | "hai_chan";
+  hometown?: string;
 }
 
 export type AlbumCategory = "Trận đấu" | "Sự kiện" | "Sinh hoạt" | "Kỷ niệm" | "Video";

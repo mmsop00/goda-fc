@@ -19,6 +19,8 @@ interface PaymentItemRow {
 interface ItemsResponse {
   items: PaymentItemRow[];
   summary: { chuaDong: number; choDuyet: number; daDong: number };
+  /** Số dư nộp thừa/thiếu của mình */
+  credit: number;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -40,16 +42,39 @@ export default function MemberDashboardPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [usingCredit, setUsingCredit] = useState<string | null>(null);
 
-  useEffect(() => {
-    Promise.all([
+  function load() {
+    return Promise.all([
       fetch("/api/finance/summary").then((r) => r.json()),
       fetch("/api/finance/payment-items").then((r) => r.json()),
     ]).then(([summary, items]) => {
       setTotalFund(summary.totalFund ?? 0);
       setData(items);
     });
+  }
+
+  useEffect(() => {
+    load();
   }, []);
+
+  async function payWithCredit(item: PaymentItemRow) {
+    if (!confirm(`Trừ ${formatVnd(item.amount)} từ số dư để đóng "${item.bill.title}"?`)) return;
+    setUsingCredit(item.id);
+    setError("");
+    const res = await fetch(`/api/finance/payment-items/${item.id}/use-credit`, { method: "POST" });
+    const json = await res.json().catch(() => ({}));
+    setUsingCredit(null);
+    if (!res.ok) return setError(json.error || "Không trừ được số dư");
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.delete(item.id);
+      return next;
+    });
+    setNotice(`Đã trừ số dư cho "${item.bill.title}" — số dư còn ${formatVnd(json.credit)}`);
+    load();
+  }
 
   function toggle(id: string) {
     setSelected((prev) => {
@@ -92,6 +117,7 @@ export default function MemberDashboardPage() {
   const selectedTotal = data.items
     .filter((i) => selected.has(i.id))
     .reduce((sum, i) => sum + i.amount, 0);
+  const credit = data.credit ?? 0;
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
@@ -130,6 +156,26 @@ export default function MemberDashboardPage() {
         </Card>
       </div>
 
+      {credit > 0 && (
+        <Card size="sm">
+          <CardContent className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-xs text-gray-500">Số dư của tôi (nộp thừa / thiếu)</p>
+              <p className="text-lg font-bold text-goda-navy">{formatVnd(credit)}</p>
+            </div>
+            <p className="max-w-sm text-xs text-gray-500">
+              Khoản nào có số tiền không quá số dư thì bấm <strong>Trừ số dư</strong> để đóng luôn. Khoản thu mới sẽ tự
+              trừ nếu số dư đủ trọn khoản.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {notice && (
+        <Alert>
+          <AlertDescription>{notice}</AlertDescription>
+        </Alert>
+      )}
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
@@ -163,8 +209,24 @@ export default function MemberDashboardPage() {
                     )}
                   </div>
                 </div>
-                <span className="font-semibold text-sm whitespace-nowrap">
-                  {formatVnd(item.amount)}
+                <span className="flex flex-col items-end gap-1">
+                  <span className="font-semibold text-sm whitespace-nowrap">{formatVnd(item.amount)}</span>
+                  {credit >= item.amount && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        payWithCredit(item);
+                      }}
+                      disabled={usingCredit !== null}
+                      className="rounded-md px-2 py-0.5 text-xs font-medium text-goda-navy ring-1 ring-goda-navy/30 hover:bg-goda-navy/5 disabled:opacity-50"
+                    >
+                      {usingCredit === item.id ? "Đang trừ..." : "Trừ số dư"}
+                    </button>
+                  )}
+                  {credit > 0 && credit < item.amount && (
+                    <span className="text-[11px] text-gray-500">Cần thêm {formatVnd(item.amount - credit)}</span>
+                  )}
                 </span>
               </label>
             ))

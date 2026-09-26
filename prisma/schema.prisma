@@ -82,11 +82,17 @@ model Member {
   goals     Int      @default(0)
   assists   Int      @default(0)
   mvp       Int      @default(0)
-  birthday  String?  // DD/MM
+  birthday  String?  // DD/MM/YYYY (dữ liệu seed cũ chỉ có DD/MM)
   joinYear  Int?
   status    String   @default("Đang thi đấu")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // ─── Hồ sơ cầu thủ — thành viên tự sửa, ghi đè lên thẻ cầu thủ công khai ───
+  joinDate           String?   // DD/MM/YYYY hoặc chỉ năm YYYY
+  preferredFoot      String?   // phai | trai | hai_chan
+  hometown           String?
+  profileUpdatedAt   DateTime? // có giá trị = đã tự sửa hồ sơ → dùng thay dữ liệu mặc định
 
   // ─── Cổng tài chính (đăng nhập bằng số điện thoại) ───
   // Không @unique: db push chạy non-interactive trên Vercel sẽ dừng vì cảnh
@@ -98,6 +104,7 @@ model Member {
 
   billsCreated   Bill[]          @relation("BillsCreated")
   fundEntries    FundEntry[]     @relation("FundEntriesCreated")
+  credits        CreditEntry[]   @relation("MemberCredits")
   paymentItems   PaymentItem[]   @relation("MemberPaymentItems")
   paymentIntents PaymentIntent[] @relation("MemberPaymentIntents")
 }
@@ -118,6 +125,25 @@ model Bill {
 
   createdBy Member        @relation("BillsCreated", fields: [createdByMemberId], references: [id])
   items     PaymentItem[]
+}
+
+/// Sổ số dư của từng thành viên — chỉ phát sinh khi nộp thừa / nộp thiếu.
+/// Số dư = tổng `amount`. Mỗi lần duyệt: +tiền thực nhận ("nop"), −từng khoản được
+/// trừ trọn ("tru"); nộp đúng thì 2 dòng triệt tiêu, số dư không đổi.
+model CreditEntry {
+  id                String   @id @default(cuid())
+  memberId          String
+  kind              String   // nop | tru | dieu_chinh
+  amount            Int      // + tăng số dư, − giảm số dư
+  paymentIntentId   String?  // lần chuyển khoản (kind = nop)
+  paymentItemId     String?  // khoản được trừ (kind = tru)
+  note              String?
+  createdByMemberId String?
+  createdAt         DateTime @default(now())
+
+  member Member @relation("MemberCredits", fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
 }
 
 /// Sổ quỹ ghi tay của chủ tịch: khoản chi, và khoản thu không qua đóng quỹ
@@ -169,6 +195,7 @@ model PaymentIntent {
   confirmedAt         DateTime?
   confirmedByMemberId String?
   rejectionNote       String?
+  receivedAmount      Int?      // số tiền chủ tịch thực nhận (có thể thừa/thiếu so với totalAmount)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 

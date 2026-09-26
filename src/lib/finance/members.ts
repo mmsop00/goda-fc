@@ -13,11 +13,13 @@ export interface FinanceMember {
 export async function getFinanceMembers(): Promise<FinanceMember[]> {
   const rows = await prisma.member.findMany({
     where: { phone: { not: null } },
-    select: { id: true, name: true, birthday: true },
+    select: { id: true, name: true, birthday: true, profileUpdatedAt: true },
   });
   const order = new Map(MOCK_MEMBERS.map((m, i) => [m.name, i]));
   const birthdays = new Map(MOCK_MEMBERS.map((m) => [m.name, m.birthday]));
+  // Ngày sinh tự sửa trong Hồ sơ cầu thủ được ưu tiên (dùng để tính miễn quỹ từ 70 tuổi)
+  const edited = (r: (typeof rows)[number]) => (r.profileUpdatedAt && r.birthday ? r.birthday : null);
   return rows
-    .map((r) => ({ id: r.id, name: r.name, birthday: birthdays.get(r.name) ?? r.birthday ?? null }))
+    .map((r) => ({ id: r.id, name: r.name, birthday: edited(r) ?? birthdays.get(r.name) ?? r.birthday ?? null }))
     .sort((a, b) => (order.get(a.name) ?? 999) - (order.get(b.name) ?? 999));
 }

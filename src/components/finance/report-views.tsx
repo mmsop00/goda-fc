@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatIsoDate, formatPeriod, formatVnd } from "@/lib/finance/format";
+import { MoneyInput } from "@/components/finance/money-input";
 import {
   BalanceChart,
   CategoryBars,
@@ -40,6 +41,8 @@ type OpenDetail = (d: Detail) => void;
 export type Basis = "cash" | "accrual";
 
 const monthKey = (r: LedgerRow, basis: Basis) => (basis === "cash" ? r.date.slice(0, 7) : r.period);
+/** Tiền thực nộp chỉ tính theo dòng tiền, khoản đóng qua số dư chỉ tính theo kỳ — không đếm 2 lần */
+const inBasis = (r: LedgerRow, basis: Basis) => r.basis === "both" || r.basis === basis;
 
 const selectClass =
   "h-8 rounded-lg border border-input bg-white px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
@@ -260,6 +263,7 @@ export function DetailSheet({
   onBack,
   onClose,
   canEdit = false,
+  onChanged,
 }: {
   report: FinanceReport;
   stack: Detail[];
@@ -268,6 +272,8 @@ export function DetailSheet({
   onClose: () => void;
   /** Chủ tịch, đang xem số liệu thật → hiện nút sửa */
   canEdit?: boolean;
+  /** Gọi sau khi chủ tịch điều chỉnh số dư, để tải lại báo cáo */
+  onChanged?: () => void;
 }) {
   const detail = stack[stack.length - 1];
 
@@ -335,11 +341,12 @@ export function DetailSheet({
     body = (
       <>
         {member && (
-          <div className="grid grid-cols-3 gap-2 px-4 pb-3 text-center">
+          <div className="grid grid-cols-2 gap-2 px-4 pb-3 text-center sm:grid-cols-4">
             {[
               ["Đã đóng", formatVnd(member.daDong)],
               ["Chờ duyệt", formatVnd(member.choDuyet)],
               ["Còn nợ", formatVnd(member.chuaDong)],
+              ["Số dư", formatVnd(member.soDu)],
             ].map(([l, v]) => (
               <div key={l} className="rounded-lg bg-goda-soft-gray px-2 py-2">
                 <p className="text-[11px] text-gray-500">{l}</p>
@@ -369,6 +376,13 @@ export function DetailSheet({
             ))}
           </ul>
         )}
+        <CreditHistory
+          rows={report.credits.filter((c) => c.memberId === detail.memberId)}
+          memberId={detail.memberId}
+          balance={member?.soDu ?? 0}
+          canEdit={canEdit}
+          onChanged={onChanged}
+        />
       </>
     );
   }
@@ -449,8 +463,131 @@ function BillDetail({ bill, onOpen, canEdit }: { bill: BillProgress; onOpen: Ope
   );
 }
 
+const CREDIT_KIND: Record<string, string> = { nop: "Nộp tiền", tru: "Trừ vào khoản", dieu_chinh: "Chủ tịch điều chỉnh" };
+
+/** Lịch sử số dư (nộp thừa/thiếu) của 1 thành viên; chủ tịch điều chỉnh được. */
+function CreditHistory({
+  rows,
+  memberId,
+  balance,
+  canEdit,
+  onChanged,
+}: {
+  rows: FinanceReport["credits"];
+  memberId: string;
+  balance: number;
+  canEdit: boolean;
+  onChanged?: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [sign, setSign] = useState<1 | -1>(1);
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  if (rows.length === 0 && !canEdit) return null;
+
+  async function submit() {
+    setError("");
+    if (!Number(amount)) return setError("Nhập số tiền");
+    if (!note.trim()) return setError("Ghi lý do điều chỉnh");
+    setBusy(true);
+    const res = await fetch("/api/finance/credits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ memberId, amount: sign * Number(amount), note }),
+    });
+    const json = await res.json().catch(() => ({}));
+    setBusy(false);
+    if (!res.ok) return setError(json.error || "Không lưu được");
+    setOpen(false);
+    setAmount("");
+    setNote("");
+    onChanged?.();
+  }
+
+  return (
+    <section className="mt-4">
+      <h3 className="flex items-center justify-between border-y border-border/60 bg-goda-soft-gray/60 px-4 py-1.5 text-xs font-medium text-gray-600">
+        <span>Số dư nộp thừa / thiếu</span>
+        <span className="tabular-nums">{formatVnd(balance)}</span>
+      </h3>
+      {rows.length === 0 ? (
+        <p className="px-4 py-3 text-xs text-gray-500">Chưa phát sinh số dư — nộp đúng số tiền các khoản.</p>
+      ) : (
+        <ul className="divide-y divide-border/60">
+          {rows.map((c) => (
+            <li key={c.id} className="flex items-center gap-3 px-4 py-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-gray-900">{CREDIT_KIND[c.kind] ?? c.kind}</p>
+                <p className="truncate text-xs text-gray-500">
+                  {formatIsoDate(c.date)}
+                  {c.note && ` · ${c.note}`}
+                </p>
+              </div>
+              <span className={`text-sm font-semibold tabular-nums ${c.amount > 0 ? "text-[#006300]" : "text-gray-900"}`}>
+                {c.amount > 0 ? "+" : "−"}
+                {formatVnd(Math.abs(c.amount))}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {canEdit && (
+        <div className="px-4 pt-2">
+          {!open ? (
+            <button type="button" onClick={() => setOpen(true)} className="text-sm text-goda-navy underline">
+              Điều chỉnh số dư
+            </button>
+          ) : (
+            <div className="space-y-2 rounded-lg bg-goda-soft-gray/60 p-3">
+              <div className="flex gap-2">
+                {([
+                  [1, "Cộng thêm"],
+                  [-1, "Trừ bớt"],
+                ] as const).map(([v, label]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setSign(v)}
+                    className={`rounded-full px-3 py-1 text-xs ring-1 ${sign === v ? "bg-goda-navy text-white ring-goda-navy" : "bg-white text-gray-700 ring-black/10"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <MoneyInput value={amount} onChange={setAmount} placeholder="Số tiền" />
+              <input
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Lý do (vd: số dư cũ chuyển sang)"
+                className={`${selectClass} w-full`}
+              />
+              {error && <p className="text-xs text-red-600">{error}</p>}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={submit}
+                  disabled={busy}
+                  className="rounded-md bg-goda-navy px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+                >
+                  {busy ? "Đang lưu..." : "Lưu điều chỉnh"}
+                </button>
+                <button type="button" onClick={() => setOpen(false)} className="text-xs text-gray-600 underline">
+                  Huỷ
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
 // ─── Tổng quan ─────────────────────────────────────────
-export function Overview({ report, onOpen, basis }: { report: FinanceReport; onOpen: OpenDetail; basis: Basis }) {
+export function Overview({ report: full, onOpen, basis }: { report: FinanceReport; onOpen: OpenDetail; basis: Basis }) {
+  const report = useMemo(() => ({ ...full, ledger: full.ledger.filter((r) => inBasis(r, basis)) }), [full, basis]);
   const years = useMemo(() => {
     const set = new Set([currentMonthKey().slice(0, 4)]);
     for (const r of report.ledger) set.add(monthKey(r, basis).slice(0, 4));
@@ -491,6 +628,11 @@ export function Overview({ report, onOpen, basis }: { report: FinanceReport; onO
             <p>
               Đang chờ duyệt: <strong className="text-gray-900">{formatVnd(report.outstanding.choDuyet)}</strong>
             </p>
+            {report.outstanding.creditHeld > 0 && (
+              <p title="Tiền thành viên nộp thừa/thiếu, đang nằm trong quỹ nhưng chưa trừ vào khoản nào">
+                Số dư thành viên đang giữ: <strong className="text-gray-900">{formatVnd(report.outstanding.creditHeld)}</strong>
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -655,7 +797,7 @@ export function Overview({ report, onOpen, basis }: { report: FinanceReport; onO
 
 // ─── Sổ thu chi ────────────────────────────────────────
 export function Ledger({
-  report,
+  report: full,
   onOpen,
   onDelete,
   basis,
@@ -666,6 +808,7 @@ export function Ledger({
   /** Chỉ truyền khi là chủ tịch và đang xem dữ liệu thật */
   onDelete?: (r: LedgerRow) => void;
 }) {
+  const report = useMemo(() => ({ ...full, ledger: full.ledger.filter((r) => inBasis(r, basis)) }), [full, basis]);
   const [q, setQ] = useState("");
   const [direction, setDirection] = useState<"all" | "thu" | "chi">("all");
   const [category, setCategory] = useState("all");
@@ -783,8 +926,8 @@ export function Members({ report, onOpen }: { report: FinanceReport; onOpen: Ope
     (m) => (filter === "all" || statusOf(m) === filter) && (!needle || m.name.toLowerCase().includes(needle))
   );
   const total = rows.reduce(
-    (s, m) => ({ daDong: s.daDong + m.daDong, choDuyet: s.choDuyet + m.choDuyet, chuaDong: s.chuaDong + m.chuaDong }),
-    { daDong: 0, choDuyet: 0, chuaDong: 0 }
+    (s, m) => ({ daDong: s.daDong + m.daDong, choDuyet: s.choDuyet + m.choDuyet, chuaDong: s.chuaDong + m.chuaDong, soDu: s.soDu + m.soDu }),
+    { daDong: 0, choDuyet: 0, chuaDong: 0, soDu: 0 }
   );
   const STANDING = {
     no: { status: "chua_dong", label: "Còn nợ" },
@@ -825,7 +968,8 @@ export function Members({ report, onOpen }: { report: FinanceReport; onOpen: Ope
                 <th className="px-4 py-2 font-medium">Thành viên</th>
                 <th className="px-3 py-2 text-right font-medium">Đã đóng</th>
                 <th className="hidden px-3 py-2 text-right font-medium sm:table-cell">Chờ duyệt</th>
-                <th className="px-4 py-2 text-right font-medium">Còn nợ</th>
+                <th className="px-3 py-2 text-right font-medium">Còn nợ</th>
+                <th className="hidden px-4 py-2 text-right font-medium sm:table-cell">Số dư</th>
               </tr>
             </thead>
             <tbody className="tabular-nums">
@@ -850,10 +994,12 @@ export function Members({ report, onOpen }: { report: FinanceReport; onOpen: Ope
                       {st === "no" && m.choDuyet > 0 && (
                         <p className="text-xs text-gray-500 sm:hidden">Chờ duyệt {formatVnd(m.choDuyet)}</p>
                       )}
+                      {m.soDu > 0 && <p className="text-xs text-gray-500 sm:hidden">Số dư {formatVnd(m.soDu)}</p>}
                     </td>
                     <td className="px-3 py-2 text-right">{m.daDong ? formatVnd(m.daDong) : "—"}</td>
                     <td className="hidden px-3 py-2 text-right sm:table-cell">{m.choDuyet ? formatVnd(m.choDuyet) : "—"}</td>
-                    <td className="px-4 py-2 text-right font-medium">{m.chuaDong ? formatVnd(m.chuaDong) : "—"}</td>
+                    <td className="px-3 py-2 text-right font-medium">{m.chuaDong ? formatVnd(m.chuaDong) : "—"}</td>
+                    <td className="hidden px-4 py-2 text-right sm:table-cell">{m.soDu ? formatVnd(m.soDu) : "—"}</td>
                   </tr>
                 );
               })}
@@ -863,7 +1009,8 @@ export function Members({ report, onOpen }: { report: FinanceReport; onOpen: Ope
                 <td className="px-4 py-2 font-semibold">Tổng ({rows.length} người)</td>
                 <td className="px-3 py-2 text-right font-semibold">{formatVnd(total.daDong)}</td>
                 <td className="hidden px-3 py-2 text-right font-semibold sm:table-cell">{formatVnd(total.choDuyet)}</td>
-                <td className="px-4 py-2 text-right font-semibold">{formatVnd(total.chuaDong)}</td>
+                <td className="px-3 py-2 text-right font-semibold">{formatVnd(total.chuaDong)}</td>
+                <td className="hidden px-4 py-2 text-right font-semibold sm:table-cell">{formatVnd(total.soDu)}</td>
               </tr>
             </tfoot>
           </table>

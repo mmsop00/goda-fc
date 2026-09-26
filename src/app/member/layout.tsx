@@ -6,6 +6,7 @@ import { MemberTabs, type TabItem } from "./member-tabs";
 // Các tính năng của khu thành viên — thêm tính năng mới thì thêm 1 tab ở đây.
 const TABS: TabItem[] = [
   { label: "Quỹ CLB", href: "/member/quy" },
+  { label: "Hồ sơ cầu thủ", href: "/member/ho-so" },
   { label: "Tài khoản", href: "/member/doi-mat-khau" },
 ];
 

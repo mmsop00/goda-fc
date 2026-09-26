@@ -33,7 +33,70 @@ export async function createBill(params: {
     await tx.paymentItem.createMany({
       data: params.items.map((it) => ({ billId: bill.id, memberId: it.memberId, amount: it.amount })),
     });
+    const created = await tx.paymentItem.findMany({ where: { billId: bill.id } });
+    await payFromCredit(tx, created, bill.title);
     return bill;
+  });
+}
+
+// ─── Số dư thành viên (chỉ phát sinh khi nộp thừa / nộp thiếu) ───
+
+async function creditBalances(tx: Prisma.TransactionClient, memberIds: string[]) {
+  const rows = await tx.creditEntry.groupBy({ by: ["memberId"], where: { memberId: { in: memberIds } }, _sum: { amount: true } });
+  return new Map(rows.map((r) => [r.memberId, r._sum.amount ?? 0]));
+}
+
+export async function getCreditBalance(memberId: string): Promise<number> {
+  const r = await prisma.creditEntry.aggregate({ where: { memberId }, _sum: { amount: true } });
+  return r._sum.amount ?? 0;
+}
+
+/** Khoản vừa tạo: ai có số dư đủ TRỌN khoản thì trừ luôn và coi như đã đóng.
+ * Không đủ thì để nguyên — không bao giờ trừ một phần. */
+async function payFromCredit(
+  tx: Prisma.TransactionClient,
+  items: { id: string; memberId: string; amount: number; status: string }[],
+  billTitle: string
+) {
+  const open = items.filter((it) => it.status === "chua_dong");
+  if (open.length === 0) return;
+  const balances = await creditBalances(tx, [...new Set(open.map((it) => it.memberId))]);
+  const now = new Date();
+  for (const it of open) {
+    const bal = balances.get(it.memberId) ?? 0;
+    if (bal < it.amount) continue;
+    await tx.paymentItem.update({ where: { id: it.id }, data: { status: "da_dong", confirmedAt: now } });
+    await tx.creditEntry.create({
+      data: { memberId: it.memberId, kind: "tru", amount: -it.amount, paymentItemId: it.id, note: `Tự trừ số dư cho ${billTitle}` },
+    });
+    balances.set(it.memberId, bal - it.amount);
+  }
+}
+
+/** Thành viên tự bấm "Trừ vào số dư" cho 1 khoản — chỉ khi số dư đủ trọn khoản. */
+export async function payItemWithCredit(memberId: string, itemId: string) {
+  return prisma.$transaction(async (tx) => {
+    const item = await tx.paymentItem.findUnique({ where: { id: itemId }, include: { bill: { select: { title: true } } } });
+    if (!item || item.memberId !== memberId) throw new FinanceRuleError("Không tìm thấy khoản cần đóng");
+    if (item.status !== "chua_dong") throw new FinanceRuleError("Khoản này không còn ở trạng thái chưa đóng");
+    const bal = (await creditBalances(tx, [memberId])).get(memberId) ?? 0;
+    if (bal < item.amount) throw new FinanceRuleError("Số dư không đủ để trừ trọn khoản này");
+    await cancelOpenIntents(tx, [item.id]);
+    await tx.paymentItem.update({ where: { id: item.id }, data: { status: "da_dong", confirmedAt: new Date() } });
+    await tx.creditEntry.create({
+      data: { memberId, kind: "tru", amount: -item.amount, paymentItemId: item.id, note: `Trừ số dư cho ${item.bill.title}` },
+    });
+    return bal - item.amount;
+  });
+}
+
+/** Chủ tịch điều chỉnh số dư (vd sửa nhầm, số dư cũ chuyển sang). Không làm số dư âm. */
+export async function adjustCredit(memberId: string, amount: number, note: string, chairmanMemberId: string) {
+  return prisma.$transaction(async (tx) => {
+    const bal = (await creditBalances(tx, [memberId])).get(memberId) ?? 0;
+    if (bal + amount < 0) throw new FinanceRuleError(`Số dư hiện có ${bal.toLocaleString("vi-VN")}đ — không trừ quá số này được`);
+    await tx.creditEntry.create({ data: { memberId, kind: "dieu_chinh", amount, note, createdByMemberId: chairmanMemberId } });
+    return bal + amount;
   });
 }
 
@@ -92,6 +155,8 @@ export async function updateBill(
     }
     if (toCreate.length) {
       await tx.paymentItem.createMany({ data: toCreate.map((it) => ({ billId, memberId: it.memberId, amount: it.amount })) });
+      const added = await tx.paymentItem.findMany({ where: { billId, memberId: { in: toCreate.map((it) => it.memberId) } } });
+      await payFromCredit(tx, added, input.title);
     }
 
     return tx.bill.update({
@@ -194,25 +259,47 @@ export async function submitReceipt(params: {
   });
 }
 
-/** Chủ tịch xác nhận — đã tự đối chiếu tài khoản ngân hàng thật. */
-export async function approveIntent(intentId: string, chairmanMemberId: string) {
+/** Chủ tịch xác nhận, nhập số tiền THỰC NHẬN (đối chiếu tài khoản ngân hàng thật).
+ * Tiền nhận + số dư sẵn có được trừ cho TRỌN từng khoản (khoản cũ trước); khoản
+ * không đủ tiền quay về "chưa đóng"; phần còn lại nằm trong số dư.
+ * Nộp đúng số tiền → mọi khoản đã đóng, số dư không đổi. */
+export async function approveIntent(intentId: string, chairmanMemberId: string, receivedAmount?: number) {
   return prisma.$transaction(async (tx) => {
     const intent = await tx.paymentIntent.findUniqueOrThrow({
       where: { id: intentId },
-      include: { items: true },
+      include: { items: { include: { paymentItem: { include: { bill: { select: { title: true, createdAt: true } } } } } } },
     });
-    const itemIds = intent.items.map((link) => link.paymentItemId);
+    const received = receivedAmount ?? intent.totalAmount;
     const now = new Date();
+    const items = intent.items
+      .map((l) => l.paymentItem)
+      .filter((it) => it.status === "cho_duyet" && it.paidIntentId === intent.id)
+      .sort((x, y) => x.bill.createdAt.getTime() - y.bill.createdAt.getTime());
 
-    await tx.paymentItem.updateMany({
-      where: { id: { in: itemIds } },
-      data: { status: "da_dong", confirmedAt: now, confirmedByMemberId: chairmanMemberId },
+    let pool = ((await creditBalances(tx, [intent.memberId])).get(intent.memberId) ?? 0) + received;
+    await tx.creditEntry.create({
+      data: { memberId: intent.memberId, kind: "nop", amount: received, paymentIntentId: intent.id, note: `Chuyển khoản ${intent.code}`, createdByMemberId: chairmanMemberId },
     });
 
-    return tx.paymentIntent.update({
+    let paid = 0;
+    for (const it of items) {
+      if (pool >= it.amount) {
+        pool -= it.amount;
+        paid++;
+        await tx.paymentItem.update({ where: { id: it.id }, data: { status: "da_dong", confirmedAt: now, confirmedByMemberId: chairmanMemberId } });
+        await tx.creditEntry.create({
+          data: { memberId: intent.memberId, kind: "tru", amount: -it.amount, paymentItemId: it.id, paymentIntentId: intent.id, note: `Trừ cho ${it.bill.title}` },
+        });
+      } else {
+        await tx.paymentItem.update({ where: { id: it.id }, data: { status: "chua_dong", paidIntentId: null } });
+      }
+    }
+
+    await tx.paymentIntent.update({
       where: { id: intentId },
-      data: { status: "da_xac_nhan", confirmedAt: now, confirmedByMemberId: chairmanMemberId },
+      data: { status: "da_xac_nhan", confirmedAt: now, confirmedByMemberId: chairmanMemberId, receivedAmount: received },
     });
+    return { paid, unpaid: items.length - paid, creditAfter: pool };
   });
 }
 
