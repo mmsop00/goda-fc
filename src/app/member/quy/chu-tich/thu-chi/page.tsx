@@ -6,6 +6,7 @@ import { Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateBillForm } from "@/components/finance/create-bill-form";
 import { FundEntryForm } from "@/components/finance/fund-entry-form";
+import { AutoMonthlyCard } from "@/components/finance/auto-monthly-card";
 import { formatPeriod, formatVnd } from "@/lib/finance/format";
 import type { Direction } from "@/lib/finance/categories";
 
@@ -154,6 +155,7 @@ function ThuChiContent() {
 
       {mode === "thu_thanh_vien" && (
         <>
+          {!editBillId && <AutoMonthlyCard />}
           <CreateBillForm
             key={editBillId ?? "moi"}
             editId={editBillId ?? undefined}

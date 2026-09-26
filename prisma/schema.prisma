@@ -363,3 +363,13 @@ model DonationReceipt {
 
   donation Donation @relation(fields: [donationId], references: [id], onDelete: Cascade)
 }
+
+/// Cài đặt quỹ CLB (1 dòng duy nhất, id = "default")
+model FundSetting {
+  id                String   @id @default("default")
+  autoMonthly       Boolean  @default(false) // tự tạo "Quỹ tháng MM/YYYY" lúc 00:00 ngày 1 hằng tháng
+  monthlyAmount     Int      @default(200000) // số tiền mỗi người
+  dueDay            Int?     // hạn đóng: ngày mấy trong tháng (trống = không đặt hạn)
+  updatedByMemberId String?
+  updatedAt         DateTime @updatedAt
+}
