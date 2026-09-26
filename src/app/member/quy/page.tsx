@@ -121,54 +121,53 @@ export default function MemberDashboardPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs text-gray-500">Số dư quỹ CLB</CardTitle>
-          </CardHeader>
-          <CardContent className="text-lg font-bold text-goda-navy">
-            {formatVnd(totalFund)}
+      {/* Hàng 1: 2 loại số dư — quỹ chung của CLB và số dư riêng của mình, để không nhầm */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card size="sm">
+          <CardContent>
+            <p className="text-xs text-gray-500">Số dư quỹ CLB</p>
+            <p className="mt-1 text-lg font-bold text-goda-navy">{formatVnd(totalFund)}</p>
+            <p className="mt-0.5 text-[11px] text-gray-500">Tiền cả CLB đang có</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs text-gray-500">Chưa đóng</CardTitle>
-          </CardHeader>
-          <CardContent className="text-lg font-bold text-red-600">
-            {formatVnd(data.summary.chuaDong)}
+        <Card size="sm" className={credit > 0 ? "ring-2 ring-goda-yellow" : ""}>
+          <CardContent>
+            <p className="text-xs text-gray-500">Số dư của tôi</p>
+            <p className="mt-1 text-lg font-bold text-goda-navy">{formatVnd(credit)}</p>
+            <p className="mt-0.5 text-[11px] text-gray-500">
+              {credit > 0 ? "Tiền bạn nộp thừa/thiếu — dùng để trừ vào khoản sau" : "Tiền nộp thừa/thiếu sẽ nằm ở đây"}
+            </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs text-gray-500">Chờ duyệt</CardTitle>
-          </CardHeader>
-          <CardContent className="text-lg font-bold text-amber-600">
-            {formatVnd(data.summary.choDuyet)}
+      </div>
+
+      {/* Hàng 2: các khoản của mình */}
+      <div className="grid grid-cols-3 gap-3">
+        <Card size="sm">
+          <CardContent>
+            <p className="text-xs text-gray-500">Chưa đóng</p>
+            <p className="mt-1 text-sm font-bold text-red-600 tabular-nums sm:text-lg">{formatVnd(data.summary.chuaDong)}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs text-gray-500">Đã đóng</CardTitle>
-          </CardHeader>
-          <CardContent className="text-lg font-bold text-green-600">
-            {formatVnd(data.summary.daDong)}
+        <Card size="sm">
+          <CardContent>
+            <p className="text-xs text-gray-500">Chờ duyệt</p>
+            <p className="mt-1 text-sm font-bold text-amber-600 tabular-nums sm:text-lg">{formatVnd(data.summary.choDuyet)}</p>
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardContent>
+            <p className="text-xs text-gray-500">Đã đóng</p>
+            <p className="mt-1 text-sm font-bold text-green-600 tabular-nums sm:text-lg">{formatVnd(data.summary.daDong)}</p>
           </CardContent>
         </Card>
       </div>
 
       {credit > 0 && (
-        <Card size="sm">
-          <CardContent className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-xs text-gray-500">Số dư của tôi (nộp thừa / thiếu)</p>
-              <p className="text-lg font-bold text-goda-navy">{formatVnd(credit)}</p>
-            </div>
-            <p className="max-w-sm text-xs text-gray-500">
-              Khoản nào có số tiền không quá số dư thì bấm <strong>Trừ số dư</strong> để đóng luôn. Khoản thu mới sẽ tự
-              trừ nếu số dư đủ trọn khoản.
-            </p>
-          </CardContent>
-        </Card>
+        <p className="rounded-lg bg-goda-yellow/15 px-4 py-2.5 text-xs text-gray-700">
+          Khoản nào có số tiền không quá số dư thì bấm <strong>Trừ số dư</strong> để đóng luôn. Khoản thu mới sẽ tự trừ
+          nếu số dư đủ trọn khoản.
+        </p>
       )}
 
       {notice && (
