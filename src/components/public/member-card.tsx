@@ -114,6 +114,37 @@ function getTag(
   return "Reliable";
 }
 
+// Chân thuận kiểu thẻ FIFA: 2 bàn chân (trái | phải), chân thuận tô đậm, chân
+// còn lại nhạt; "Hai chân" thì đậm cả hai. Không cần chữ — chữ chỉ để ở tooltip.
+function FootShape({ strong, left }: { strong: boolean; left?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 20 32"
+      className={`h-4 w-2.5 ${strong ? "fill-goda-navy" : "fill-gray-300"}`}
+      style={left ? { transform: "scaleX(-1)" } : undefined}
+      aria-hidden
+    >
+      {/* gan bàn chân phải (ngón cái bên trái), ngón chân là các chấm */}
+      <path d="M6.5 11c3.4-1 8.2-.6 9.4 3.3 1.3 4.3-.4 7.4-1.2 10.8-.7 3.1-2 6.1-5 6.1-3.3 0-4.4-3-4.6-6.3-.2-3.1-.8-5-1.5-7.8C3 14.4 3.7 11.8 6.5 11Z" />
+      <ellipse cx="5.2" cy="5.6" rx="2.5" ry="3.1" />
+      <circle cx="9.6" cy="3.6" r="1.7" />
+      <circle cx="12.9" cy="4.4" r="1.5" />
+      <circle cx="15.5" cy="6.1" r="1.3" />
+      <circle cx="17.3" cy="8.6" r="1.1" />
+    </svg>
+  );
+}
+
+function FootIcons({ foot }: { foot: keyof typeof FOOT_LABEL }) {
+  const label = `Chân thuận: ${FOOT_LABEL[foot]}`;
+  return (
+    <span className="inline-flex items-end gap-0.5" title={label} aria-label={label} role="img">
+      <FootShape left strong={foot !== "phai"} />
+      <FootShape strong={foot !== "trai"} />
+    </span>
+  );
+}
+
 export function MemberCard({ member, isLoading }: MemberCardProps) {
   if (isLoading) {
     return (
@@ -285,7 +316,7 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
                   ? member.joinYear
                   : "—"}
             </span>
-            {member.preferredFoot && <span>🦶 {FOOT_LABEL[member.preferredFoot]}</span>}
+            {member.preferredFoot && <FootIcons foot={member.preferredFoot} />}
             {member.hometown && <span>📍 {member.hometown}</span>}
           </div>
         </div>

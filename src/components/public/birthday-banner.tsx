@@ -116,7 +116,7 @@ export function BirthdayBanner({ members, events, recentDonations = [] }: Birthd
 
   // Mỗi "băng" phải rộng ít nhất bằng màn hình, nếu không khi ít nội dung (vd
   // chỉ 1 sự kiện) sẽ lộ khoảng trống dài và trông như không chạy vòng tròn →
-  // lặp lại bộ chip đủ số lần để phủ kín. Tốc độ giữ ~70px/giây.
+  // lặp lại bộ chip đủ số lần để phủ kín. Tốc độ cố định ~60px/giây trên mọi màn hình.
   const containerRef = useRef<HTMLDivElement>(null);
   const setRef = useRef<HTMLDivElement>(null);
   const [repeat, setRepeat] = useState(1);
@@ -129,7 +129,7 @@ export function BirthdayBanner({ members, events, recentDonations = [] }: Birthd
       const setWidth = set.scrollWidth || 1;
       const n = Math.max(1, Math.ceil(container.clientWidth / setWidth));
       setRepeat(n);
-      setDuration(Math.max(18, Math.round((setWidth * n) / 70)));
+      setDuration(Math.max(6, Math.round((setWidth * n) / 60)));
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -144,7 +144,7 @@ export function BirthdayBanner({ members, events, recentDonations = [] }: Birthd
     Array.from({ length: repeat }, (_, r) => (
       <div key={`${copy}-${r}`} ref={copy === "a" && r === 0 ? setRef : undefined} className="flex items-center gap-2.5 shrink-0">
         {renderChips(`${copy}${r}`)}
-        <span className="w-8 shrink-0" />
+        <span className="w-6 shrink-0" />
       </div>
     ));
 
@@ -179,10 +179,10 @@ export function BirthdayBanner({ members, events, recentDonations = [] }: Birthd
       <div className="pointer-events-none absolute inset-y-0 right-0 w-10 md:w-16 bg-gradient-to-l from-goda-navy to-transparent z-10" />
 
       <div className="flex py-2.5">
-        <div className="gd-ticker-track flex items-center gap-2.5 shrink-0" style={{ animationDuration: `${duration}s` }}>
+        <div className="gd-ticker-track flex items-center shrink-0" style={{ animationDuration: `${duration}s`, ["--gd-dur" as string]: `${duration}s` }}>
           {renderTrack("a")}
         </div>
-        <div aria-hidden className="gd-ticker-track flex items-center gap-2.5 shrink-0" style={{ animationDuration: `${duration}s` }}>
+        <div aria-hidden className="gd-ticker-track flex items-center shrink-0" style={{ animationDuration: `${duration}s`, ["--gd-dur" as string]: `${duration}s` }}>
           {renderTrack("b")}
         </div>
       </div>
@@ -197,11 +197,14 @@ export function BirthdayBanner({ members, events, recentDonations = [] }: Birthd
           animation-timing-function: linear;
           animation-iteration-count: infinite;
         }
-        .gd-ticker:hover .gd-ticker-track {
-          animation-play-state: paused;
+        /* Chỉ dừng khi rê chuột thật; trên điện thoại chạm vào sẽ "dính" hover
+           làm bảng tin đứng yên luôn. Máy bật "giảm chuyển động" vẫn chạy (chậm
+           hơn) thay vì tắt hẳn, để không ai thấy bảng tin bị đứng. */
+        @media (hover: hover) and (pointer: fine) {
+          .gd-ticker:hover .gd-ticker-track { animation-play-state: paused; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .gd-ticker-track { animation: none; }
+          .gd-ticker-track { animation-duration: calc(var(--gd-dur) * 1.6) !important; }
         }
       `}</style>
     </div>
