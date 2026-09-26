@@ -245,9 +245,11 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
               </p>
               {member.preferredFoot && <FootIcons foot={member.preferredFoot} />}
             </div>
-            {member.nickname && (
+            {(member.nickname || member.hometown) && (
               <p className="truncate text-[10px] text-gray-500">
-                &ldquo;{member.nickname}&rdquo;
+                {member.nickname && <>&ldquo;{member.nickname}&rdquo;</>}
+                {member.nickname && member.hometown && " · "}
+                {member.hometown && <>📍 {member.hometown}</>}
               </p>
             )}
           </div>
@@ -319,7 +321,6 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
                   ? member.joinYear
                   : "—"}
             </span>
-            {member.hometown && <span>📍 {member.hometown}</span>}
           </div>
         </div>
       </div>
