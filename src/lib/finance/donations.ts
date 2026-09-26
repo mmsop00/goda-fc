@@ -71,17 +71,24 @@ export async function createDonation(input: DonationInput, ip: string) {
   return { donation, token };
 }
 
-/** Người ủng hộ gửi ảnh bill (phải kèm đúng token). OCR chỉ là gợi ý cho chủ tịch. */
+/** Người ủng hộ gửi ảnh bill (phải kèm đúng token). Lưu ngay; đọc ảnh chạy sau (xem readDonationReceipt). */
 export async function submitDonationReceipt(id: string, token: string, image: Buffer, mimeType: string) {
   const donation = await prisma.donation.findUnique({ where: { id } });
   if (!donation || donation.tokenHash !== sha256(token)) throw new FinanceRuleError("Không tìm thấy lượt ủng hộ");
   if (donation.status !== "cho_bien_lai") throw new FinanceRuleError("Lượt ủng hộ này đã gửi ảnh bill rồi");
-  const ocr = await checkReceiptImage(image, donation.code, donation.amount);
   const expiresAt = new Date(Date.now() + 90 * 86400_000);
   return prisma.$transaction(async (tx) => {
     await tx.donationReceipt.create({ data: { donationId: id, imageData: new Uint8Array(image), mimeType, expiresAt } });
-    return tx.donation.update({ where: { id }, data: { status: "cho_duyet", ocrHint: ocr.hint, ocrRawText: ocr.rawText } });
+    return tx.donation.update({ where: { id }, data: { status: "cho_duyet" } });
   });
+}
+
+/** Đọc ảnh bill (OCR ~15 giây) — gọi trong after() sau khi đã trả lời người gửi. Chỉ là gợi ý. */
+export async function readDonationReceipt(id: string, image: Buffer) {
+  const donation = await prisma.donation.findUnique({ where: { id }, select: { code: true, amount: true } });
+  if (!donation) return;
+  const ocr = await checkReceiptImage(image, donation.code, donation.amount);
+  await prisma.donation.update({ where: { id }, data: { ocrHint: ocr.hint, ocrRawText: ocr.rawText } });
 }
 
 export async function approveDonation(id: string, chairmanMemberId: string, receivedAmount: number) {

@@ -3,7 +3,7 @@
 // POST /api/finance/payment-intents/[id]/receipt  (multipart/form-data, field "file")
 // ═══════════════════════════════════════
 
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireMember } from "@/lib/finance-auth";
 import { submitReceipt } from "@/lib/finance/status";
@@ -52,14 +52,13 @@ export async function POST(
     }
 
     const imageData = Buffer.from(await file.arrayBuffer());
-    const ocr = await checkReceiptImage(imageData, intent.code, intent.totalAmount);
+    const updated = await submitReceipt({ intentId: intent.id, imageData, mimeType: file.type });
 
-    const updated = await submitReceipt({
-      intentId: intent.id,
-      imageData,
-      mimeType: file.type,
-      ocrHint: ocr.hint,
-      ocrRawText: ocr.rawText,
+    // Đọc ảnh (OCR) mất ~15 giây → chạy SAU khi trả lời, để người gửi không phải chờ.
+    // Chỉ là gợi ý cho chủ tịch; lỗi thì bỏ qua.
+    after(async () => {
+      const ocr = await checkReceiptImage(imageData, intent.code, intent.totalAmount);
+      await prisma.paymentIntent.update({ where: { id: intent.id }, data: { ocrHint: ocr.hint, ocrRawText: ocr.rawText } });
     });
 
     return NextResponse.json({

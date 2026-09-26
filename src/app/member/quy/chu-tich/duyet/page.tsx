@@ -149,7 +149,7 @@ export default function ApprovalQueuePage() {
             <CardHeader className="flex-row items-center justify-between gap-2">
               <CardTitle className="text-base">{item.memberName}</CardTitle>
               <Badge variant={item.ocrHint === "likely_match" ? "default" : "secondary"}>
-                {item.ocrHint === "likely_match" ? "Khớp tự động" : "Cần xem lại"}
+                {item.ocrHint === "likely_match" ? "Khớp tự động" : item.ocrHint ? "Cần xem lại" : "Đang đọc ảnh…"}
               </Badge>
             </CardHeader>
             <CardContent className="space-y-3">

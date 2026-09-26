@@ -224,8 +224,9 @@ export async function submitReceipt(params: {
   intentId: string;
   imageData: Buffer;
   mimeType: string;
-  ocrHint: string;
-  ocrRawText: string;
+  /** Kết quả đọc ảnh — thường cập nhật sau (chạy nền), nên có thể bỏ trống */
+  ocrHint?: string | null;
+  ocrRawText?: string | null;
 }) {
   return prisma.$transaction(async (tx) => {
     const intent = await tx.paymentIntent.findUniqueOrThrow({
@@ -254,7 +255,7 @@ export async function submitReceipt(params: {
 
     return tx.paymentIntent.update({
       where: { id: intent.id },
-      data: { status: "cho_duyet", ocrHint: params.ocrHint, ocrRawText: params.ocrRawText },
+      data: { status: "cho_duyet", ocrHint: params.ocrHint ?? null, ocrRawText: params.ocrRawText ?? null },
     });
   });
 }

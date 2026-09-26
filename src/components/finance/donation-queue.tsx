@@ -77,7 +77,7 @@ export function DonationQueue() {
                 {d.anonymous && <span className="ml-1 text-xs font-normal text-gray-500">(hiện “Ẩn danh” trên trang chủ)</span>}
               </CardTitle>
               <Badge variant={d.ocrHint === "likely_match" ? "default" : "secondary"}>
-                {d.ocrHint === "likely_match" ? "Khớp tự động" : "Cần xem lại"}
+                {d.ocrHint === "likely_match" ? "Khớp tự động" : d.ocrHint ? "Cần xem lại" : "Đang đọc ảnh…"}
               </Badge>
             </CardHeader>
             <CardContent className="space-y-3">
