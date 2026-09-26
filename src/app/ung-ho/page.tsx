@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Heart } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MoneyInput } from "@/components/finance/money-input";
-import { BANK_ACCOUNT_NAME, BANK_ACCOUNT_NO, buildVietQrUrl } from "@/lib/finance/config";
 import { formatVnd } from "@/lib/finance/format";
 import { resizeImageFile } from "@/lib/image-resize";
+import { PayAndUpload } from "@/components/finance/pay-and-upload";
 
 interface Pending {
   id: string;
@@ -50,7 +50,6 @@ export default function DonatePage() {
   const [showAmount, setShowAmount] = useState(true);
   const [amount, setAmount] = useState("");
   const [message, setMessage] = useState("");
-  const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -90,31 +89,23 @@ export default function DonatePage() {
     }
   }
 
-  async function upload() {
-    if (!file || !pending) return;
-    setBusy(true);
-    setError("");
-    try {
-      const form = new FormData();
-      form.append("file", await resizeImageFile(file));
-      form.append("token", pending.token);
-      const res = await fetch(`/api/donations/${pending.id}/receipt`, { method: "POST", body: form });
-      const json = await res.json();
-      if (!res.ok) return setError(json.error || "Không gửi được ảnh bill");
-      savePending(null);
-      setStep("done");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch {
-      setError("Lỗi kết nối, vui lòng thử lại");
-    } finally {
-      setBusy(false);
-    }
+  async function upload(file: File): Promise<string | null> {
+    if (!pending) return "Không tìm thấy lượt ủng hộ";
+    const form = new FormData();
+    form.append("file", await resizeImageFile(file));
+    form.append("token", pending.token);
+    const res = await fetch(`/api/donations/${pending.id}/receipt`, { method: "POST", body: form });
+    const json = await res.json();
+    if (!res.ok) return json.error || "Không gửi được ảnh bill";
+    savePending(null);
+    setStep("done");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return null;
   }
 
   function restart() {
     savePending(null);
     setPending(null);
-    setFile(null);
     setError("");
     setStep("form");
   }
@@ -216,48 +207,16 @@ export default function DonatePage() {
           )}
 
           {step === "pay" && pending && (
-            <>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quét mã để chuyển khoản</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={buildVietQrUrl(pending.amount, pending.code)}
-                    alt="Mã QR chuyển khoản ủng hộ"
-                    className="mx-auto rounded-lg border border-border"
-                  />
-                  <div className="text-sm space-y-1 text-center">
-                    <p>
-                      Số tài khoản: <strong>{BANK_ACCOUNT_NO}</strong> ({BANK_ACCOUNT_NAME} — BIDV)
-                    </p>
-                    <p>
-                      Số tiền: <strong>{formatVnd(pending.amount)}</strong>
-                    </p>
-                    <p>
-                      Nội dung: <strong>{pending.code}</strong>
-                    </p>
-                    <p className="text-xs text-gray-500">Quét mã bằng app ngân hàng — số tiền và nội dung tự điền sẵn.</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Chuyển xong, tải ảnh bill lên</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-sm" />
-                  <Button onClick={upload} disabled={!file || busy} className="w-full bg-goda-navy hover:bg-goda-navy/90">
-                    {busy ? "Đang gửi..." : "Gửi ảnh bill"}
-                  </Button>
-                  <button type="button" onClick={restart} className="w-full text-xs text-gray-500 underline">
-                    Nhập lại số tiền khác
-                  </button>
-                </CardContent>
-              </Card>
-            </>
+            <PayAndUpload
+              amount={pending.amount}
+              code={pending.code}
+              onSubmit={upload}
+              footer={
+                <button type="button" onClick={restart} className="w-full text-xs text-gray-500 underline">
+                  Nhập lại số tiền khác
+                </button>
+              }
+            />
           )}
 
           {step === "done" && (
