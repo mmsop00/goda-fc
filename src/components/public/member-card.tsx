@@ -138,7 +138,7 @@ function FootShape({ strong, left }: { strong: boolean; left?: boolean }) {
 function FootIcons({ foot }: { foot: keyof typeof FOOT_LABEL }) {
   const label = `Chân thuận: ${FOOT_LABEL[foot]}`;
   return (
-    <span className="inline-flex items-end gap-0.5" title={label} aria-label={label} role="img">
+    <span className="inline-flex shrink-0 items-end gap-0.5" title={label} aria-label={label} role="img">
       <FootShape left strong={foot !== "phai"} />
       <FootShape strong={foot !== "trai"} />
     </span>
@@ -239,9 +239,12 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
         {/* ── Name + shirt number ── */}
         <div className="flex items-end justify-between gap-2 bg-white/85 px-3 py-2 backdrop-blur-sm">
           <div className="min-w-0">
-            <p className="truncate font-display text-sm font-extrabold leading-tight text-goda-navy">
-              {member.name}
-            </p>
+            <div className="flex min-w-0 items-center gap-1.5">
+              <p className="truncate font-display text-sm font-extrabold leading-tight text-goda-navy">
+                {member.name}
+              </p>
+              {member.preferredFoot && <FootIcons foot={member.preferredFoot} />}
+            </div>
             {member.nickname && (
               <p className="truncate text-[10px] text-gray-500">
                 &ldquo;{member.nickname}&rdquo;
@@ -316,7 +319,6 @@ export function MemberCard({ member, isLoading }: MemberCardProps) {
                   ? member.joinYear
                   : "—"}
             </span>
-            {member.preferredFoot && <FootIcons foot={member.preferredFoot} />}
             {member.hometown && <span>📍 {member.hometown}</span>}
           </div>
         </div>
